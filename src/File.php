@@ -61,4 +61,14 @@ class File extends Flysystem\File
     {
         return $this->filesystem;
     }
+
+    /**
+     * Get the file extension.
+     *
+     * @return string
+     */
+    public function getExtension()
+    {
+        return pathinfo($this->path, PATHINFO_EXTENSION);
+    }
 }
