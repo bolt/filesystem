@@ -1,0 +1,21 @@
+{
+    "name": "bolt/filesystem",
+    "description": "Bolt's filesystem abstraction layer",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Carson Full",
+            "email": "carsonfull@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Bolt\\Filesystem\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Bolt\\Filesystem\\Tests\\": "tests"
+        }
+    }
+}
