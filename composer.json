@@ -8,6 +8,13 @@
             "email": "carsonfull@gmail.com"
         }
     ],
+    "require": {
+        "league/flysystem": "^1.0",
+        "php" : ">=5.4.16"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8"
+    },
     "autoload": {
         "psr-4": {
             "Bolt\\Filesystem\\": "src"
@@ -16,6 +23,11 @@
     "autoload-dev": {
         "psr-4": {
             "Bolt\\Filesystem\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.x-dev"
         }
     }
 }
