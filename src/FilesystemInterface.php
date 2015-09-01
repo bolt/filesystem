@@ -24,4 +24,22 @@ interface FilesystemInterface extends Flysystem\FilesystemInterface
      * @return File|Directory Either a file or directory handler.
      */
     public function get($path, Flysystem\Handler $handler = null);
+
+    /**
+     * Get a image handler.
+     *
+     * @param string $path The path to the file
+     *
+     * @return Image
+     */
+    public function getImage($path);
+
+    /**
+     * Return the ImageInfo for an image.
+     *
+     * @param string $path The path to the file
+     *
+     * @return ImageInfo
+     */
+    public function getImageInfo($path);
 }

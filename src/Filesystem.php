@@ -29,4 +29,20 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
         }
         return parent::get($path, $handler);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getImage($path)
+    {
+        return $this->get($path, new Image());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getImageInfo($path)
+    {
+        return ImageInfo::createFromString($this->read($path));
+    }
 }
