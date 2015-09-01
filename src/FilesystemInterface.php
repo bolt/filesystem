@@ -7,15 +7,6 @@ use League\Flysystem;
 interface FilesystemInterface extends Flysystem\FilesystemInterface
 {
     /**
-     * Casts a Flysystem filesystem to this FilesystemInterface.
-     *
-     * @param Flysystem\FilesystemInterface $filesystem
-     *
-     * @return FilesystemInterface
-     */
-    public static function cast(Flysystem\FilesystemInterface $filesystem);
-
-    /**
      * Get a file/directory handler.
      *
      * @param string            $path    The path to the file.
