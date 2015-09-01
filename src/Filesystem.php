@@ -3,6 +3,7 @@
 namespace Bolt\Filesystem;
 
 use League\Flysystem;
+use LogicException;
 
 class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
 {
@@ -11,11 +12,11 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
      */
     public static function cast(Flysystem\FilesystemInterface $filesystem)
     {
-        if ($filesystem instanceof Flysystem\Filesystem) {
-            return new static($filesystem->getAdapter(), $filesystem->getConfig());
+        if (!$filesystem instanceof Flysystem\Filesystem) {
+            throw new LogicException('Cannot cast Flysystem\FilesystemInterface, only Flysystem\Filesystem');
         }
 
-        //TODO create wrapper for interface
+        return new static($filesystem->getAdapter(), $filesystem->getConfig());
     }
 
     /**
