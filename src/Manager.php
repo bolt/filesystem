@@ -5,12 +5,11 @@ use InvalidArgumentException;
 use League\Flysystem\Adapter\NullAdapter;
 use League\Flysystem\Handler;
 use League\Flysystem\Plugin\PluggableTrait;
+use LogicException;
 
 class Manager implements AggregateFilesystemInterface, FilesystemInterface
 {
     use PluggableTrait;
-
-    const DEFAULT_PREFIX = 'files';
 
     /** @var FilesystemInterface[] */
     protected $filesystems = [];
@@ -46,7 +45,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function mountFilesystem($prefix, FilesystemInterface $filesystem)
     {
         if (!is_string($prefix)) {
-            throw new InvalidArgumentException(__METHOD__ . ' expects argument $prefix to be a string.');
+            throw new InvalidArgumentException(__METHOD__ . ' expects $prefix argument to be a string.');
         }
 
         $this->filesystems[$prefix] = $filesystem;
@@ -59,11 +58,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function getFilesystem($prefix)
     {
-        $prefix = isset($this->filesystems[$prefix]) ? $prefix : static::DEFAULT_PREFIX;
-
-//        if (!isset($this->filesystems[$prefix])) {
-//            throw new LogicException('No filesystem mounted with prefix ' . $prefix);
-//        }
+        if (!isset($this->filesystems[$prefix])) {
+            throw new LogicException('No filesystem mounted with prefix ' . $prefix);
+        }
 
         return $this->filesystems[$prefix];
     }
@@ -343,11 +340,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
         }
 
         if (!preg_match('#^.+\:\/\/.*#', $path)) {
-            list($prefix, $path) = explode('://', $path, 2);
-        } else {
-            $prefix = static::DEFAULT_PREFIX;
+            throw new InvalidArgumentException('No prefix detected in path: ' . $path);
         }
 
-        return [$prefix, $path];
+        return explode('://', $path, 2);
     }
 }
