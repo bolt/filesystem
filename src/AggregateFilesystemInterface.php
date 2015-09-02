@@ -26,13 +26,22 @@ interface AggregateFilesystemInterface
     public function mountFilesystem($prefix, FilesystemInterface $filesystem);
 
     /**
-     * Get the filesystem with the corresponding prefix.
+     * Get the filesystem with the given prefix.
      *
      * @param string $prefix
      *
-     * @throws LogicException
+     * @throws LogicException If the filesystem does not exist.
      *
      * @return FilesystemInterface
      */
     public function getFilesystem($prefix);
+
+    /**
+     * Check if the filesystem with the given prefix exists.
+     *
+     * @param string $prefix
+     *
+     * @return bool
+     */
+    public function hasFilesystem($prefix);
 }

@@ -66,6 +66,14 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function hasFilesystem($prefix)
+    {
+        return isset($this->filesystems[$prefix]);
+    }
+
+    /**
      * @inheritDoc
      */
     public function listContents($directory = '', $recursive = false)
