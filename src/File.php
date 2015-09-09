@@ -4,6 +4,7 @@ namespace Bolt\Filesystem;
 
 use Bolt\Filesystem\Exception\IOException;
 use Carbon\Carbon;
+use GuzzleHttp\Stream\StreamInterface;
 use League\Flysystem;
 use League\Flysystem\FileNotFoundException;
 
@@ -86,5 +87,123 @@ class File extends Flysystem\File
     public function getCarbon()
     {
         return $this->filesystem->getCarbon($this->path);
+    }
+
+    /**
+     * Read the file as a stream.
+     *
+     * @return StreamInterface file stream
+     */
+    public function readStream()
+    {
+        return parent::readStream();
+    }
+
+    /**
+     * Write the new file.
+     *
+     * @param string $content
+     *
+     * @return void
+     */
+    public function write($content)
+    {
+        parent::write($content);
+    }
+
+    /**
+     * Write the new file using a stream.
+     *
+     * @param StreamInterface|resource $resource
+     *
+     * @return void
+     */
+    public function writeStream($resource)
+    {
+        parent::writeStream($resource);
+    }
+
+    /**
+     * Update the file contents.
+     *
+     * @param string $content
+     *
+     * @return void
+     */
+    public function update($content)
+    {
+        parent::update($content);
+    }
+
+    /**
+     * Update the file contents with a stream.
+     *
+     * @param StreamInterface|resource $resource
+     *
+     * @return void
+     */
+    public function updateStream($resource)
+    {
+        parent::updateStream($resource);
+    }
+
+    /**
+     * Create the file or update if exists.
+     *
+     * @param string $content
+     *
+     * @return void
+     */
+    public function put($content)
+    {
+        parent::put($content);
+    }
+
+    /**
+     * Create the file or update if exists using a stream.
+     *
+     * @param StreamInterface|resource $resource
+     *
+     * @return void
+     */
+    public function putStream($resource)
+    {
+        parent::putStream($resource);
+    }
+
+    /**
+     * Rename the file.
+     *
+     * @param string $newpath
+     *
+     * @return void
+     */
+    public function rename($newpath)
+    {
+        $this->filesystem->rename($this->path, $newpath);
+        $this->path = $newpath;
+    }
+
+    /**
+     * Copy the file.
+     *
+     * @param string $newpath
+     *
+     * @return File new file
+     */
+    public function copy($newpath)
+    {
+        $this->filesystem->copy($this->path, $newpath);
+        return new File($this->filesystem, $newpath);
+    }
+
+    /**
+     * Delete the file.
+     *
+     * @return void
+     */
+    public function delete()
+    {
+        parent::delete();
     }
 }
