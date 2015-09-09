@@ -2,7 +2,9 @@
 
 namespace Bolt\Filesystem;
 
+use Carbon\Carbon;
 use League\Flysystem;
+use League\Flysystem\FileNotFoundException;
 
 class File extends Flysystem\File
 {
@@ -70,5 +72,17 @@ class File extends Flysystem\File
     public function getExtension()
     {
         return pathinfo($this->path, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * Get the file's timestamp as a Carbon instance.
+     *
+     * @throws FileNotFoundException
+     *
+     * @return Carbon|false The Carbon instance or false on failure.
+     */
+    public function getCarbon()
+    {
+        return $this->filesystem->getCarbon($this->path);
     }
 }

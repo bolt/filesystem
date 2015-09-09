@@ -179,6 +179,15 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getCarbon($path)
+    {
+        list($prefix, $path) = $this->filterPrefix($path);
+        return $this->getFilesystem($prefix)->getCarbon($path);
+    }
+
+    /**
      * @inheritDoc
      */
     public function getVisibility($path)

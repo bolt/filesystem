@@ -11,6 +11,7 @@
     "require": {
         "league/flysystem": "^1.0",
         "miljar/php-exif": "^0.5",
+        "nesbot/carbon": "^1.20",
         "php" : ">=5.4.16"
     },
     "require-dev": {

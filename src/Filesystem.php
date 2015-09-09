@@ -2,6 +2,7 @@
 
 namespace Bolt\Filesystem;
 
+use Carbon\Carbon;
 use League\Flysystem;
 use LogicException;
 
@@ -45,5 +46,19 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
     public function getImageInfo($path)
     {
         return ImageInfo::createFromString($this->read($path));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCarbon($path)
+    {
+        $ts = $this->getTimestamp($path);
+
+        if ($ts === false) {
+            throw new \RuntimeException('Failed to get timestamp at path: ' . $path);
+        }
+
+        return Carbon::createFromTimestamp($ts);
     }
 }

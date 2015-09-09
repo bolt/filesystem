@@ -2,7 +2,9 @@
 
 namespace Bolt\Filesystem;
 
+use Carbon\Carbon;
 use League\Flysystem;
+use League\Flysystem\FileNotFoundException;
 
 interface FilesystemInterface extends Flysystem\FilesystemInterface
 {
@@ -33,4 +35,16 @@ interface FilesystemInterface extends Flysystem\FilesystemInterface
      * @return ImageInfo
      */
     public function getImageInfo($path);
+
+    /**
+     * Get a file's timestamp as a Carbon instance.
+     *
+     * @param string $path The path to the file.
+     *
+     * @throws FileNotFoundException
+     * @throws \RuntimeException
+     *
+     * @return Carbon The Carbon instance
+     */
+    public function getCarbon($path);
 }
