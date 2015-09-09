@@ -2,7 +2,10 @@
 
 namespace Bolt\Filesystem;
 
+use Bolt\Filesystem\Exception as Ex;
 use Carbon\Carbon;
+use Exception;
+use InvalidArgumentException;
 use League\Flysystem;
 use LogicException;
 
@@ -23,13 +26,337 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
     /**
      * {@inheritdoc}
      */
+    public function has($path)
+    {
+        try {
+            return parent::has($path);
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function write($path, $contents, array $config = [])
+    {
+        try {
+            if (!parent::write($path, $contents, $config)) {
+                throw new Ex\IOException('Failed to write to file', $path);
+            }
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function writeStream($path, $resource, array $config = [])
+    {
+        try {
+            if (!parent::writeStream($path, $resource, $config)) {
+                throw new Ex\IOException('Failed to write to file', $path);
+            }
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function put($path, $contents, array $config = [])
+    {
+        try {
+            if (!parent::put($path, $contents, $config)) {
+                throw new Ex\IOException('Failed to write to file', $path);
+            }
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function putStream($path, $resource, array $config = [])
+    {
+        try {
+            if (!parent::putStream($path, $resource, $config)) {
+                throw new Ex\IOException('Failed to write to file', $path);
+            }
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function readAndDelete($path)
+    {
+        try {
+            $contents = parent::readAndDelete($path);
+            if ($contents === false) {
+                throw new Ex\IOException('Failed to read file', $path);
+            }
+            return $contents;
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function update($path, $contents, array $config = [])
+    {
+        try {
+            if (!parent::update($path, $contents, $config)) {
+                throw new Ex\IOException('Failed to write to file', $path);
+            }
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateStream($path, $resource, array $config = [])
+    {
+        try {
+            if (!parent::updateStream($path, $resource, $config)) {
+                throw new Ex\IOException('Failed to write to file', $path);
+            }
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function read($path)
+    {
+        try {
+            $contents = parent::read($path);
+            if ($contents === false) {
+                throw new Ex\IOException('Failed to read file', $path);
+            }
+            return $contents;
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function readStream($path)
+    {
+        try {
+            $resource = parent::readStream($path);
+            if ($resource === false) {
+                throw new Ex\IOException('Failed to open stream', $path);
+            }
+            return $resource;
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rename($path, $newpath)
+    {
+        try {
+            if (!parent::rename($path, $newpath)) {
+                throw new Ex\IOException('Failed to rename file', $path);
+            }
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function copy($path, $newpath)
+    {
+        try {
+            if (!parent::copy($path, $newpath)) {
+                throw new Ex\IOException('Failed to copy file', $path);
+            }
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete($path)
+    {
+        try {
+            if (!parent::delete($path)) {
+                throw new Ex\IOException('Failed to delete file', $path);
+            }
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteDir($dirname)
+    {
+        try {
+            if (!parent::deleteDir($dirname)) {
+                throw new Ex\IOException('Failed to delete directory', $dirname);
+            }
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $dirname);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createDir($dirname, array $config = [])
+    {
+        try {
+            if (!parent::createDir($dirname, $config)) {
+                throw new Ex\IOException('Failed to delete file', $dirname);
+            }
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $dirname);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function listContents($directory = '', $recursive = false)
+    {
+        try {
+            return parent::listContents($directory, $recursive);
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $directory);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMimetype($path)
+    {
+        try {
+            $mimeType = parent::getMimetype($path);
+            if ($mimeType === false) {
+                throw new Ex\IOException("Failed to get file's MIME-type", $path);
+            }
+            return $mimeType;
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTimestamp($path)
+    {
+        try {
+            $ts = parent::getMimetype($path);
+            if ($ts === false) {
+                throw new Ex\IOException("Failed to get file's timestamp", $path);
+            }
+            return $ts;
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVisibility($path)
+    {
+        try {
+            $visibility = parent::getVisibility($path);
+            if ($visibility === false) {
+                throw new Ex\IOException("Failed to get file's visibility", $path);
+            }
+            return $visibility;
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSize($path)
+    {
+        try {
+            $size = parent::getSize($path);
+            if ($size === false) {
+                throw new Ex\IOException("Failed to get file's size", $path);
+            }
+            return $size;
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setVisibility($path, $visibility)
+    {
+        try {
+            if (!parent::setVisibility($path, $visibility)) {
+                throw new Ex\IOException("Failed to set file's visibility", $path);
+            }
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMetadata($path)
+    {
+        try {
+            $metadata = parent::getMetadata($path);
+            if ($metadata === false) {
+                throw new Ex\IOException("Failed to get file's metadata", $path);
+            }
+            return $metadata;
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function get($path, Flysystem\Handler $handler = null)
     {
         if ($handler === null) {
             $metadata = $this->getMetadata($path);
             $handler = $metadata['type'] === 'file' ? new File($this, $path) : new Directory($this, $path);
         }
-        return parent::get($path, $handler);
+        try {
+            return parent::get($path, $handler);
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
     }
 
     /**
@@ -41,7 +368,7 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getImageInfo($path)
     {
@@ -53,12 +380,50 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
      */
     public function getCarbon($path)
     {
-        $ts = $this->getTimestamp($path);
+        return Carbon::createFromTimestamp($this->getTimestamp($path));
+    }
 
-        if ($ts === false) {
-            throw new \RuntimeException('Failed to get timestamp at path: ' . $path);
+    /**
+     * {@inheritdoc}
+     */
+    public function assertPresent($path)
+    {
+        if (!$this->has($path)) {
+            throw new Ex\FileNotFoundException($path);
         }
+    }
 
-        return Carbon::createFromTimestamp($ts);
+    /**
+     * {@inheritdoc}
+     */
+    public function assertAbsent($path)
+    {
+        if ($this->has($path)) {
+            throw new Ex\FileExistsException($path);
+        }
+    }
+
+    /**
+     * @param Exception $e
+     * @param string     $path
+     *
+     * @return Exception
+     */
+    protected function handleEx(Exception $e, $path)
+    {
+        if ($e instanceof InvalidArgumentException) {
+            return $e;
+        } elseif ($e instanceof Flysystem\RootViolationException) {
+            return new Ex\RootViolationException($e->getMessage(), $e->getCode(), $e);
+        } elseif ($e instanceof Flysystem\NotSupportedException) {
+            return new Ex\NotSupportedException($e->getMessage(), $e->getCode(), $e);
+        } elseif ($e instanceof LogicException) {
+            if (strpos($e->getMessage(), 'Path is outside of the defined root') === 0) {
+                return new Ex\RootViolationException($e->getMessage(), $e->getCode(), $e);
+            }
+            return new Ex\IOException($e->getMessage(), $e->getCode(), $e, $path);
+        } else {
+            return new Ex\IOException($e->getMessage(), $e->getCode(), $e, $path);
+        }
     }
 }

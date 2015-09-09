@@ -2,6 +2,7 @@
 
 namespace Bolt\Filesystem;
 
+use Bolt\Filesystem\Exception\IOException;
 use Carbon\Carbon;
 use League\Flysystem;
 use League\Flysystem\FileNotFoundException;
@@ -78,8 +79,9 @@ class File extends Flysystem\File
      * Get the file's timestamp as a Carbon instance.
      *
      * @throws FileNotFoundException
+     * @throws IOException
      *
-     * @return Carbon|false The Carbon instance or false on failure.
+     * @return Carbon The Carbon instance.
      */
     public function getCarbon()
     {

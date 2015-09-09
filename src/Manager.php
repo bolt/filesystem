@@ -74,7 +74,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function listContents($directory = '', $recursive = false)
     {
@@ -116,7 +116,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function has($path)
     {
@@ -125,7 +125,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function read($path)
     {
@@ -134,7 +134,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function readStream($path)
     {
@@ -143,7 +143,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getMetadata($path)
     {
@@ -152,7 +152,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getSize($path)
     {
@@ -161,7 +161,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getMimetype($path)
     {
@@ -170,7 +170,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getTimestamp($path)
     {
@@ -188,7 +188,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getVisibility($path)
     {
@@ -197,106 +197,106 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function write($path, $contents, array $config = [])
     {
         list($prefix, $path) = $this->filterPrefix($path);
-        return $this->getFilesystem($prefix)->write($path, $contents, $config);
+        $this->getFilesystem($prefix)->write($path, $contents, $config);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function writeStream($path, $resource, array $config = [])
     {
         list($prefix, $path) = $this->filterPrefix($path);
-        return $this->getFilesystem($prefix)->writeStream($path, $resource, $config);
+        $this->getFilesystem($prefix)->writeStream($path, $resource, $config);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function update($path, $contents, array $config = [])
     {
         list($prefix, $path) = $this->filterPrefix($path);
-        return $this->getFilesystem($prefix)->update($path, $contents, $config);
+        $this->getFilesystem($prefix)->update($path, $contents, $config);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function updateStream($path, $resource, array $config = [])
     {
         list($prefix, $path) = $this->filterPrefix($path);
-        return $this->getFilesystem($prefix)->updateStream($path, $resource, $config);
+        $this->getFilesystem($prefix)->updateStream($path, $resource, $config);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function rename($path, $newpath)
     {
         list($prefix, $path) = $this->filterPrefix($path);
-        return $this->getFilesystem($prefix)->rename($path, $newpath);
+        $this->getFilesystem($prefix)->rename($path, $newpath);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function delete($path)
     {
         list($prefix, $path) = $this->filterPrefix($path);
-        return $this->getFilesystem($prefix)->delete($path);
+        $this->getFilesystem($prefix)->delete($path);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function deleteDir($dirname)
     {
         list($prefix, $path) = $this->filterPrefix($dirname);
-        return $this->getFilesystem($prefix)->deleteDir($path);
+        $this->getFilesystem($prefix)->deleteDir($path);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function createDir($dirname, array $config = [])
     {
         list($prefix, $path) = $this->filterPrefix($dirname);
-        return $this->getFilesystem($prefix)->createDir($path, $config);
+        $this->getFilesystem($prefix)->createDir($path, $config);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function setVisibility($path, $visibility)
     {
         list($prefix, $path) = $this->filterPrefix($path);
-        return $this->getFilesystem($prefix)->setVisibility($path, $visibility);
+        $this->getFilesystem($prefix)->setVisibility($path, $visibility);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function put($path, $contents, array $config = [])
     {
         list($prefix, $path) = $this->filterPrefix($path);
-        return $this->getFilesystem($prefix)->put($path, $contents, $config);
+        $this->getFilesystem($prefix)->put($path, $contents, $config);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function putStream($path, $resource, array $config = [])
     {
         list($prefix, $path) = $this->filterPrefix($path);
-        return $this->getFilesystem($prefix)->putStream($path, $resource, $config);
+        $this->getFilesystem($prefix)->putStream($path, $resource, $config);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function readAndDelete($path)
     {
@@ -305,7 +305,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function get($path, Handler $handler = null)
     {
@@ -314,7 +314,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getImage($path)
     {
@@ -323,7 +323,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getImageInfo($path)
     {

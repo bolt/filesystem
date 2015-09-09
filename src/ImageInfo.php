@@ -2,7 +2,7 @@
 
 namespace Bolt\Filesystem;
 
-use InvalidArgumentException;
+use Bolt\Filesystem\Exception\IOException;
 use PHPExif\Exif;
 use PHPExif\Reader\Reader;
 
@@ -61,7 +61,7 @@ class ImageInfo
     {
         $info = @getimagesize($file);
         if ($info === false) {
-            throw new InvalidArgumentException('Failed to get image data from file');
+            throw new IOException('Failed to get image data from file');
         }
 
         $exif = static::readExif($file);
@@ -80,7 +80,7 @@ class ImageInfo
     {
         $info = @getimagesizefromstring($data);
         if ($info === false) {
-            throw new InvalidArgumentException('Failed to get image data from string');
+            throw new IOException('Failed to get image data from string');
         }
 
         $file = sprintf('data://%s;base64,%s', $info['mime'], base64_encode($data));
