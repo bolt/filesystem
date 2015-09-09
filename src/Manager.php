@@ -102,11 +102,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
         list($prefixTo, $pathTo) = $this->filterPrefix($newpath);
 
         $fsTo = $this->getFilesystem($prefixTo);
-        $result = $fsTo->writeStream($pathTo, $buffer);
+        $fsTo->writeStream($pathTo, $buffer);
 
         $buffer->close();
-
-        return $result;
     }
 
     /**
