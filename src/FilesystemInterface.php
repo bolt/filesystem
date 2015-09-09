@@ -7,6 +7,7 @@ use Bolt\Filesystem\Exception\FileNotFoundException;
 use Bolt\Filesystem\Exception\IOException;
 use Bolt\Filesystem\Exception\RootViolationException;
 use Carbon\Carbon;
+use GuzzleHttp\Stream\StreamInterface;
 use InvalidArgumentException;
 use League\Flysystem;
 
@@ -41,7 +42,7 @@ interface FilesystemInterface extends Flysystem\FilesystemInterface
      * @throws FileNotFoundException
      * @throws IOException
      *
-     * @return resource The path resource.
+     * @return StreamInterface A stream for the path.
      */
     public function readStream($path);
 
@@ -133,9 +134,9 @@ interface FilesystemInterface extends Flysystem\FilesystemInterface
     /**
      * Write a new file using a stream.
      *
-     * @param string   $path     The path of the new file.
-     * @param resource $resource The file handle.
-     * @param array    $config   An optional configuration array.
+     * @param string                   $path     The path of the new file.
+     * @param StreamInterface|resource $resource The stream or resource.
+     * @param array                    $config   An optional configuration array.
      *
      * @throws InvalidArgumentException If $resource is not a file handle.
      * @throws FileExistsException
@@ -162,9 +163,9 @@ interface FilesystemInterface extends Flysystem\FilesystemInterface
     /**
      * Update an existing file using a stream.
      *
-     * @param string   $path     The path of the existing file.
-     * @param resource $resource The file handle.
-     * @param array    $config   An optional configuration array.
+     * @param string                   $path     The path of the existing file.
+     * @param StreamInterface|resource $resource The stream or resource.
+     * @param array                    $config   An optional configuration array.
      *
      * @throws InvalidArgumentException If $resource is not a file handle.
      * @throws FileNotFoundException
@@ -266,9 +267,9 @@ interface FilesystemInterface extends Flysystem\FilesystemInterface
     /**
      * Create a file or update if exists.
      *
-     * @param string   $path     The path to the file.
-     * @param resource $resource The file handle.
-     * @param array    $config   An optional configuration array.
+     * @param string                   $path     The path to the file.
+     * @param StreamInterface|resource $resource The stream or resource.
+     * @param array                    $config   An optional configuration array.
      *
      * @throws InvalidArgumentException Thrown if $resource is not a resource.
      * @throws IOException

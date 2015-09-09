@@ -5,6 +5,9 @@ namespace Bolt\Filesystem;
 use Bolt\Filesystem\Exception as Ex;
 use Carbon\Carbon;
 use Exception;
+use GuzzleHttp\Stream\GuzzleStreamWrapper;
+use GuzzleHttp\Stream\Stream;
+use GuzzleHttp\Stream\StreamInterface;
 use InvalidArgumentException;
 use League\Flysystem;
 use LogicException;
@@ -54,6 +57,9 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
      */
     public function writeStream($path, $resource, array $config = [])
     {
+        if ($resource instanceof StreamInterface) {
+            $resource = GuzzleStreamWrapper::getResource($resource);
+        }
         try {
             if (!parent::writeStream($path, $resource, $config)) {
                 throw new Ex\IOException('Failed to write to file', $path);
@@ -82,6 +88,9 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
      */
     public function putStream($path, $resource, array $config = [])
     {
+        if ($resource instanceof StreamInterface) {
+            $resource = GuzzleStreamWrapper::getResource($resource);
+        }
         try {
             if (!parent::putStream($path, $resource, $config)) {
                 throw new Ex\IOException('Failed to write to file', $path);
@@ -126,6 +135,9 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
      */
     public function updateStream($path, $resource, array $config = [])
     {
+        if ($resource instanceof StreamInterface) {
+            $resource = GuzzleStreamWrapper::getResource($resource);
+        }
         try {
             if (!parent::updateStream($path, $resource, $config)) {
                 throw new Ex\IOException('Failed to write to file', $path);
@@ -161,7 +173,7 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
             if ($resource === false) {
                 throw new Ex\IOException('Failed to open stream', $path);
             }
-            return $resource;
+            return Stream::factory($resource);
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
