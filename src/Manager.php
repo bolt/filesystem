@@ -99,18 +99,12 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
         $fsFrom = $this->getFilesystem($prefixFrom);
         $buffer = $fsFrom->readStream($pathFrom);
 
-        if ($buffer === false) {
-            return false;
-        }
-
         list($prefixTo, $pathTo) = $this->filterPrefix($newpath);
 
         $fsTo = $this->getFilesystem($prefixTo);
         $result = $fsTo->writeStream($pathTo, $buffer);
 
-        if (is_resource($buffer)) {
-            fclose($buffer);
-        }
+        $buffer->close();
 
         return $result;
     }
