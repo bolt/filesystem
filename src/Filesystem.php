@@ -50,6 +50,8 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
+
+        return true;
     }
 
     /**
@@ -67,6 +69,8 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
+
+        return true;
     }
 
     /**
@@ -81,6 +85,8 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
+
+        return true;
     }
 
     /**
@@ -98,6 +104,8 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
+
+        return true;
     }
 
     /**
@@ -128,6 +136,8 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
+
+        return true;
     }
 
     /**
@@ -145,6 +155,8 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
+
+        return true;
     }
 
     /**
@@ -191,6 +203,8 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
+
+        return true;
     }
 
     /**
@@ -205,6 +219,8 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
+
+        return true;
     }
 
     /**
@@ -219,6 +235,8 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
+
+        return true;
     }
 
     /**
@@ -233,6 +251,8 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
         } catch (Exception $e) {
             throw $this->handleEx($e, $dirname);
         }
+
+        return true;
     }
 
     /**
@@ -247,6 +267,8 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
         } catch (Exception $e) {
             throw $this->handleEx($e, $dirname);
         }
+
+        return true;
     }
 
     /**
@@ -337,6 +359,8 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
+
+        return true;
     }
 
     /**

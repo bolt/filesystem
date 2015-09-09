@@ -105,6 +105,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
         $fsTo->writeStream($pathTo, $buffer);
 
         $buffer->close();
+
+        return true;
     }
 
     /**
@@ -195,6 +197,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->write($path, $contents, $config);
+
+        return true;
     }
 
     /**
@@ -204,6 +208,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->writeStream($path, $resource, $config);
+
+        return true;
     }
 
     /**
@@ -213,6 +219,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->update($path, $contents, $config);
+
+        return true;
     }
 
     /**
@@ -222,6 +230,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->updateStream($path, $resource, $config);
+
+        return true;
     }
 
     /**
@@ -231,6 +241,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->rename($path, $newpath);
+
+        return true;
     }
 
     /**
@@ -240,6 +252,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->delete($path);
+
+        return true;
     }
 
     /**
@@ -249,6 +263,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($prefix, $path) = $this->filterPrefix($dirname);
         $this->getFilesystem($prefix)->deleteDir($path);
+
+        return true;
     }
 
     /**
@@ -258,6 +274,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($prefix, $path) = $this->filterPrefix($dirname);
         $this->getFilesystem($prefix)->createDir($path, $config);
+
+        return true;
     }
 
     /**
@@ -267,6 +285,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->setVisibility($path, $visibility);
+
+        return true;
     }
 
     /**
@@ -276,6 +296,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->put($path, $contents, $config);
+
+        return true;
     }
 
     /**
@@ -285,6 +307,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->putStream($path, $resource, $config);
+
+        return true;
     }
 
     /**
