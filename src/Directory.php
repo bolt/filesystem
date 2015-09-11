@@ -2,8 +2,8 @@
 
 namespace Bolt\Filesystem;
 
+use Bolt\Filesystem\Exception\IOException;
 use League\Flysystem;
-use League\Flysystem\FilesystemInterface;
 
 class Directory extends Flysystem\Directory
 {
@@ -61,5 +61,20 @@ class Directory extends Flysystem\Directory
     public function getFilesystem()
     {
         return $this->filesystem;
+    }
+
+    /**
+     * Get a file/directory handler.
+     *
+     * @param string            $path    The path to the file.
+     * @param Flysystem\Handler $handler An optional existing handler to populate.
+     *
+     * @throws IOException
+     *
+     * @return File|Directory Either a file or directory handler.
+     */
+    public function get($path, Flysystem\Handler $handler = null)
+    {
+        return $this->filesystem->get($this->path . '/' . $path, $handler);
     }
 }
