@@ -314,13 +314,13 @@ interface FilesystemInterface extends Flysystem\FilesystemInterface
     public function getImage($path);
 
     /**
-     * Return the ImageInfo for an image.
+     * Return the info for an image.
      *
      * @param string $path The path to the file.
      *
      * @throws IOException
      *
-     * @return ImageInfo
+     * @return Image\Info
      */
     public function getImageInfo($path);
 

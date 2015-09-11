@@ -4,15 +4,15 @@ namespace Bolt\Filesystem;
 
 class Image extends File
 {
-    /** @var ImageInfo */
+    /** @var Image\Info */
     protected $info;
 
     /**
-     * Returns the ImageInfo for this image.
+     * Returns the info for this image.
      *
      * @param bool $cache Whether to use cached info from previous call
      *
-     * @return ImageInfo
+     * @return Image\Info
      */
     public function getInfo($cache = true)
     {

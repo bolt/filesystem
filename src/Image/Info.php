@@ -1,9 +1,8 @@
 <?php
 
-namespace Bolt\Filesystem;
+namespace Bolt\Filesystem\Image;
 
 use Bolt\Filesystem\Exception\IOException;
-use Bolt\Filesystem\Image;
 use PHPExif\Exif;
 use PHPExif\Reader\Reader;
 
@@ -12,13 +11,13 @@ use PHPExif\Reader\Reader;
  *
  * @author Carson Full <carsonfull@gmail.com>
  */
-class ImageInfo
+class Info
 {
     /** @var int */
     protected $width;
     /** @var int */
     protected $height;
-    /** @var Image\Type */
+    /** @var Type */
     protected $type;
     /** @var int */
     protected $bits;
@@ -30,17 +29,17 @@ class ImageInfo
     protected $exif;
 
     /**
-     * ImageInfo constructor.
+     * Info constructor.
      *
-     * @param int        $width
-     * @param int        $height
-     * @param Image\Type $type
-     * @param int        $bits
-     * @param int        $channels
-     * @param string     $mime
-     * @param Exif       $exif
+     * @param int    $width
+     * @param int    $height
+     * @param Type   $type
+     * @param int    $bits
+     * @param int    $channels
+     * @param string $mime
+     * @param Exif   $exif
      */
-    public function __construct($width, $height, Image\Type $type, $bits, $channels, $mime, Exif $exif)
+    public function __construct($width, $height, Type $type, $bits, $channels, $mime, Exif $exif)
     {
         $this->width = (int) $width;
         $this->height = (int) $height;
@@ -52,11 +51,11 @@ class ImageInfo
     }
 
     /**
-     * Creates an ImageInfo from a file.
+     * Creates an Info from a file.
      *
      * @param string $file A filepath
      *
-     * @return ImageInfo
+     * @return Info
      */
     public static function createFromFile($file)
     {
@@ -71,11 +70,11 @@ class ImageInfo
     }
 
     /**
-     * Creates an ImageInfo from a string of image data.
+     * Creates an Info from a string of image data.
      *
      * @param string $data A string containing the image data
      *
-     * @return ImageInfo
+     * @return Info
      */
     public static function createFromString($data)
     {
@@ -94,7 +93,7 @@ class ImageInfo
      * @param array $info
      * @param Exif  $exif
      *
-     * @return ImageInfo
+     * @return Info
      */
     protected static function createFromArray(array $info, Exif $exif)
     {
@@ -107,7 +106,15 @@ class ImageInfo
             'channels' => 0,
             'mime'     => '',
         ];
-        return new static($info[0], $info[1], new Image\Type($info[2]), $info['bits'], $info['channels'], $info['mime'], $exif);
+        return new static(
+            $info[0],
+            $info[1],
+            new Type($info[2]),
+            $info['bits'],
+            $info['channels'],
+            $info['mime'],
+            $exif
+        );
     }
 
     /**
@@ -206,7 +213,7 @@ class ImageInfo
     /**
      * Returns the image type.
      *
-     * @return Image\Type
+     * @return Type
      */
     public function getType()
     {

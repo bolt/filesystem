@@ -408,7 +408,7 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
      */
     public function getImageInfo($path)
     {
-        return ImageInfo::createFromString($this->read($path));
+        return Image\Info::createFromString($this->read($path));
     }
 
     /**
