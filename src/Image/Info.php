@@ -5,6 +5,7 @@ namespace Bolt\Filesystem\Image;
 use Bolt\Filesystem\Exception\IOException;
 use PHPExif\Exif;
 use PHPExif\Reader\Reader;
+use PHPExif\Reader\ReaderInterface;
 
 /**
  * An object representation of properties returned from getimagesize() and EXIF data
@@ -27,6 +28,9 @@ class Info
     protected $mime;
     /** @var Exif */
     protected $exif;
+
+    /** @var ReaderInterface */
+    protected static $exifReader;
 
     /**
      * Info constructor.
@@ -124,9 +128,11 @@ class Info
      */
     protected static function readExif($file)
     {
-        $reader = Reader::factory(Reader::TYPE_NATIVE);
+        if (static::$exifReader === null) {
+            static::$exifReader = Reader::factory(Reader::TYPE_NATIVE);
+        }
         try {
-            return $reader->read($file);
+            return static::$exifReader->read($file);
         } catch (\RuntimeException $e) {
             return new Exif();
         }
