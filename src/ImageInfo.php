@@ -145,6 +145,64 @@ class ImageInfo
     }
 
     /**
+     * Returns the aspect ratio.
+     *
+     * @return float
+     */
+    public function getAspectRatio()
+    {
+        if ($this->width === 0 || $this->height === 0) {
+            return 0.0;
+        }
+
+        // Account for image rotation
+        if (in_array($this->exif->getOrientation(), [5, 6, 7, 8])) {
+            return $this->height / $this->width;
+        }
+
+        return $this->width / $this->height;
+    }
+
+    /**
+     * Returns whether or not the image is landscape.
+     *
+     * This is determined by the aspect ratio being
+     * greater than 5:4.
+     *
+     * @return bool
+     */
+    public function isLandscape()
+    {
+        return $this->getAspectRatio() >= 1.25;
+    }
+
+    /**
+     * Returns whether or not the image is portrait.
+     *
+     * This is determined by the aspect ratio being
+     * less than 4:5.
+     *
+     * @return bool
+     */
+    public function isPortrait()
+    {
+        return $this->getAspectRatio() <= 0.8;
+    }
+
+    /**
+     * Returns whether or not the image is square-ish.
+     *
+     * The image is considered square if it is not
+     * determined to be landscape or portrait.
+     *
+     * @return bool
+     */
+    public function isSquare()
+    {
+        return !$this->isLandscape() && !$this->isPortrait();
+    }
+
+    /**
      * Returns the image type as a IMAGETYPE_* constant
      *
      * @return int
