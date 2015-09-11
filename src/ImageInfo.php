@@ -3,6 +3,7 @@
 namespace Bolt\Filesystem;
 
 use Bolt\Filesystem\Exception\IOException;
+use Bolt\Filesystem\Image;
 use PHPExif\Exif;
 use PHPExif\Reader\Reader;
 
@@ -17,7 +18,7 @@ class ImageInfo
     protected $width;
     /** @var int */
     protected $height;
-    /** @var int */
+    /** @var Image\Type */
     protected $type;
     /** @var int */
     protected $bits;
@@ -31,19 +32,19 @@ class ImageInfo
     /**
      * ImageInfo constructor.
      *
-     * @param int    $width
-     * @param int    $height
-     * @param int    $type
-     * @param int    $bits
-     * @param int    $channels
-     * @param string $mime
-     * @param Exif   $exif
+     * @param int        $width
+     * @param int        $height
+     * @param Image\Type $type
+     * @param int        $bits
+     * @param int        $channels
+     * @param string     $mime
+     * @param Exif       $exif
      */
-    public function __construct($width, $height, $type, $bits, $channels, $mime, Exif $exif)
+    public function __construct($width, $height, Image\Type $type, $bits, $channels, $mime, Exif $exif)
     {
         $this->width = (int) $width;
         $this->height = (int) $height;
-        $this->type = (int) $type;
+        $this->type = $type;
         $this->bits = (int) $bits;
         $this->channels = (int) $channels;
         $this->mime = $mime;
@@ -106,7 +107,7 @@ class ImageInfo
             'channels' => 0,
             'mime'     => '',
         ];
-        return new static($info[0], $info[1], $info[2], $info['bits'], $info['channels'], $info['mime'], $exif);
+        return new static($info[0], $info[1], new Image\Type($info[2]), $info['bits'], $info['channels'], $info['mime'], $exif);
     }
 
     /**
@@ -203,9 +204,9 @@ class ImageInfo
     }
 
     /**
-     * Returns the image type as a IMAGETYPE_* constant
+     * Returns the image type.
      *
-     * @return int
+     * @return Image\Type
      */
     public function getType()
     {
