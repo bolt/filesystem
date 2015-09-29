@@ -93,13 +93,12 @@ class Type
         // Get list of all standard constants
         $constants = get_defined_constants(true)['standard'];
         // filter down to image type constants
-        $types = array_filter(
-            $constants,
-            function ($value, $name) {
-                return $value !== IMAGETYPE_COUNT && strpos($name, 'IMAGETYPE_') === 0;
-            },
-            ARRAY_FILTER_USE_BOTH
-        );
+        $types = [];
+        foreach ($constants as $name => $value) {
+            if ($value !== IMAGETYPE_COUNT && strpos($name, 'IMAGETYPE_') === 0) {
+                $types[$name] = $value;
+            }
+        }
         // flip these and map them to a humanized string
         $types = array_map(
             function ($type) {
