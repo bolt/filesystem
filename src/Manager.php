@@ -59,7 +59,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function getFilesystem($prefix)
     {
         if (!isset($this->filesystems[$prefix])) {
-            throw new LogicException('No filesystem mounted with prefix ' . $prefix);
+            throw new LogicException(sprintf('No filesystem mounted with prefix "%s"', $prefix));
         }
 
         return $this->filesystems[$prefix];
