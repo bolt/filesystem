@@ -85,6 +85,7 @@ class Type
      */
     public static function getTypes()
     {
+        // List can't change at runtime, so cache it
         static $types;
         if ($types) {
             return $types;
@@ -108,5 +109,37 @@ class Type
         );
 
         return $types;
+    }
+
+    /**
+     * Returns a list of file extensions for images.
+     *
+     * Note: Leading periods are excluded.
+     *
+     * @return string[]
+     */
+    public static function getTypeExtensions()
+    {
+        // List can't change at runtime, so cache it
+        static $extensions;
+        if ($extensions) {
+            return $extensions;
+        }
+
+        // List of type integers
+        $types = array_values(array_flip(static::getTypes()));
+        // Remove unknown
+        $types = array_filter($types);
+        // Map to extension
+        $extensions = array_map(
+            function ($type) {
+                return image_type_to_extension($type, false);
+            },
+            $types
+        );
+        // .jpg isn't included :rolleyes:
+        $extensions[] = 'jpg';
+
+        return $extensions;
     }
 }
