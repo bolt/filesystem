@@ -79,4 +79,16 @@ class Directory extends Flysystem\Directory
     {
         return $this->filesystem->get($this->path . '/' . $path, $handler);
     }
+
+    /**
+     * List the directory contents.
+     *
+     * @param bool $recursive
+     *
+     * @return File[]|Directory[]|Image[] A list of handlers.
+     */
+    public function getContents($recursive = false)
+    {
+        return parent::getContents($recursive);
+    }
 }

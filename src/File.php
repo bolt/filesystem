@@ -41,6 +41,26 @@ class File extends Flysystem\File
     }
 
     /**
+     * Helper for creating a handler from a listContents entry.
+     *
+     * @param FilesystemInterface $filesystem
+     * @param array               $entry
+     *
+     * @return File
+     */
+    public static function createFromListingEntry(FilesystemInterface $filesystem, array $entry)
+    {
+        $file = new static($filesystem, $entry['path']);
+        foreach (['timestamp', 'mimetype', 'visibility', 'size'] as $property) {
+            if (isset($entry[$property])) {
+                $file->$property = $entry[$property];
+            }
+        }
+
+        return $file;
+    }
+
+    /**
      * Casts a Flysystem\File to this subclass.
      *
      * @param Flysystem\File $file

@@ -279,10 +279,25 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
     public function listContents($directory = '', $recursive = false)
     {
         try {
-            return parent::listContents($directory, $recursive);
+            $contents = parent::listContents($directory, $recursive);
         } catch (Exception $e) {
             throw $this->handleEx($e, $directory);
         }
+
+        $contents = array_map(
+            function ($entry) {
+                if ($entry['type'] === 'dir') {
+                    return new Directory($this, $entry['path']);
+                } elseif (in_array($entry['extension'], Image\Type::getTypeExtensions())) {
+                    return Image::createFromListingEntry($this, $entry);
+                } else {
+                    return File::createFromListingEntry($this, $entry);
+                }
+            },
+            $contents
+        );
+
+        return $contents;
     }
 
     /**

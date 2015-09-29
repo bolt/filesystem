@@ -54,7 +54,7 @@ interface FilesystemInterface extends Flysystem\FilesystemInterface
      *
      * @throws IOException
      *
-     * @return array A list of file metadata.
+     * @return File[]|Directory[]|Image[] A list of handlers.
      */
     public function listContents($directory = '', $recursive = false);
 

@@ -79,14 +79,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function listContents($directory = '', $recursive = false)
     {
         list($prefix, $directory) = $this->filterPrefix($directory);
-        $filesystem = $this->getFilesystem($prefix);
-        $result = $filesystem->listContents($directory, $recursive);
-
-        foreach ($result as &$file) {
-            $file['filesystem'] = $prefix;
-        }
-
-        return $result;
+        return $this->getFilesystem($prefix)->listContents($directory, $recursive);
     }
 
     /**
