@@ -322,7 +322,7 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
     public function getTimestamp($path)
     {
         try {
-            $ts = parent::getMimetype($path);
+            $ts = parent::getTimestamp($path);
             if ($ts === false) {
                 throw new Ex\IOException("Failed to get file's timestamp", $path);
             }
