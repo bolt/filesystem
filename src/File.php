@@ -190,6 +190,26 @@ class File extends Flysystem\File
     }
 
     /**
+     * Get the file size in a human readable format.
+     *
+     * @param bool $cache Whether to use cached info from previous call
+     *
+     * @return string
+     */
+    public function getSizeFormatted($cache = true)
+    {
+        $size = $this->getSize($cache);
+
+        if ($size > 1024 * 1024) {
+            return sprintf("%0.2f MiB", ($size / 1024 / 1024));
+        } elseif ($size > 1024) {
+            return sprintf("%0.2f KiB", ($size / 1024));
+        } else {
+            return $size . ' B';
+        }
+    }
+
+    /**
      * Read the file as a stream.
      *
      * @return StreamInterface file stream
