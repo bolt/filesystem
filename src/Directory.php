@@ -7,6 +7,8 @@ use League\Flysystem;
 
 class Directory extends Flysystem\Directory
 {
+    use HandlerTrait;
+
     /** @var FilesystemInterface */
     protected $filesystem;
 

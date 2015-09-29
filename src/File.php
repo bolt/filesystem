@@ -10,6 +10,8 @@ use League\Flysystem\FileNotFoundException;
 
 class File extends Flysystem\File
 {
+    use HandlerTrait;
+
     /** @var FilesystemInterface */
     protected $filesystem;
 

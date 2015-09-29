@@ -298,7 +298,7 @@ interface FilesystemInterface extends Flysystem\FilesystemInterface
      *
      * @throws IOException
      *
-     * @return File|Directory Either a file or directory handler.
+     * @return File|Directory|Image Either a file, directory, or image handler.
      */
     public function get($path, Flysystem\Handler $handler = null);
 

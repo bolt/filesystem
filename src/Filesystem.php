@@ -14,6 +14,8 @@ use LogicException;
 
 class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
 {
+    private static $DOCUMENT_EXTENSIONS = ['doc', 'docx', 'txt', 'md', 'pdf', 'xls', 'xlsx', 'ppt', 'pptx', 'csv'];
+
     /**
      * {@inheritdoc}
      */
@@ -373,10 +375,18 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
             if ($metadata === false) {
                 throw new Ex\IOException("Failed to get file's metadata", $path);
             }
-            return $metadata;
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
+
+        $ext = pathinfo($metadata['path'], PATHINFO_EXTENSION);
+        if (in_array($ext, Image\Type::getTypeExtensions())) {
+            $metadata['type'] = 'image';
+        } elseif (in_array($ext, static::$DOCUMENT_EXTENSIONS)) {
+            $metadata['type'] = 'document';
+        }
+
+        return $metadata;
     }
 
     /**
@@ -386,7 +396,13 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
     {
         if ($handler === null) {
             $metadata = $this->getMetadata($path);
-            $handler = $metadata['type'] === 'file' ? new File($this, $path) : new Directory($this, $path);
+            if ($metadata['type'] === 'dir') {
+                $handler = new Directory($this, $path);
+            } elseif ($metadata['type'] === 'image') {
+                $handler = new Image($this, $path);
+            } else {
+                $handler = new File($this, $path);
+            }
         }
         try {
             return parent::get($path, $handler);
