@@ -15,6 +15,17 @@ class File extends Flysystem\File
     /** @var FilesystemInterface */
     protected $filesystem;
 
+    /** @var int cached timestamp */
+    protected $timestamp;
+    /** @var string cached mimetype */
+    protected $mimetype;
+    /** @var string cached visibility */
+    protected $visibility;
+    /** @var array cached metadata */
+    protected $metadata;
+    /** @var int cached size */
+    protected $size;
+
     /**
      * Constructor.
      *
@@ -68,18 +79,114 @@ class File extends Flysystem\File
         return $this->filesystem;
     }
 
+    /**
+     * Get the file's timestamp.
+     *
+     * @param bool $cache Whether to use cached info from previous call
+     *
+     * @return int unix timestamp
+     */
+    public function getTimestamp($cache = true)
+    {
+        if (!$cache) {
+            $this->timestamp = null;
+        }
+        if (!$this->timestamp) {
+            $this->timestamp = parent::getTimestamp();
+        }
+
+        return $this->timestamp;
+    }
 
     /**
      * Get the file's timestamp as a Carbon instance.
+     *
+     * @param bool $cache Whether to use cached info from previous call
      *
      * @throws FileNotFoundException
      * @throws IOException
      *
      * @return Carbon The Carbon instance.
      */
-    public function getCarbon()
+    public function getCarbon($cache = true)
     {
-        return $this->filesystem->getCarbon($this->path);
+        return Carbon::createFromTimestamp($this->getTimestamp($cache));
+    }
+
+    /**
+     * Get the file's mimetype.
+     *
+     * @param bool $cache Whether to use cached info from previous call
+     *
+     * @return string mimetime
+     */
+    public function getMimetype($cache = true)
+    {
+        if (!$cache) {
+            $this->mimetype = null;
+        }
+        if (!$this->mimetype) {
+            $this->mimetype = parent::getMimetype();
+        }
+
+        return $this->mimetype;
+    }
+
+    /**
+     * Get the file's visibility.
+     *
+     * @param bool $cache Whether to use cached info from previous call
+     *
+     * @return string visibility
+     */
+    public function getVisibility($cache = true)
+    {
+        if (!$cache) {
+            $this->visibility = null;
+        }
+        if (!$this->visibility) {
+            $this->visibility = parent::getVisibility();
+        }
+
+        return $this->visibility;
+    }
+
+    /**
+     * Get the file's metadata.
+     *
+     * @param bool $cache Whether to use cached info from previous call
+     *
+     * @return array
+     */
+    public function getMetadata($cache = true)
+    {
+        if (!$cache) {
+            $this->metadata = null;
+        }
+        if (!$this->metadata) {
+            $this->metadata = parent::getMetadata();
+        }
+
+        return $this->metadata;
+    }
+
+    /**
+     * Get the file size.
+     *
+     * @param bool $cache Whether to use cached info from previous call
+     *
+     * @return int file size
+     */
+    public function getSize($cache = true)
+    {
+        if (!$cache) {
+            $this->size = null;
+        }
+        if (!$this->size) {
+            $this->size = parent::getSize();
+        }
+
+        return $this->size;
     }
 
     /**
