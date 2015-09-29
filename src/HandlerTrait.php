@@ -2,6 +2,8 @@
 
 namespace Bolt\Filesystem;
 
+use League\Flysystem\Util;
+
 trait HandlerTrait
 {
     abstract public function getType();
@@ -34,5 +36,37 @@ trait HandlerTrait
     public function isDocument()
     {
         return $this->getType() === 'document';
+    }
+
+    /**
+     * Get the file extension.
+     *
+     * @return string
+     */
+    public function getExtension()
+    {
+        return pathinfo($this->path, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * Get the directory path.
+     *
+     * @return string
+     */
+    public function getDirname()
+    {
+        return Util::dirname($this->path);
+    }
+
+    /**
+     * Get the filename.
+     *
+     * @param string $suffix If the filename ends in suffix this will also be cut off
+     *
+     * @return string
+     */
+    public function getFilename($suffix = null)
+    {
+        return basename($this->path, $suffix);
     }
 }
