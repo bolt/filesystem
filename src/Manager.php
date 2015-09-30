@@ -5,6 +5,7 @@ use InvalidArgumentException;
 use League\Flysystem\Adapter\NullAdapter;
 use League\Flysystem\Handler;
 use League\Flysystem\Plugin\PluggableTrait;
+use League\Flysystem\PluginInterface;
 use LogicException;
 
 class Manager implements AggregateFilesystemInterface, FilesystemInterface
@@ -50,6 +51,11 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
 
         $this->filesystems[$prefix] = $filesystem;
 
+        // Propagate our plugins to filesystem
+        foreach ($this->plugins as $plugin) {
+            $filesystem->addPlugin($plugin);
+        }
+
         return $this;
     }
 
@@ -71,6 +77,21 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function hasFilesystem($prefix)
     {
         return isset($this->filesystems[$prefix]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addPlugin(PluginInterface $plugin)
+    {
+        $this->plugins[$plugin->getMethod()] = $plugin;
+
+        // Propagate plugin to all of our filesystems
+        foreach ($this->filesystems as $filesystem) {
+            $filesystem->addPlugin($plugin);
+        }
+
+        return $this;
     }
 
     /**
