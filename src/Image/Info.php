@@ -3,7 +3,6 @@
 namespace Bolt\Filesystem\Image;
 
 use Bolt\Filesystem\Exception\IOException;
-use PHPExif\Exif;
 use PHPExif\Reader\Reader;
 use PHPExif\Reader\ReaderInterface;
 
@@ -132,7 +131,8 @@ class Info
             static::$exifReader = Reader::factory(Reader::TYPE_NATIVE);
         }
         try {
-            return static::$exifReader->read($file);
+            $exif = static::$exifReader->read($file);
+            return Exif::cast($exif);
         } catch (\RuntimeException $e) {
             return new Exif();
         }
