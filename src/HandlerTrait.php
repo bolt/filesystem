@@ -2,10 +2,14 @@
 
 namespace Bolt\Filesystem;
 
+use Carbon\Carbon;
 use League\Flysystem\Util;
 
 trait HandlerTrait
 {
+    /** @var int cached timestamp */
+    protected $timestamp;
+
     abstract public function getType();
 
     /**
@@ -68,5 +72,36 @@ trait HandlerTrait
     public function getFilename($suffix = null)
     {
         return basename($this->path, $suffix);
+    }
+
+    /**
+     * Get the file/directory's timestamp.
+     *
+     * @param bool $cache Whether to use cached info from previous call
+     *
+     * @return int unix timestamp
+     */
+    public function getTimestamp($cache = true)
+    {
+        if (!$cache) {
+            $this->timestamp = null;
+        }
+        if (!$this->timestamp) {
+            $this->timestamp = $this->filesystem->getTimestamp($this->path);
+        }
+
+        return $this->timestamp;
+    }
+
+    /**
+     * Get the file/directory's timestamp as a Carbon instance.
+     *
+     * @param bool $cache Whether to use cached info from previous call
+     *
+     * @return Carbon The Carbon instance.
+     */
+    public function getCarbon($cache = true)
+    {
+        return Carbon::createFromTimestamp($this->getTimestamp($cache));
     }
 }

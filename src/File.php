@@ -15,8 +15,6 @@ class File extends Flysystem\File
     /** @var FilesystemInterface */
     protected $filesystem;
 
-    /** @var int cached timestamp */
-    protected $timestamp;
     /** @var string cached mimetype */
     protected $mimetype;
     /** @var string cached visibility */
@@ -97,40 +95,6 @@ class File extends Flysystem\File
     public function getFilesystem()
     {
         return $this->filesystem;
-    }
-
-    /**
-     * Get the file's timestamp.
-     *
-     * @param bool $cache Whether to use cached info from previous call
-     *
-     * @return int unix timestamp
-     */
-    public function getTimestamp($cache = true)
-    {
-        if (!$cache) {
-            $this->timestamp = null;
-        }
-        if (!$this->timestamp) {
-            $this->timestamp = parent::getTimestamp();
-        }
-
-        return $this->timestamp;
-    }
-
-    /**
-     * Get the file's timestamp as a Carbon instance.
-     *
-     * @param bool $cache Whether to use cached info from previous call
-     *
-     * @throws FileNotFoundException
-     * @throws IOException
-     *
-     * @return Carbon The Carbon instance.
-     */
-    public function getCarbon($cache = true)
-    {
-        return Carbon::createFromTimestamp($this->getTimestamp($cache));
     }
 
     /**
