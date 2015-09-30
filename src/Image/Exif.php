@@ -65,4 +65,16 @@ class Exif extends PHPExif\Exif
 
         return (float) $parts[$index];
     }
+
+    /**
+     * Returns the creation datetime, if it exists.
+     *
+     * @deprecated Use {@see Exif::getCreationDate} instead.
+     *
+     * @return bool|\DateTime
+     */
+    public function getDateTime()
+    {
+        return $this->getCreationDate();
+    }
 }
