@@ -81,6 +81,16 @@ class Directory extends Flysystem\Directory
     }
 
     /**
+     * Check whether the directory exists.
+     *
+     * @return bool
+     */
+    public function exists()
+    {
+        return $this->filesystem->has($this->path);
+    }
+
+    /**
      * List the directory contents.
      *
      * @param bool $recursive
