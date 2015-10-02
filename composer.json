@@ -9,7 +9,7 @@
         }
     ],
     "require": {
-        "guzzlehttp/streams": "^3.0",
+        "guzzlehttp/psr7": "^1.2",
         "league/flysystem": "^1.0",
         "miljar/php-exif": "^0.5",
         "nesbot/carbon": "^1.20",

@@ -5,12 +5,12 @@ namespace Bolt\Filesystem;
 use Bolt\Filesystem\Exception as Ex;
 use Carbon\Carbon;
 use Exception;
-use GuzzleHttp\Stream\GuzzleStreamWrapper;
-use GuzzleHttp\Stream\Stream;
-use GuzzleHttp\Stream\StreamInterface;
+use GuzzleHttp\Psr7\Stream;
+use GuzzleHttp\Psr7\StreamWrapper as GuzzleStreamWrapper;
 use InvalidArgumentException;
 use League\Flysystem;
 use LogicException;
+use Psr\Http\Message\StreamInterface;
 
 class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
 {
@@ -187,7 +187,7 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
             if ($resource === false) {
                 throw new Ex\IOException('Failed to open stream', $path);
             }
-            return Stream::factory($resource);
+            return new Stream($resource);
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }

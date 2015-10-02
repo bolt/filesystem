@@ -7,9 +7,9 @@ use Bolt\Filesystem\Exception\FileNotFoundException;
 use Bolt\Filesystem\Exception\IOException;
 use Bolt\Filesystem\Exception\RootViolationException;
 use Carbon\Carbon;
-use GuzzleHttp\Stream\StreamInterface;
 use InvalidArgumentException;
 use League\Flysystem;
+use Psr\Http\Message\StreamInterface;
 
 interface FilesystemInterface extends Flysystem\FilesystemInterface
 {

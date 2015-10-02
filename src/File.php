@@ -2,11 +2,8 @@
 
 namespace Bolt\Filesystem;
 
-use Bolt\Filesystem\Exception\IOException;
-use Carbon\Carbon;
-use GuzzleHttp\Stream\StreamInterface;
 use League\Flysystem;
-use League\Flysystem\FileNotFoundException;
+use Psr\Http\Message\StreamInterface;
 
 class File extends Flysystem\File
 {
