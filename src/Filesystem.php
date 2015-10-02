@@ -288,7 +288,7 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
             function ($entry) {
                 if ($entry['type'] === 'dir') {
                     return new Directory($this, $entry['path']);
-                } elseif (in_array($entry['extension'], Image\Type::getTypeExtensions())) {
+                } elseif (isset($entry['extension']) && in_array($entry['extension'], Image\Type::getTypeExtensions())) {
                     return Image::createFromListingEntry($this, $entry);
                 } else {
                     return File::createFromListingEntry($this, $entry);
