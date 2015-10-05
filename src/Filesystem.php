@@ -14,8 +14,6 @@ use Psr\Http\Message\StreamInterface;
 
 class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
 {
-    private static $DOCUMENT_EXTENSIONS = ['doc', 'docx', 'txt', 'md', 'pdf', 'xls', 'xlsx', 'ppt', 'pptx', 'csv'];
-
     /**
      * {@inheritdoc}
      */
@@ -397,7 +395,7 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
         $ext = pathinfo($metadata['path'], PATHINFO_EXTENSION);
         if (in_array($ext, Image\Type::getTypeExtensions())) {
             $metadata['type'] = 'image';
-        } elseif (in_array($ext, static::$DOCUMENT_EXTENSIONS)) {
+        } elseif (in_array($ext, $this->getDocumentExtensions())) {
             $metadata['type'] = 'document';
         }
 
@@ -492,5 +490,13 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
         } else {
             return new Ex\IOException($e->getMessage(), $e->getCode(), $e, $path);
         }
+    }
+
+    protected function getDocumentExtensions()
+    {
+        return $this->config->get(
+            'doc_extensions',
+            ['doc', 'docx', 'txt', 'md', 'pdf', 'xls', 'xlsx', 'ppt', 'pptx', 'csv']
+        );
     }
 }
