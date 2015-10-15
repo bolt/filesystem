@@ -14,6 +14,7 @@
     ],
     "require": {
         "bolt/common": "^1.0",
+        "doctrine/cache": "^1.4",
         "ext-json": "*",
         "guzzlehttp/psr7": "^1.2",
         "league/flysystem": "^1.0",
