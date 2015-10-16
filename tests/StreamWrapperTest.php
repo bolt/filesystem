@@ -5,6 +5,7 @@ namespace Bolt\Filesystem\Tests;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\Local;
 use Bolt\Filesystem\StreamWrapper;
+use Bolt\Filesystem\Tests\Mock\ArrayCacheMock;
 use Doctrine\Common\Cache\VoidCache;
 
 class StreamWrapperTest extends \PHPUnit_Framework_TestCase
@@ -120,5 +121,132 @@ class StreamWrapperTest extends \PHPUnit_Framework_TestCase
         stream_context_set_default($options);
 
         StreamWrapper::getHandler('test-fs://why-what-no');
+    }
+
+    public function testUrlStatFile()
+    {
+        StreamWrapper::register($this->fs, 'test-fs');
+        $nativePath = $this->root . '/composer.json';
+        $streamPath = 'test-fs://composer.json';
+
+        $warnings = new \ArrayObject();
+        set_error_handler(
+            function ($errno, $errstr) use ($warnings) {
+                $warnings[] = $errstr;
+            },
+            E_USER_WARNING | E_WARNING
+        );
+
+        try {
+            $this->assertSame(filesize($nativePath), filesize($streamPath), 'filesize');
+            $this->assertSame(filemtime($nativePath), filemtime($streamPath), 'filemtime');
+            $this->assertSame(filetype($nativePath), filetype($streamPath), 'filetype');
+            $this->assertTrue(is_file($streamPath), 'is_file');
+            $this->assertFalse(is_dir($streamPath), 'is_dir');
+            $this->assertFalse(is_link($streamPath), 'is_link');
+            $this->assertTrue(is_writable($streamPath), 'is_writable');
+            $this->assertTrue(is_readable($streamPath), 'is_readable');
+            $this->assertTrue(file_exists($streamPath), 'file_exists');
+        } catch (\Exception $e) {
+            restore_error_handler();
+            throw $e;
+        }
+
+        $this->assertEmpty($warnings, 'url_stat should not trigger warnings for a valid file');
+
+        restore_error_handler();
+    }
+
+    public function testUrlStatDirectory()
+    {
+        StreamWrapper::register($this->fs, 'test-fs');
+        $nativePath = $this->root . '/src';
+        $streamPath = 'test-fs://src';
+
+        $warnings = new \ArrayObject();
+        set_error_handler(
+            function ($errno, $errstr) use ($warnings) {
+                $warnings[] = $errstr;
+            },
+            E_USER_WARNING | E_WARNING
+        );
+
+        try {
+            $this->assertSame(0, filesize($streamPath), 'filesize');
+            $this->assertSame(filemtime($nativePath), filemtime($streamPath), 'filemtime');
+            $this->assertSame(filetype($nativePath), filetype($streamPath), 'filetype');
+            $this->assertFalse(is_file($streamPath), 'is_file');
+            $this->assertTrue(is_dir($streamPath), 'is_dir');
+            $this->assertFalse(is_link($streamPath), 'is_link');
+            $this->assertTrue(is_writable($streamPath), 'is_writable');
+            $this->assertTrue(is_readable($streamPath), 'is_readable');
+            $this->assertTrue(file_exists($streamPath), 'file_exists');
+        } catch (\Exception $e) {
+            restore_error_handler();
+            throw $e;
+        }
+
+        $this->assertEmpty($warnings, 'url_stat should not trigger warnings for a valid directory');
+
+        restore_error_handler();
+    }
+
+    public function testUrlStatNonExistent()
+    {
+        StreamWrapper::register($this->fs, 'test-fs');
+        $streamPath = 'test-fs://wut';
+
+        $warnings = new \ArrayObject();
+        set_error_handler(
+            function ($errno, $errstr) use ($warnings) {
+                $warnings[] = $errstr;
+            },
+            E_USER_WARNING | E_WARNING
+        );
+
+        try {
+            $methods = ['filesize', 'filemtime', 'filetype'];
+            foreach ($methods as $method) {
+                $this->assertFalse($method($streamPath), $method);
+                $this->assertContainsSubstring($method, $warnings);
+                $warnings->exchangeArray([]); // empty it
+            }
+
+            $methods = ['is_file', 'is_dir', 'is_link', 'is_writable', 'is_readable', 'file_exists'];
+            foreach ($methods as $method) {
+                $this->assertFalse($method($streamPath), $method);
+            }
+            $this->assertEmpty($warnings, 'url_stat should not trigger warnings for is_* methods');
+        } catch (\Exception $e) {
+            restore_error_handler();
+            throw $e;
+        }
+
+        restore_error_handler();
+    }
+
+    private function assertContainsSubstring($expected, $list)
+    {
+        foreach ($list as $item) {
+            if (strpos($item, $expected) !== false) {
+                return;
+            }
+        }
+
+        $this->fail('List did not contain a string containing: ' . $expected);
+    }
+
+    public function testUrlStatCaching()
+    {
+        $cache = new ArrayCacheMock();
+        StreamWrapper::register($this->fs, 'test-fs', $cache);
+
+        $path = 'test-fs://composer.json';
+        $this->assertTrue(is_file($path));
+        $this->assertTrue($cache->contains($path), 'url_stat did not cache result');
+
+        clearstatcache(true, $path);
+        is_file($path);
+        $this->assertSame(1, $cache->saveInvoked, 'url_stat did not use cached value');
     }
 }
