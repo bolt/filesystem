@@ -21,12 +21,15 @@ class StreamWrapper
      */
     public $context;
 
-    /** @var File Handler of opened stream */
+    /** @var File|Directory for current path */
     private $handler;
     /** @var string The opened protocol */
     private $protocol;
     /** @var string The opened path */
     private $path;
+
+    /** @var \Iterator Iterator used with directory related calls */
+    private $iterator;
 
     /** @var Cache */
     private $cache;
@@ -112,20 +115,90 @@ class StreamWrapper
     {
     }
 
-    public function dir_opendir($path, $options)
+
+    /**
+     * Support for {@see dir()} and {@see opendir()}
+     *
+     * @param string $path The path to the directory
+     *
+     * @return bool
+     *
+     * @see http://www.php.net/manual/en/function.opendir.php
+     */
+    public function dir_opendir($path)
     {
+        $this->init($path);
+
+        $handler = $this->getThisHandler();
+        if ($handler === false) {
+            return false;
+        }
+
+        $this->iterator = new \ArrayIterator($handler->getContents());
+
+        return true;
     }
 
+    /**
+     * Used with {@see readdir()}
+     *
+     * @return bool|string The next filename or false if there is no next file.
+     *
+     * @link http://www.php.net/manual/en/function.readdir.php
+     */
     public function dir_readdir()
     {
+        if (!$this->iterator || !$this->iterator->valid()) {
+            return false;
+        }
+
+        /** @var File|Directory $handler */
+        $handler = $this->iterator->current();
+
+        // Cache the object data for quick url_stat lookups used with RecursiveDirectoryIterator
+        $key = $this->getFullPath($handler->getPath());
+        $stat = $this->createStat($handler);
+        $this->getCache()->save($key, $stat);
+
+        $this->iterator->next();
+
+        // To emulate other stream wrappers we need to strip $this->path
+        // (current directory open) from $path (file in directory)
+        $path = $handler->getPath();
+        if ($this->path) {
+            $path = substr($path, strlen($this->path) + 1);
+        }
+
+        return $path;
     }
 
+    /**
+     * Used with {@see rewinddir()}
+     *
+     * @return bool
+     *
+     * @link http://www.php.net/manual/en/function.rewinddir.php
+     */
     public function dir_rewinddir()
     {
+        $this->iterator->rewind();
+
+        return true;
     }
 
+    /**
+     * Used with {@see closedir()}
+     *
+     * @return bool
+     *
+     * @link http://www.php.net/manual/en/function.closedir.php
+     */
     public function dir_closedir()
     {
+        $this->iterator = null;
+        gc_collect_cycles();
+
+        return true;
     }
 
 
@@ -227,6 +300,18 @@ class StreamWrapper
     private function init($path)
     {
         list($this->protocol, $this->path) = explode('://', $path, 2);
+    }
+
+    /**
+     * Returns the path with the protocol.
+     *
+     * @param string $path Optional path to use instead of current.
+     *
+     * @return string
+     */
+    private function getFullPath($path = null)
+    {
+        return $this->protocol . '://' . ($path ?: $this->path);
     }
 
     /**

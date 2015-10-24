@@ -8,6 +8,9 @@ use Bolt\Filesystem\StreamWrapper;
 use Bolt\Filesystem\Tests\Mock\ArrayCacheMock;
 use Doctrine\Common\Cache\VoidCache;
 
+/**
+ * @coversDefaultClass \Bolt\Filesystem\StreamWrapper
+ */
 class StreamWrapperTest extends \PHPUnit_Framework_TestCase
 {
     /** @var string */
@@ -218,6 +221,50 @@ class StreamWrapperTest extends \PHPUnit_Framework_TestCase
         clearstatcache(true, $path);
         is_file($path);
         $this->assertSame(1, $cache->saveInvoked, 'url_stat did not use cached value');
+    }
+
+    /**
+     * @covers ::dir_opendir
+     * @covers ::dir_readdir
+     * @covers ::dir_rewinddir
+     * @covers ::dir_closedir
+     */
+    public function testDirectoryIteration()
+    {
+        StreamWrapper::register($this->fs, 'test-fs');
+
+        $it = new \RecursiveDirectoryIterator('test-fs://tests/files');
+        $it = new \RecursiveIteratorIterator($it, \RecursiveIteratorIterator::SELF_FIRST);
+        $files = array_keys(iterator_to_array($it));
+
+        $expected = [
+            'test-fs://tests/files/dir_a',
+            'test-fs://tests/files/dir_a/bar.txt',
+            'test-fs://tests/files/dir_a/foo.txt',
+            'test-fs://tests/files/dir_b',
+            'test-fs://tests/files/dir_b/dir_c',
+            'test-fs://tests/files/dir_b/dir_c/nested.txt',
+            'test-fs://tests/files/dir_b/hello.txt',
+            'test-fs://tests/files/dir_b/world.txt',
+        ];
+
+        $this->assertEquals($expected, $files);
+    }
+
+    /**
+     * @covers ::dir_opendir
+     */
+    public function testOpenDirFail()
+    {
+        StreamWrapper::register($this->fs, 'test-fs');
+
+        $this->catchWarnings(
+            function (\ArrayObject $warnings) {
+                $resource = opendir('test-fs://nonexistent');
+                $this->assertFalse($resource);
+                $this->assertContainsSubstring('File not found at path: nonexistent', $warnings);
+            }
+        );
     }
 
     /**
