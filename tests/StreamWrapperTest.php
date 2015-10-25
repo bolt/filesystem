@@ -302,6 +302,86 @@ class StreamWrapperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::mkdir
+     */
+    public function testMakeDir()
+    {
+        StreamWrapper::register($this->fs, 'test-fs');
+
+        $this->catchWarnings(
+            function (\ArrayObject $warnings) {
+                $this->assertTrue(mkdir('test-fs://tests/tmp/new_directory'));
+                $this->assertTrue(file_exists(__DIR__ . '/tmp/new_directory'));
+
+                $this->assertEmpty($warnings, 'mkdir should not trigger warnings');
+            }
+        );
+    }
+
+    /**
+     * @covers ::rename
+     */
+    public function testRename()
+    {
+        $this->fs->write('tests/tmp/old.txt', '');
+        StreamWrapper::register($this->fs, 'test-fs');
+
+        $this->catchWarnings(
+            function (\ArrayObject $warnings) {
+                $this->assertTrue(rename('test-fs://tests/tmp/old.txt', 'test-fs://tests/tmp/new.txt'));
+                $this->assertFalse(file_exists(__DIR__ . '/tmp/old.txt'));
+                $this->assertTrue(file_exists(__DIR__ . '/tmp/new.txt'));
+
+                $this->assertEmpty($warnings, 'rename should not trigger warnings');
+
+                $this->assertFalse(rename('test-fs://tests/tmp/old.txt', 'test-fs://tests/tmp/new.txt'));
+                $this->assertContains('File not found at path: tests/tmp/old.txt', $warnings);
+            }
+        );
+    }
+
+    /**
+     * @covers ::rmdir
+     */
+    public function testRemoveDir()
+    {
+        $this->fs->createDir('tests/tmp/evil_dir');
+
+        StreamWrapper::register($this->fs, 'test-fs');
+
+        $this->catchWarnings(
+            function (\ArrayObject $warnings) {
+                $this->assertTrue(rmdir('test-fs://tests/tmp/evil_dir'));
+                $this->assertEmpty($warnings, 'rmdir should not trigger warnings for a valid directory');
+
+                $this->assertFalse(rmdir('test-fs://tests/tmp/does_not_exist'));
+                $this->assertContains('File not found at path: tests/tmp/does_not_exist', $warnings);
+            }
+        );
+    }
+
+    /**
+     * @covers ::unlink
+     */
+    public function testUnlink()
+    {
+        $this->fs->put('tests/tmp/evil_file.txt', '');
+
+        StreamWrapper::register($this->fs, 'test-fs');
+
+        $this->catchWarnings(
+            function (\ArrayObject $warnings) {
+                $this->assertTrue(unlink('test-fs://tests/tmp/evil_file.txt'));
+                $this->assertFalse(file_exists(__DIR__ . '/tmp/evil_file.txt'));
+                $this->assertEmpty($warnings, 'unlink should not trigger warnings for a valid file');
+
+                $this->assertFalse(unlink('test-fs://tests/tmp/does_not_exist'));
+                $this->assertContains('File not found at path: tests/tmp/does_not_exist', $warnings);
+            }
+        );
+    }
+
+    /**
      * @covers ::stream_open
      * @covers ::stream_read
      * @covers ::stream_eof

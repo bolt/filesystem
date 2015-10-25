@@ -100,10 +100,7 @@ class StreamWrapper
      */
     public static function getHandler($path, $handler = null)
     {
-        if (strpos($path, '://') == 0) { // == is intentional to check for false
-            throw new \InvalidArgumentException('Path needs to be in the form of protocol://path');
-        }
-        list($protocol, $path) = explode('://', $path, 2);
+        list($protocol, $path) = self::parsePath($path);
 
         $default = stream_context_get_options(stream_context_get_default());
         if (!isset($default[$protocol]['filesystem']) || $default[$protocol]['filesystem'] === null) {
@@ -213,20 +210,95 @@ class StreamWrapper
     }
 
 
+    /**
+     * Used with {@see mkdir()}
+     *
+     * @param string $path
+     * @param int    $mode
+     * @param int    $options Bitwise mask of values. STREAM_MKDIR_RECURSIVE is implied and the only option I can find.
+     *
+     * @return bool
+     */
     public function mkdir($path, $mode, $options)
     {
+        $this->init($path);
+
+        return $this->boolCall(
+            function () {
+                /** @var Directory $dir */
+                $dir = $this->getThisHandler(new Directory());
+
+                $dir->create();
+
+                return true;
+            }
+        );
     }
 
+    /**
+     * Used with {@see rename}
+     *
+     * @param string $path_from
+     * @param string $path_to
+     *
+     * @return bool
+     */
     public function rename($path_from, $path_to)
     {
+        $this->init($path_from);
+
+        return $this->boolCall(
+            function () use ($path_to) {
+                $handler = $this->getThisHandler();
+                if ($handler === false) {
+                    return false;
+                }
+
+                list($protocol_to, $path_to) = self::parsePath($path_to);
+
+                $handler->rename($path_to);
+
+                return true;
+            }
+        );
     }
 
+    /**
+     * Used with {@see rmdir()}
+     *
+     * @param string $path
+     * @param int    $options
+     *
+     * @return bool
+     */
     public function rmdir($path, $options)
     {
+        return $this->unlink($path);
     }
 
+    /**
+     * Used with {@see unlink()}
+     *
+     * @param $path
+     *
+     * @return bool
+     */
     public function unlink($path)
     {
+        $this->init($path);
+
+        return $this->boolCall(
+            function () {
+                $handler = $this->getThisHandler();
+                if ($handler === false) {
+                    return false;
+                }
+
+                $handler->delete();
+
+                return true;
+            }
+        );
     }
 
 
@@ -456,7 +528,21 @@ class StreamWrapper
      */
     private function init($path)
     {
-        list($this->protocol, $this->path) = explode('://', $path, 2);
+        list($this->protocol, $this->path) = static::parsePath($path);
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return string[] [protocol, path]
+     */
+    private static function parsePath($path)
+    {
+        if (strpos($path, '://') == 0) { // == is intentional to check for false
+            throw new \InvalidArgumentException('Path needs to be in the form of protocol://path');
+        }
+
+        return explode('://', $path, 2);
     }
 
     /**
