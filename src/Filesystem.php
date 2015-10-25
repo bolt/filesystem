@@ -498,7 +498,7 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
 
     protected function getDocumentExtensions()
     {
-        return $this->config->get(
+        return $this->getConfig()->get(
             'doc_extensions',
             ['doc', 'docx', 'txt', 'md', 'pdf', 'xls', 'xlsx', 'ppt', 'pptx', 'csv']
         );
