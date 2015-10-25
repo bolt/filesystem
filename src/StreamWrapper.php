@@ -11,7 +11,21 @@ use Psr\Http\Message\StreamInterface;
 /**
  * Wraps Filesystem into stream protocol.
  *
- * Based on AWS's S3 implementation.
+ * Direct use of this class is highly discouraged.
+ *
+ * It should only be used when needing work with
+ * 3rd party code that makes direct filesystem calls
+ * and can not be easily extended. The whole point of
+ * this library is to have an interface to work with,
+ * let's stick with that.
+ *
+ * This code is based on
+ * {@link https://github.com/aws/aws-sdk-php AWS S3's} and
+ * {@link https://github.com/guzzle/guzzle Guzzle's} implementations.
+ * Licenses are
+ * {@link https://github.com/aws/aws-sdk-php/blob/master/LICENSE.md here} and
+ * {@link https://github.com/guzzle/guzzle/blob/master/LICENSE here}.
+ * Thanks Michael Dowling!
  *
  * @author Carson Full <carsonfull@gmail.com>
  */
@@ -114,13 +128,6 @@ class StreamWrapper
         }
 
         return $filesystem->get($path, $handler);
-    }
-
-    /**
-     * @internal Use {@see StreamWrapper::register} instead.
-     */
-    public function __construct()
-    {
     }
 
 
