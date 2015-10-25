@@ -16,11 +16,11 @@ class IOException extends \RuntimeException implements ExceptionInterface
      * Constructor.
      *
      * @param string          $message
+     * @param string|null     $path
      * @param int             $code
      * @param \Exception|null $previous
-     * @param string|null     $path
      */
-    public function __construct($message, $code = 0, \Exception $previous = null, $path = null)
+    public function __construct($message, $path = null, $code = 0, \Exception $previous = null)
     {
         $this->path = $path;
         parent::__construct($message, $code, $previous);

@@ -482,13 +482,17 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
             return new Ex\RootViolationException($e->getMessage(), $e->getCode(), $e);
         } elseif ($e instanceof Flysystem\NotSupportedException) {
             return new Ex\NotSupportedException($e->getMessage(), $e->getCode(), $e);
+        } elseif ($e instanceof Flysystem\FileNotFoundException) {
+            return new Ex\FileNotFoundException($e->getPath(), $e->getCode(), $e);
+        } elseif ($e instanceof Flysystem\FileExistsException) {
+            return new Ex\FileExistsException($e->getPath(), $e->getCode(), $e);
         } elseif ($e instanceof LogicException) {
             if (strpos($e->getMessage(), 'Path is outside of the defined root') === 0) {
                 return new Ex\RootViolationException($e->getMessage(), $e->getCode(), $e);
             }
-            return new Ex\IOException($e->getMessage(), $e->getCode(), $e, $path);
+            return new Ex\IOException($e->getMessage(), $path, $e->getCode(), $e);
         } else {
-            return new Ex\IOException($e->getMessage(), $e->getCode(), $e, $path);
+            return new Ex\IOException($e->getMessage(), $path, $e->getCode(), $e);
         }
     }
 
