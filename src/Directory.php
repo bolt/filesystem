@@ -20,7 +20,7 @@ class Directory extends Flysystem\Directory
      */
     public function __construct(Flysystem\FilesystemInterface $filesystem = null, $path = null)
     {
-        if (!$filesystem instanceof FilesystemInterface) {
+        if ($filesystem !== null && !$filesystem instanceof FilesystemInterface) {
             $filesystem = Filesystem::cast($filesystem);
         }
         parent::__construct($filesystem, $path);
