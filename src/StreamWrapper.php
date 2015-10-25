@@ -83,11 +83,15 @@ class StreamWrapper
     /**
      * Gets a filesystem handler for the given path.
      *
-     * @param string $path In the form of protocol://path
+     * If the handler is not given, the path needs to exist
+     * to determine if it is a directory or file.
      *
-     * @return File|Directory
+     * @param string            $path    In the form of protocol://path
+     * @param Flysystem\Handler $handler An optional handler to populate
+     *
+     * @return Directory|File
      */
-    public static function getHandler($path)
+    public static function getHandler($path, $handler = null)
     {
         if (strpos($path, '://') == 0) { // == is intentional to check for false
             throw new \InvalidArgumentException('Path needs to be in the form of protocol://path');
@@ -105,7 +109,7 @@ class StreamWrapper
             );
         }
 
-        return $filesystem->get($path);
+        return $filesystem->get($path, $handler);
     }
 
     /**
@@ -263,7 +267,7 @@ class StreamWrapper
      * Note: class variables are not populated.
      *
      * @param string $path
-     * @param int $flags
+     * @param int    $flags
      *
      * @return array
      *
@@ -278,7 +282,7 @@ class StreamWrapper
             return $value;
         }
 
-        $handler = $this->getThisHandler($flags);
+        $handler = $this->getThisHandler(null, $flags);
         if (!$handler || is_array($handler)) {
             return $handler;
         }
@@ -293,7 +297,7 @@ class StreamWrapper
     }
 
     /**
-     * Sets the protocol and path variable for getOptions().
+     * Sets the protocol and path variables.
      *
      * @param string $path
      */
@@ -364,15 +368,16 @@ class StreamWrapper
     }
 
     /**
-     * @param int $flags
+     * @param Flysystem\Handler $handler Optional handler, to skip file exists check
+     * @param int  $flags
      *
-     * @return File|Directory|false|array
+     * @return array|Directory|File|false
      */
-    private function getThisHandler($flags = null)
+    private function getThisHandler($handler = null, $flags = null)
     {
         if (!$this->handler) {
-            $this->handler = $this->boolCall(function () {
-                return static::getHandler($this->protocol . '://' . $this->path);
+            $this->handler = $this->boolCall(function () use ($handler) {
+                return static::getHandler($this->getFullPath(), $handler);
             }, $flags);
         }
 
@@ -424,7 +429,7 @@ class StreamWrapper
      * Triggers one or more errors.
      *
      * @param string|array $errors Errors to trigger
-     * @param int $flags If set to STREAM_URL_STAT_QUIET, then no error or exception occurs
+     * @param int          $flags  If set to STREAM_URL_STAT_QUIET, then no error or exception occurs
      *
      * @return array|bool
      */

@@ -2,6 +2,7 @@
 
 namespace Bolt\Filesystem\Tests;
 
+use Bolt\Filesystem\File;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\Local;
 use Bolt\Filesystem\StreamWrapper;
@@ -124,6 +125,24 @@ class StreamWrapperTest extends \PHPUnit_Framework_TestCase
         stream_context_set_default($options);
 
         StreamWrapper::getHandler('test-fs://why-what-no');
+    }
+
+    /**
+     * @expectedException \Bolt\Filesystem\Exception\FileNotFoundException
+     */
+    public function testGetHandlerNonExistentPath()
+    {
+        StreamWrapper::register($this->fs, 'test-fs');
+
+        StreamWrapper::getHandler('test-fs://does-not-exist');
+    }
+
+    public function testGetHandlerNonExistentPathWithHandlerGiven()
+    {
+        StreamWrapper::register($this->fs, 'test-fs');
+
+        $handler = StreamWrapper::getHandler('test-fs://does-not-exist', new File());
+        $this->assertInstanceOf('\Bolt\Filesystem\File', $handler);
     }
 
     public function testUrlStatFile()
