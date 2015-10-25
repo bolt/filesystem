@@ -4,7 +4,9 @@ namespace Bolt\Filesystem;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Cache;
+use GuzzleHttp\Psr7\Stream;
 use League\Flysystem;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * Wraps Filesystem into stream protocol.
@@ -30,6 +32,11 @@ class StreamWrapper
 
     /** @var \Iterator Iterator used with directory related calls */
     private $iterator;
+
+    /** @var StreamInterface The opened stream */
+    private $stream;
+    /** @var string The opened stream mode */
+    private $mode;
 
     /** @var Cache */
     private $cache;
@@ -223,40 +230,186 @@ class StreamWrapper
     }
 
 
-    public function stream_open($path, $mode, $options, &$opened_path)
+    /**
+     * Used with {@see fopen()} and {@see file_get_contents()}
+     *
+     * @param string $path        The path to open
+     * @param string $mode        The stream mode
+     * @param int    $options     STREAM_USE_PATH - Search include_path for relative paths. We don't support this.
+     *                            STREAM_REPORT_ERRORS - Trigger errors or not.
+     * @param string $opened_path Path to set with STREAM_USE_PATH, since we don't support that it's not used.
+     *
+     * @return bool
+     */
+    public function stream_open($path, $mode, $options, /** @noinspection PhpUnusedParameterInspection */&$opened_path)
     {
+        $this->init($path);
+
+        if (strpos($mode, '+') !== false) {
+            return $this->triggerError('Simultaneous reading and writing is not supported.');
+        }
+
+        // Strip binary, and windose text translation flags
+        $this->mode = $mode = rtrim($mode, 'bt');
+
+        if (!in_array($mode, ['r', 'w', 'x'])) {
+            return $this->triggerError("Mode not supported: {$mode}. Use r, w, x.");
+        }
+
+        $handler = $this->getThisHandler(new File(), $options);
+
+        if ($mode === 'x' && $handler->exists()) {
+            return $this->triggerError($handler->getPath() . ' already exists.');
+        }
+
+        if ($mode === 'r') {
+            $this->stream = $handler->readStream();
+        } else {
+            $this->stream = new Stream(fopen('php://temp', 'r+'));
+        }
+
+        return true;
     }
 
+    /**
+     * Used with {@see fclose()}
+     */
     public function stream_close()
     {
+        $this->stream->close();
+        $this->stream = null;
     }
 
+    /**
+     * Used with {@see fflush()}
+     *
+     * @return bool
+     */
     public function stream_flush()
     {
+        if (!$this->stream->isWritable()) {
+            return false;
+        }
+
+        return $this->boolCall(
+            function () {
+                if ($this->stream->isSeekable()) {
+                    $this->stream->seek(0);
+                }
+
+                $this->handler->putStream($this->stream);
+
+                return true;
+            }
+        );
     }
 
+    /**
+     * Used with {@see fread()} and {@see fgets()}
+     *
+     * @param int $count
+     *
+     * @return bool|string
+     */
     public function stream_read($count)
     {
+        // $this->mode instead $this->stream->isReadable() is used intentionally.
+        // The write stream is readable and writable, but we want it to appear only writable.
+        if ($this->mode !== 'r') {
+            return false;
+        }
+
+        return $this->boolCall(
+            function () use ($count) {
+                return $this->stream->read($count);
+            }
+        );
     }
 
+    /**
+     * Used with {@see fwrite()}
+     *
+     * @param string $data
+     *
+     * @return int
+     */
     public function stream_write($data)
     {
+        return $this->boolCall(
+            function () use ($data) {
+                return $this->stream->write($data);
+            }
+        ) ?: 0;
     }
 
+    /**
+     * Used with {@see ftell()}
+     *
+     * @return int
+     */
     public function stream_tell()
     {
+        return $this->boolCall(
+            function () {
+                return $this->stream->tell();
+            }
+        );
     }
 
+    /**
+     * Used with {@see feof()}
+     *
+     * @return bool
+     */
     public function stream_eof()
     {
+        return $this->stream->eof();
     }
 
+    /**
+     * Used with {@see fseek()}
+     *
+     * @param int $offset
+     * @param int $whence
+     *
+     * @return bool
+     */
     public function stream_seek($offset, $whence)
     {
+        if (!$this->stream->isSeekable()) {
+            return false; //@codeCoverageIgnore
+        }
+
+        return $this->boolCall(
+            function () use ($offset, $whence) {
+                $this->stream->seek($offset, $whence);
+
+                return true;
+            }
+        );
     }
 
+    /**
+     * Used with {@see fstat()}
+     *
+     * @return array
+     */
     public function stream_stat()
     {
+        $stats = $this->getStatTemplate();
+
+        // $this->mode instead $this->stream->isReadable() is used intentionally.
+        // The write stream is readable and writable, but we want it to appear only writable.
+        $stats[2] = $stats['mode'] = $this->mode === 'r' ? 0100444 : 0100644;
+
+        $size = $this->stream->getSize();
+        $stats[7] = $stats['size'] = $size !== null ? $size : $this->handler->getSize();
+
+        try {
+            $stats[9] = $stats['mtime'] = $this->handler->getTimestamp();
+        } catch (\Exception $e) { }
+
+        return $stats;
     }
 
     /**

@@ -36,6 +36,21 @@ class StreamWrapperTest extends \PHPUnit_Framework_TestCase
     {
         parent::tearDown();
         StreamWrapper::unregister('test-fs');
+
+        $dir = __DIR__ . '/tmp';
+        if (!file_exists($dir)) {
+            return;
+        }
+        $it = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS);
+        $it = new \RecursiveIteratorIterator($it, \RecursiveIteratorIterator::CHILD_FIRST);
+        foreach ($it as $file => $info) {
+            if (is_dir($file)) {
+                @rmdir($file);
+            } else {
+                @unlink($file);
+            }
+        }
+        @rmdir($dir);
     }
 
     public function testRegister()
@@ -282,6 +297,165 @@ class StreamWrapperTest extends \PHPUnit_Framework_TestCase
                 $resource = opendir('test-fs://nonexistent');
                 $this->assertFalse($resource);
                 $this->assertContainsSubstring('File not found at path: nonexistent', $warnings);
+            }
+        );
+    }
+
+    /**
+     * @covers ::stream_open
+     * @covers ::stream_read
+     * @covers ::stream_eof
+     * @covers ::stream_flush
+     * @covers ::stream_close
+     */
+    public function testStreamReading()
+    {
+        StreamWrapper::register($this->fs, 'test-fs');
+
+        $this->catchWarnings(
+            function (\ArrayObject $warnings) {
+                $res = fopen('test-fs://tests/files/dir_b/hello.txt', 'r');
+
+                $this->assertSame('hello', trim(stream_get_contents($res)));
+
+                $this->assertEmpty($warnings, 'fopen should not trigger warnings for a valid file');
+            }
+        );
+    }
+
+    /**
+     * @covers ::stream_open
+     * @covers ::stream_write
+     * @covers ::stream_tell
+     * @covers ::stream_read
+     * @covers ::stream_flush
+     * @covers ::stream_close
+     */
+    public function testStreamWriting()
+    {
+        StreamWrapper::register($this->fs, 'test-fs');
+
+        $this->catchWarnings(
+            function (\ArrayObject $warnings) {
+                $path = 'tests/tmp/test.txt';
+                $res = fopen('test-fs://' . $path, 'w');
+
+                $this->assertSame(11, fwrite($res, 'hello world'));
+
+                $this->assertSame(11, ftell($res));
+
+                $this->assertSame('', fread($res, 11), 'Should not be able to read from a writable-only stream');
+
+                $this->assertTrue(fclose($res));
+
+                $this->assertEmpty($warnings, 'Writing to stream should not trigger warnings for a valid file');
+
+                $this->assertSame('hello world', $this->fs->read($path));
+            }
+        );
+    }
+
+    /**
+     * @covers ::stream_seek
+     * @covers ::stream_tell
+     */
+    public function testStreamSeeking()
+    {
+        StreamWrapper::register($this->fs, 'test-fs');
+
+        $this->catchWarnings(
+            function (\ArrayObject $warnings) {
+                $res = fopen('test-fs://tests/Mock/ArrayCacheMock.php', 'r');
+
+                $expected = fread($res, 1024);
+                $this->assertTrue(rewind($res));
+                $actual = fread($res, 1024);
+
+                $this->assertSame($expected, $actual);
+
+                $this->assertEmpty($warnings, 'Stream seeking should not trigger warnings for a seekable stream');
+            }
+        );
+    }
+
+    /**
+     * @covers ::stream_stat
+     */
+    public function testStreamStatReading()
+    {
+        StreamWrapper::register($this->fs, 'test-fs');
+        $res = fopen('test-fs://tests/files/dir_b/hello.txt', 'r');
+
+        $stats = fstat($res);
+
+        $this->assertSame(0100444, $stats['mode']);
+        $this->assertSame(filesize(__DIR__ . '/files/dir_b/hello.txt'), $stats['size']);
+        $this->assertSame(filemtime(__DIR__ . '/files/dir_b/hello.txt'), $stats['mtime']);
+    }
+
+    /**
+     * @covers ::stream_stat
+     */
+    public function testStreamStatWriting()
+    {
+        StreamWrapper::register($this->fs, 'test-fs');
+
+        $res = fopen('test-fs://tests/tmp/foo.txt', 'w');
+        fwrite($res, 'herp derp');
+
+        $stats = fstat($res);
+
+        $this->assertSame(0100644, $stats['mode']);
+        $this->assertSame(9, $stats['size']);
+        $this->assertSame(0, $stats['mtime']);
+    }
+
+    /**
+     * @covers ::stream_open
+     */
+    public function testStreamOpenWritingOnlyIfNotExists()
+    {
+        StreamWrapper::register($this->fs, 'test-fs');
+
+        $this->catchWarnings(
+            function (\ArrayObject $warnings) {
+                $this->assertFalse(fopen('test-fs://tests/files/dir_b/hello.txt', 'x'));
+                $this->assertContainsSubstring('tests/files/dir_b/hello.txt already exists.', $warnings);
+
+                $warnings->exchangeArray([]); // empty it
+
+                $this->assertFalse(fopen('test-fs://tests/files/dir_b/hello.txt', 'x+'));
+                $this->assertContainsSubstring('Simultaneous reading and writing is not supported.', $warnings);
+            }
+        );
+    }
+
+    /**
+     * @covers ::stream_open
+     */
+    public function testStreamOpenUnsupportedModes()
+    {
+        StreamWrapper::register($this->fs, 'test-fs');
+
+        foreach (['r+', 'w+', 'a', 'a+', 'x+', 'c', 'c+'] as $mode) {
+            $this->assertStreamModeNotSupported('test-fs://tests/files/dir_b/hello.txt', $mode);
+        }
+    }
+
+    /**
+     * @param string $path
+     * @param string $mode
+     */
+    private function assertStreamModeNotSupported($path, $mode)
+    {
+        $this->catchWarnings(
+            function (\ArrayObject $warnings) use ($path, $mode) {
+                $this->assertFalse(fopen($path, $mode));
+                if (strpos($mode, '+') !== false) {
+                    $this->assertContainsSubstring('Simultaneous reading and writing is not supported.', $warnings);
+                } else {
+                    $this->assertContainsSubstring("Mode not supported: {$mode}. Use r, w, x.", $warnings);
+                }
             }
         );
     }
