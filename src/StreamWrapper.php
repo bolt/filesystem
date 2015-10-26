@@ -536,6 +536,7 @@ class StreamWrapper
     private function init($path)
     {
         list($this->protocol, $this->path) = static::parsePath($path);
+        $this->path = ltrim($this->path, '/');
     }
 
     /**
@@ -561,7 +562,7 @@ class StreamWrapper
      */
     private function getFullPath($path = null)
     {
-        return $this->protocol . '://' . ($path ?: $this->path);
+        return $this->protocol . ':///' . ($path ?: $this->path);
     }
 
     /**
