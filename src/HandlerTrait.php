@@ -7,6 +7,8 @@ use League\Flysystem\Util;
 
 trait HandlerTrait
 {
+    use MountPointAwareTrait;
+
     /** @var int cached timestamp */
     protected $timestamp;
 
@@ -40,6 +42,11 @@ trait HandlerTrait
     public function isDocument()
     {
         return $this->getType() === 'document';
+    }
+
+    public function getPath()
+    {
+        return (!empty($this->mountPoint) ? $this->mountPoint . '://' : '') . $this->path;
     }
 
     /**

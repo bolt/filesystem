@@ -5,7 +5,7 @@ namespace Bolt\Filesystem;
 use League\Flysystem;
 use Psr\Http\Message\StreamInterface;
 
-class File extends Flysystem\File
+class File extends Flysystem\File implements MountPointAwareInterface
 {
     use HandlerTrait;
 

@@ -12,8 +12,10 @@ use League\Flysystem;
 use LogicException;
 use Psr\Http\Message\StreamInterface;
 
-class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
+class Filesystem extends Flysystem\Filesystem implements FilesystemInterface, MountPointAwareInterface
 {
+    use MountPointAwareTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -285,12 +287,15 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
         $contents = array_map(
             function ($entry) {
                 if ($entry['type'] === 'dir') {
-                    return new Directory($this, $entry['path']);
+                    $handler = new Directory($this, $entry['path']);
                 } elseif (isset($entry['extension']) && in_array($entry['extension'], Image\Type::getTypeExtensions())) {
-                    return Image::createFromListingEntry($this, $entry);
+                    $handler = Image::createFromListingEntry($this, $entry);
                 } else {
-                    return File::createFromListingEntry($this, $entry);
+                    $handler = File::createFromListingEntry($this, $entry);
                 }
+                $handler->setMountPoint($this->mountPoint);
+
+                return $handler;
             },
             $contents
         );
@@ -424,6 +429,9 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
             } else {
                 $handler = new File($this, $path);
             }
+        }
+        if ($handler instanceof MountPointAwareInterface) {
+            $handler->setMountPoint($this->mountPoint);
         }
         try {
             return parent::get($path, $handler);

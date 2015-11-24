@@ -51,6 +51,10 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
 
         $this->filesystems[$prefix] = $filesystem;
 
+        if ($filesystem instanceof MountPointAwareInterface) {
+            $filesystem->setMountPoint($prefix);
+        }
+
         // Propagate our plugins to filesystem
         foreach ($this->plugins as $plugin) {
             $filesystem->addPlugin($plugin);
