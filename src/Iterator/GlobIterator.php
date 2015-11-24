@@ -23,7 +23,13 @@ class GlobIterator extends GlobFilterIterator
      */
     public function __construct(FilesystemInterface $filesystem, $glob, $flags = 0)
     {
-        $glob = '/' . ltrim($glob, '/');
+        // Glob code requires absolute paths, so prefix path
+        // with leading slash, but not before mount point
+        if (strpos($glob, '://') > 0) {
+            $glob = str_replace('://', ':///', $glob);
+        } else {
+            $glob = '/' . ltrim($glob, '/');
+        }
 
         if (!Glob::isDynamic($glob)) {
             // If the glob is a file path, return that path.
