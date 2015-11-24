@@ -301,6 +301,14 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
     /**
      * {@inheritdoc}
      */
+    public function find()
+    {
+        return new Finder($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getMimetype($path)
     {
         try {

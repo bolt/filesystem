@@ -59,6 +59,13 @@ interface FilesystemInterface extends Flysystem\FilesystemInterface
     public function listContents($directory = '', $recursive = false);
 
     /**
+     * Returns a finder instance. Let's find some files!
+     *
+     * @return Finder
+     */
+    public function find();
+
+    /**
      * Get a file's metadata.
      *
      * @param string $path The path to the file.
