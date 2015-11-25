@@ -187,10 +187,16 @@ class RecursiveDirectoryIterator implements RecursiveIterator, SeekableIterator
 
         $this->current = $this->contents[$this->position];
 
+        $path = $this->current->getPath();
         if ($this->mode & static::KEY_FOR_GLOB) {
-            $this->key = '/' . $this->current->getPath();
-        } else {
-            $this->key = $this->current->getPath();
+            // Glob code requires absolute paths, so prefix path
+            // with leading slash, but not before mount point
+            if (strpos($path, '://') > 0) {
+                $path = str_replace('://', ':///', $path);
+            } else {
+                $path = '/' . ltrim($path, '/');
+            }
         }
+        $this->key = $path;
     }
 }

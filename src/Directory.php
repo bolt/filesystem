@@ -5,7 +5,7 @@ namespace Bolt\Filesystem;
 use Bolt\Filesystem\Exception\IOException;
 use League\Flysystem;
 
-class Directory extends Flysystem\Directory
+class Directory extends Flysystem\Directory implements MountPointAwareInterface
 {
     use HandlerTrait;
 
