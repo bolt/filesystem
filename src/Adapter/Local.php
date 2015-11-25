@@ -16,7 +16,7 @@ class Local extends LocalBase
     {
         if (!is_dir($root)) {
             $umask = umask(0);
-            $result = !@mkdir($root, $this->permissionMap['dir']['public'], true);
+            $result = @mkdir($root, $this->permissionMap['dir']['public'], true);
             umask($umask);
 
             if (!$result) {
