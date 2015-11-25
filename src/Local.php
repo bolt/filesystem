@@ -8,14 +8,6 @@ use League\Flysystem\Util;
 
 class Local extends LocalBase
 {
-    const VISIBILITY_READONLY = 'readonly';
-
-    protected static $permissions = [
-        'public'    => 0755,
-        'readonly'  => 0744,
-        'private'   => 0700
-    ];
-
     public function __construct($root)
     {
         $realRoot = $this->ensureDirectory($root);
@@ -167,48 +159,5 @@ class Local extends LocalBase
         } else {
             return $path;
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVisibility($path)
-    {
-        $path = $this->applyPathPrefix($path);
-        $permissions = $this->getPermissions($path);
-        if ($permissions & 0666) {
-            $visibility = self::VISIBILITY_PUBLIC;
-        } elseif ($permissions & 0444) {
-            $visibility = self::VISIBILITY_READONLY;
-        } else {
-            $visibility = self::VISIBILITY_PRIVATE;
-        }
-
-        return compact('visibility');
-    }
-
-    protected function getPermissions($path)
-    {
-        static $uid;
-        static $gid;
-        if ($uid === null) {
-            $uid = function_exists('posix_getuid') ? posix_getuid() : getmyuid();
-            $gid = function_exists('posix_getgid') ? posix_getgid() : getmygid();
-        }
-
-        clearstatcache(false, $path);
-        $perms = fileperms($path);
-
-        // Make permissions relative to current user
-        // Remove user permissions if file owner is not the current user
-        if ($uid !== fileowner($path)) {
-            $perms &= 0077;
-        }
-        // Remove group permissions if file group is not the
-        if ($gid !== filegroup($path)) {
-            $perms &= 0707;
-        }
-
-        return $perms;
     }
 }
