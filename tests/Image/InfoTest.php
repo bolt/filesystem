@@ -2,11 +2,11 @@
 
 namespace Bolt\Filesystem\Tests\Image;
 
+use Bolt\Filesystem\Adapter\Local;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\Image\Exif;
 use Bolt\Filesystem\Image\Info;
 use Bolt\Filesystem\Image\Type;
-use Bolt\Filesystem\Local;
 use PHPExif;
 
 /**
@@ -16,7 +16,7 @@ use PHPExif;
  */
 class InfoTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var FilesystemInterface */
+    /** @var Filesystem */
     protected $filesystem;
 
     /**

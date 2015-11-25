@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Filesystem;
+namespace Bolt\Filesystem\Adapter;
 
 use Bolt\Filesystem\Exception\DirectoryCreationException;
 use League\Flysystem\Adapter\Local as LocalBase;
