@@ -8,19 +8,19 @@ use League\Flysystem\Util;
 
 class Local extends LocalBase
 {
-    public function __construct($root)
-    {
-        $realRoot = $this->ensureDirectory($root);
-        $this->setPathPrefix($realRoot);
-    }
-
     /**
      * {@inheritdoc}
      */
     protected function ensureDirectory($root)
     {
-        if (!is_dir($root) && !@mkdir($root, 0755, true)) {
-            return false;
+        if (!is_dir($root)) {
+            $umask = umask(0);
+            $result = !@mkdir($root, $this->permissionMap['dir']['public'], true);
+            umask($umask);
+
+            if (!$result) {
+                return false;
+            }
         }
 
         return realpath($root);
@@ -120,15 +120,18 @@ class Local extends LocalBase
     public function createDir($dirname, Config $config)
     {
         $location = $this->applyPathPrefix($dirname);
+        $umask = umask(0);
+        $visibility = $config->get('visibility', 'public');
 
-        // mkdir recursively creates directories.
-        // It's easier to ignore errors and check result
-        // than try to recursively check for file permissions
-        if (!is_dir($location) && !@mkdir($location, 0777, true)) {
-            return false;
+        if (!is_dir($location) && !@mkdir($location, $this->permissionMap['dir'][$visibility], true)) {
+            $return = false;
+        } else {
+            $return = ['path' => $dirname, 'type' => 'dir'];
         }
 
-        return ['path' => $dirname, 'type' => 'dir'];
+        umask($umask);
+
+        return $return;
     }
 
     /**
@@ -142,22 +145,5 @@ class Local extends LocalBase
         }
 
         return parent::deleteDir($dirname);
-    }
-
-    /**
-     * Get the normalized path from a SplFileInfo object.
-     *
-     * @param \SplFileInfo $file
-     *
-     * @return string
-     */
-    protected function getFilePath(\SplFileInfo $file)
-    {
-        $path = parent::getFilePath($file);
-        if ($this->pathSeparator === '\\') {
-            return str_replace($this->pathSeparator, '/', $path);
-        } else {
-            return $path;
-        }
     }
 }
