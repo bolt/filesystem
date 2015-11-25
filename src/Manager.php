@@ -362,6 +362,14 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function find()
+    {
+        return new Finder($this);
+    }
+
+    /**
      * Creates a local filesystem if path exists, else a null filesystem.
      *
      * @param string $path
