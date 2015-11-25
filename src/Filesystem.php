@@ -476,7 +476,9 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
      */
     protected function handleEx(Exception $e, $path)
     {
-        if ($e instanceof InvalidArgumentException) {
+        if ($e instanceof Ex\ExceptionInterface) {
+            return $e;
+        } elseif ($e instanceof InvalidArgumentException) {
             return $e;
         } elseif ($e instanceof Flysystem\RootViolationException) {
             return new Ex\RootViolationException($e->getMessage(), $e->getCode(), $e);
