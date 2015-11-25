@@ -2,46 +2,11 @@
 
 namespace Bolt\Filesystem\Tests\Iterator;
 
+use Bolt\Filesystem\Tests\FilesystemTestCase;
 use League\Flysystem;
-use Symfony\Component\Filesystem as Symfony;
 
-abstract class IteratorTestCase extends \PHPUnit_Framework_TestCase
+abstract class IteratorTestCase extends FilesystemTestCase
 {
-    /** @var string project root */
-    protected $rootDir;
-    /** @var string */
-    protected $tempDir;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->rootDir = __DIR__ . '/../..';
-        $this->tempDir = $this->rootDir . '/tests/temp';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->removeDirectory($this->tempDir);
-    }
-
-    protected function removeDirectory($dir)
-    {
-        if (!file_exists($dir)) {
-            return;
-        }
-
-        $fs = new Symfony\Filesystem();
-        $fs->remove($dir);
-    }
-
     protected function assertIterator($expected, \Traversable $iterator)
     {
         $values = array_map(
