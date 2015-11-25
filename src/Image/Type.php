@@ -92,7 +92,13 @@ class Type
         }
 
         // Get list of all standard constants
-        $constants = get_defined_constants(true)['standard'];
+        $constants = get_defined_constants(true);
+        if (defined('HHVM_VERSION')) {
+            $constants = $constants['Core'];
+        } else {
+            $constants = $constants['standard'];
+        }
+
         // filter down to image type constants
         $types = [];
         foreach ($constants as $name => $value) {
