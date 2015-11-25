@@ -262,7 +262,7 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface
     {
         try {
             if (!parent::createDir($dirname, $config)) {
-                throw new Ex\IOException('Failed to delete file', $dirname);
+                throw new Ex\DirectoryCreationException($dirname);
             }
         } catch (Exception $e) {
             throw $this->handleEx($e, $dirname);
