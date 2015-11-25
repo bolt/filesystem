@@ -174,11 +174,11 @@ class Local extends LocalBase
      */
     public function getVisibility($path)
     {
-        $location = $this->applyPathPrefix($path);
-        clearstatcache(false, $location);
-        if ($this->userCanWrite($location) || $this->groupCanWrite($location)) {
+        $path = $this->applyPathPrefix($path);
+        $permissions = $this->getPermissions($path);
+        if ($permissions & 0666) {
             $visibility = self::VISIBILITY_PUBLIC;
-        } elseif ($this->userCanRead($location) || $this->groupCanRead($location)) {
+        } elseif ($permissions & 0444) {
             $visibility = self::VISIBILITY_READONLY;
         } else {
             $visibility = self::VISIBILITY_PRIVATE;
@@ -187,120 +187,28 @@ class Local extends LocalBase
         return compact('visibility');
     }
 
-    /**
-     * Check is a user can write to a given location.
-     *
-     * @param string $location
-     *
-     * @return boolean
-     */
-    protected function userCanWrite($location)
+    protected function getPermissions($path)
     {
-        $worldPermissions = substr(sprintf('%o', fileperms($location)), -1, 1);
-        if ($worldPermissions >= 6) {
-            return true;
+        static $uid;
+        static $gid;
+        if ($uid === null) {
+            $uid = function_exists('posix_getuid') ? posix_getuid() : getmyuid();
+            $gid = function_exists('posix_getgid') ? posix_getgid() : getmygid();
         }
 
-        $permissions = substr(sprintf('%o', fileperms($location)), -3, 1);
-        $fileOwnerId = fileowner($location);
+        clearstatcache(false, $path);
+        $perms = fileperms($path);
 
-        if (function_exists('posix_getuid')) {
-            $uhandler = 'posix_getuid';
-        } else {
-            $uhandler = 'getmyuid';
+        // Make permissions relative to current user
+        // Remove user permissions if file owner is not the current user
+        if ($uid !== fileowner($path)) {
+            $perms &= 0077;
+        }
+        // Remove group permissions if file group is not the
+        if ($gid !== filegroup($path)) {
+            $perms &= 0707;
         }
 
-        $procOwnerId = call_user_func($uhandler);
-
-        if ($fileOwnerId === $procOwnerId && (int) $permissions >= 6) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Check is a group can write to a given location.
-     *
-     * @param string $location
-     *
-     * @return boolean
-     */
-    protected function groupCanWrite($location)
-    {
-        $permissions = substr(sprintf('%o', fileperms($location)), -2, 1);
-        $fileOwnerGroup = filegroup($location);
-
-        if (function_exists('posix_getgid')) {
-            $ghandler = 'posix_getgid';
-        } else {
-            $ghandler = 'getmygid';
-        }
-
-        $procOwnerGroup = call_user_func($ghandler);
-        if ($fileOwnerGroup === $procOwnerGroup && (int) $permissions >= 6) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Check is a user can read from a given location.
-     *
-     * @param string $location
-     *
-     * @return boolean
-     */
-    protected function userCanRead($location)
-    {
-        $worldPermissions = substr(sprintf('%o', fileperms($location)), -1);
-        if ($worldPermissions >= 5) {
-            return true;
-        }
-
-        $permissions = substr(sprintf('%o', fileperms($location)), -3, 1);
-        $fileOwnerId = fileowner($location);
-
-        if (function_exists('posix_getuid')) {
-            $uhandler = 'posix_getuid';
-        } else {
-            $uhandler = 'getmyuid';
-        }
-
-        $procOwnerId = call_user_func($uhandler);
-
-        if ($fileOwnerId === $procOwnerId && (int) $permissions >= 5) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Check is a group can read from a given location.
-     *
-     * @param string $location
-     *
-     * @return boolean
-     */
-    protected function groupCanRead($location)
-    {
-        $permissions = substr(sprintf('%o', fileperms($location)), -2, 1);
-        $fileOwnerGroup = filegroup($location);
-
-        if (function_exists('posix_getgid')) {
-            $ghandler = 'posix_getgid';
-        } else {
-            $ghandler = 'getmygid';
-        }
-
-        $procOwnerGroup = call_user_func($ghandler);
-
-        if ($fileOwnerGroup === $procOwnerGroup && (int) $permissions >= 5) {
-            return true;
-        }
-
-        return false;
+        return $perms;
     }
 }
