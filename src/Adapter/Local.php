@@ -39,7 +39,7 @@ class Local extends LocalBase
             return false;
         }
 
-        if (($size = file_put_contents($location, $contents, LOCK_EX)) === false) {
+        if (($size = file_put_contents($location, $contents, $this->writeFlags)) === false) {
             return false;
         }
 
