@@ -467,6 +467,18 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface, Mo
     /**
      * {@inheritdoc}
      */
+    public function includeFile($path, $once = true)
+    {
+        if (!$this->adapter instanceof SupportsIncludeFileInterface) {
+            throw new Ex\NotSupportedException('Filesystem does not support including PHP files.', $path);
+        }
+
+        return $this->adapter->includeFile($path, $once);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function assertPresent($path)
     {
         if (!$this->has($path)) {

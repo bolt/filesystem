@@ -3,11 +3,13 @@
 namespace Bolt\Filesystem\Adapter;
 
 use Bolt\Filesystem\Exception\DirectoryCreationException;
+use Bolt\Filesystem\Exception\IncludeFileException;
+use Bolt\Filesystem\SupportsIncludeFileInterface;
 use League\Flysystem\Adapter\Local as LocalBase;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
 
-class Local extends LocalBase
+class Local extends LocalBase implements SupportsIncludeFileInterface
 {
     /**
      * {@inheritdoc}
@@ -92,4 +94,58 @@ class Local extends LocalBase
 
         return parent::deleteDir($dirname);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function includeFile($path, $once = true)
+    {
+        $location = $this->applyPathPrefix($path);
+
+        set_error_handler(
+            function ($num, $message) use ($path) {
+                throw new IncludeFileException($message, $path);
+            }
+        );
+
+        if ($once) {
+            $result = includeFileOnce($location);
+        } else {
+            $result = includeFile($location);
+        }
+
+        restore_error_handler();
+
+        return $result;
+    }
+}
+
+/**
+ * Scope isolated include.
+ *
+ * Prevents access to $this/self from included files.
+ *
+ * @param string $file
+ *
+ * @return mixed
+ */
+function includeFile($file)
+{
+    /** @noinspection PhpIncludeInspection */
+    return include $file;
+}
+
+/**
+ * Scope isolated include_once.
+ *
+ * Prevents access to $this/self from included files.
+ *
+ * @param string $file
+ *
+ * @return mixed
+ */
+function includeFileOnce($file)
+{
+    /** @noinspection PhpIncludeInspection */
+    return include_once $file;
 }
