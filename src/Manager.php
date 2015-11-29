@@ -17,11 +17,13 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     /**
      * Constructor.
      *
-     * @param array $filesystems
+     * @param FilesystemInterface[] $filesystems
+     * @param PluginInterface[]     $plugins
      */
-    public function __construct(array $filesystems = [])
+    public function __construct(array $filesystems = [], array $plugins = [])
     {
         $this->mountFilesystems($filesystems);
+        $this->addPlugins($plugins);
     }
 
     /**
@@ -95,6 +97,21 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
         }
 
         return $this;
+    }
+
+    /**
+     * Register a list of plugins.
+     *
+     * @param PluginInterface[] $plugins
+     */
+    public function addPlugins(array $plugins)
+    {
+        foreach ($plugins as $plugin) {
+            if (!$plugin instanceof PluginInterface) {
+                throw new InvalidArgumentException('Plugin must be instance of League\Flysystem\PluginInterface');
+            }
+            $this->addPlugin($plugin);
+        }
     }
 
     /**
