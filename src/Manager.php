@@ -2,7 +2,6 @@
 namespace Bolt\Filesystem;
 
 use InvalidArgumentException;
-use League\Flysystem\Adapter\NullAdapter;
 use League\Flysystem\Handler;
 use League\Flysystem\Plugin\PluggableTrait;
 use League\Flysystem\PluginInterface;
@@ -32,7 +31,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         foreach ($filesystems as $prefix => $filesystem) {
             if (!$filesystem instanceof FilesystemInterface) {
-                $filesystem = $this->createFilesystem($filesystem);
+                throw new InvalidArgumentException('Filesystem must be instance of Bolt\Filesystem\FilesystemInterface');
             }
             $this->mountFilesystem($prefix, $filesystem);
         }
@@ -371,18 +370,6 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function find()
     {
         return new Finder($this);
-    }
-
-    /**
-     * Creates a local filesystem if path exists, else a null filesystem.
-     *
-     * @param string $path
-     *
-     * @return Filesystem
-     */
-    protected function createFilesystem($path)
-    {
-        return new Filesystem(is_dir($path) ? new Local($path) : new NullAdapter());
     }
 
     /**
