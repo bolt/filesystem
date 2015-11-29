@@ -390,6 +390,15 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function includeFile($path, $once = true)
+    {
+        list($prefix, $path) = $this->filterPrefix($path);
+        return $this->getFilesystem($prefix)->includeFile($path, $once);
+    }
+
+    /**
      * Separates the filesystem prefix from the path.
      *
      * @param string $path

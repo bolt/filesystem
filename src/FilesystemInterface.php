@@ -11,7 +11,7 @@ use InvalidArgumentException;
 use League\Flysystem;
 use Psr\Http\Message\StreamInterface;
 
-interface FilesystemInterface extends Flysystem\FilesystemInterface
+interface FilesystemInterface extends Flysystem\FilesystemInterface, SupportsIncludeFileInterface
 {
     /**
      * Check whether a file exists.
