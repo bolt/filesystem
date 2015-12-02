@@ -1,10 +1,10 @@
 <?php
 namespace Bolt\Filesystem;
 
-use Bolt\Filesystem\Handler\FileInterface;
-use Bolt\Filesystem\Handler\HandlerInterface;
 use Bolt\Filesystem\Exception\InvalidArgumentException;
 use Bolt\Filesystem\Exception\LogicException;
+use Bolt\Filesystem\Handler\FileInterface;
+use Bolt\Filesystem\Handler\HandlerInterface;
 
 class Manager implements AggregateFilesystemInterface, FilesystemInterface
 {
@@ -119,6 +119,11 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
         $fsOrigin = $this->getFilesystem($fsOrigin);
         $fsTarget = $this->getFilesystem($fsTarget);
 
+        $this->doCopy($fsOrigin, $fsTarget, $origin, $target, $override);
+    }
+
+    private function doCopy(FilesystemInterface $fsOrigin, FilesystemInterface $fsTarget, $origin, $target, $override)
+    {
         if ($fsTarget->has($target) &&
             (
                 $override === false ||
@@ -297,6 +302,62 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($prefix, $path) = $this->filterPrefix($dirname);
         $this->getFilesystem($prefix)->createDir($path, $config);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function copyDir($originDir, $targetDir, $override = null)
+    {
+        $this->mirror($originDir, $targetDir, ['delete' => false, 'override' => $override]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mirror($originDir, $targetDir, $config = [])
+    {
+        $config += [
+            'delete'   => true,
+            'override' => null,
+        ];
+
+        list($fsOrigin, $originDir) = $this->filterPrefix($originDir);
+        list($fsTarget, $targetDir) = $this->filterPrefix($targetDir);
+
+        $fsOrigin = $this->getFilesystem($fsOrigin);
+        $fsTarget = $this->getFilesystem($fsTarget);
+
+        if ($config['delete'] && $fsTarget->has($targetDir)) {
+            $it = new Iterator\RecursiveDirectoryIterator($fsTarget, $targetDir);
+            $it = new \RecursiveIteratorIterator($it, \RecursiveIteratorIterator::CHILD_FIRST);
+            foreach ($it as $handler) {
+                /** @var HandlerInterface $handler */
+                $origin = str_replace($targetDir, $originDir, $handler->getPath());
+                if (!$fsOrigin->has($origin)) {
+                    if ($handler->isDir()) {
+                        $fsTarget->deleteDir($origin);
+                    } else {
+                        $fsTarget->delete($origin);
+                    }
+                }
+            }
+        }
+
+        if ($fsOrigin->has($originDir)) {
+            $fsTarget->createDir($targetDir, $config);
+        }
+
+        $it = new Iterator\RecursiveDirectoryIterator($fsOrigin, $originDir);
+        $it = new \RecursiveIteratorIterator($it, \RecursiveIteratorIterator::SELF_FIRST);
+        foreach ($it as $handler) {
+            $target = str_replace($originDir, $targetDir, $handler->getPath());
+            if ($handler->isDir()) {
+                $fsTarget->createDir($target, $config);
+            } else {
+                $this->doCopy($fsOrigin, $fsTarget, $handler->getPath(), $target, $config['override']);
+            }
+        }
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Bolt\Filesystem;
 
 use Bolt\Filesystem\Exception as Ex;
+use Bolt\Filesystem\Handler;
 use Bolt\Filesystem\Handler\FileInterface;
 use Bolt\Filesystem\Handler\HandlerInterface;
 use Carbon\Carbon;
@@ -422,6 +423,65 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         if ($result === false) {
             throw new Ex\DirectoryCreationException($path);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function copyDir($originDir, $targetDir, $override = null)
+    {
+        $this->mirror($originDir, $targetDir, ['delete' => false, 'override' => $override]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mirror($originDir, $targetDir, $config = [])
+    {
+        $originDir = $this->normalizePath($originDir);
+        $targetDir = $this->normalizePath($targetDir);
+        $config = $this->prepareConfig($config);
+
+        $this->doMirror($originDir, $targetDir, $config);
+    }
+
+    private function doMirror($originDir, $targetDir, Flysystem\Config $config)
+    {
+        if ($config->get('delete', true) && $this->doHas($targetDir)) {
+            $it = $this->getIterator($targetDir, \RecursiveIteratorIterator::CHILD_FIRST);
+            foreach ($it as $handler) {
+                /** @var HandlerInterface $handler */
+                $origin = str_replace($targetDir, $originDir, $handler->getPath());
+                if (!$this->doHas($origin)) {
+                    if ($handler->isDir()) {
+                        $this->doDeleteDir($handler->getPath());
+                    } else {
+                        $this->doDelete($handler->getPath());
+                    }
+                }
+            }
+        }
+
+        if ($this->doHas($originDir)) {
+            $this->doCreateDir($targetDir, $config);
+        }
+
+        $it = $this->getIterator($originDir, \RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($it as $handler) {
+            $target = str_replace($originDir, $targetDir, $handler->getPath());
+            if ($handler->isDir()) {
+                $this->doCreateDir($target, $config);
+            } else {
+                $this->doCopy($handler->getPath(), $target, $config->get('override'));
+            }
+        }
+    }
+
+    private function getIterator($path, $mode = null)
+    {
+        $it = new Iterator\RecursiveDirectoryIterator($this, $path);
+        return new \RecursiveIteratorIterator($it, $mode);
     }
 
     /**

@@ -198,6 +198,31 @@ interface FilesystemInterface extends SupportsIncludeFileInterface
     public function createDir($dirname, $config = []);
 
     /**
+     * Copies a directory and its contents to another.
+     *
+     * @param string    $originDir The origin directory
+     * @param string    $targetDir The target directory
+     * @param bool|null $override  Whether to override an existing file.
+     *                             true  = always override the target.
+     *                             false = never override the target.
+     *                             null  = only override the target if the source is newer.
+     */
+    public function copyDir($originDir, $targetDir, $override = null);
+
+    /**
+     * Mirrors a directory to another.
+     *
+     * Note: By default, this will delete files in target if they are not in source.
+     *
+     * @param string $originDir The origin directory
+     * @param string $targetDir The target directory
+     * @param array  $config    Valid options are:
+     *                          - delete   = Whether to delete files that are not in the source directory (default: true)
+     *                          - override = See {@see copyDir}'s $override parameter for details (default: null)
+     */
+    public function mirror($originDir, $targetDir, $config = []);
+
+    /**
      * Get a handler.
      *
      * @param string           $path    The path to the file.
