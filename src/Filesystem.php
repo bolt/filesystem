@@ -288,7 +288,7 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface, Mo
             function ($entry) {
                 if ($entry['type'] === 'dir') {
                     $handler = new Directory($this, $entry['path']);
-                } elseif (isset($entry['extension']) && in_array($entry['extension'], Image\Type::getTypeExtensions())) {
+                } elseif (isset($entry['extension']) && in_array($entry['extension'], Image\Type::getExtensions())) {
                     $handler = Image::createFromListingEntry($this, $entry);
                 } else {
                     $handler = File::createFromListingEntry($this, $entry);
@@ -406,7 +406,7 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface, Mo
         }
 
         $ext = pathinfo($metadata['path'], PATHINFO_EXTENSION);
-        if (in_array($ext, Image\Type::getTypeExtensions())) {
+        if (in_array($ext, Image\Type::getExtensions())) {
             $metadata['type'] = 'image';
         } elseif (in_array($ext, $this->getDocumentExtensions())) {
             $metadata['type'] = 'document';

@@ -12,49 +12,60 @@ use PHPExif;
  */
 class TypeTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstruct()
+    public function testGetById()
     {
-        $type = new Type(IMAGETYPE_JPEG);
+        $type = Type::getById(IMAGETYPE_JPEG);
         $this->assertInstanceOf('Bolt\Filesystem\Image\Type', $type);
 
+        $type2 = Type::getById(IMAGETYPE_JPEG);
+        $this->assertSame($type, $type2);
+
         $this->setExpectedException('\InvalidArgumentException', 'Given type is not an IMAGETYPE_* constant');
-        new Type(42);
+        Type::getById(42);
     }
 
-    public function testToInt()
+    public function testToId()
     {
-        $type = new Type(IMAGETYPE_JPEG);
-        $this->assertSame(2, $type->toInt());
+        $type = Type::getById(IMAGETYPE_JPEG);
+        $this->assertSame(2, $type->toId());
     }
 
     public function testToMimeType()
     {
-        $type = new Type(IMAGETYPE_JPEG);
+        $type = Type::getById(IMAGETYPE_JPEG);
         $this->assertSame('image/jpeg', $type->toMimeType());
     }
 
     public function testToExtension()
     {
-        $type = new Type(IMAGETYPE_JPEG);
-        $this->assertSame('.jpeg', $type->toExtension());
+        $type = Type::getById(IMAGETYPE_JPEG);
+        $this->assertSame('.jpeg', $type->toExtension(true));
+        $this->assertSame('jpeg', $type->toExtension(false));
     }
 
     public function testToString()
     {
-        $type = new Type(IMAGETYPE_JPEG);
-        $this->assertSame('jpeg', $type->toString());
-        $this->assertSame('jpeg', (string) $type);
+        $type = Type::getById(IMAGETYPE_JPEG);
+        $this->assertSame('JPEG', $type->toString());
+        $this->assertSame('JPEG', (string) $type);
     }
 
     public function testGetTypes()
     {
         $types = Type::getTypes();
-        $this->assertTrue(in_array('jpeg', $types));
+        $this->assertInstanceOf('Bolt\Filesystem\Image\Type', $types[0]);
     }
 
-    public function testGetTypeExtensions()
+    public function testGetMimeTypes()
     {
-        $extensions = Type::getTypeExtensions();
-        $this->assertTrue(in_array('jpeg', $extensions));
+        $mimeTypes = Type::getMimeTypes();
+        $this->assertContains('image/jpeg', $mimeTypes);
+    }
+
+    public function testGetExtensions()
+    {
+        $extensions = Type::getExtensions();
+        $this->assertContains('jpeg', $extensions);
+        $this->assertContains('jpg', $extensions);
     }
 }
