@@ -112,7 +112,7 @@ class Info
         return new static(
             $info[0],
             $info[1],
-            new Type($info[2]),
+            Type::getById($info[2]),
             $info['bits'],
             $info['channels'],
             $info['mime'],

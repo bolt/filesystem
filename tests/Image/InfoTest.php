@@ -30,7 +30,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
     public function testConstruct()
     {
         $exif = new Exif([]);
-        $type = new Type(IMAGETYPE_JPEG);
+        $type = Type::getById(IMAGETYPE_JPEG);
         $info = new Info(1024, 768, $type, 2, 7, 'Marcel Marceau', $exif);
         $this->assertInstanceOf('Bolt\Filesystem\Image\Info', $info);
     }
