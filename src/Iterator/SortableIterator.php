@@ -2,9 +2,9 @@
 
 namespace Bolt\Filesystem\Iterator;
 
-use Bolt\Filesystem\Directory;
-use Bolt\Filesystem\File;
-use League\Flysystem\Handler;
+use Bolt\Filesystem\Handler\Directory;
+use Bolt\Filesystem\Handler\File;
+use Bolt\Filesystem\Handler\HandlerInterface;
 
 /**
  * SortableIterator applies a sort on a given Iterator.
@@ -34,11 +34,11 @@ class SortableIterator implements \IteratorAggregate
         $this->iterator = $iterator;
 
         if (self::SORT_BY_NAME === $sort) {
-            $this->sort = function (Handler $a, Handler $b) {
+            $this->sort = function (HandlerInterface $a, HandlerInterface $b) {
                 return strcmp($a->getPath(), $b->getPath());
             };
         } elseif (self::SORT_BY_TYPE === $sort) {
-            $this->sort = function (Handler $a, Handler $b) {
+            $this->sort = function (HandlerInterface $a, HandlerInterface $b) {
                 if ($a->isDir() && $b->isFile()) {
                     return -1;
                 } elseif ($a->isFile() && $b->isDir()) {

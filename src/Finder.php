@@ -2,7 +2,6 @@
 
 namespace Bolt\Filesystem;
 
-use Bolt\Filesystem\Iterator;
 use League\Flysystem;
 use Symfony\Component\Finder as Symfony;
 
@@ -467,9 +466,9 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @param string|array $dirs A directory path or an array of directories
      *
-     * @return Finder The current Finder instance
-     *
      * @throws \InvalidArgumentException if one of the directories does not exist
+     *
+     * @return Finder The current Finder instance
      */
     public function in($dirs)
     {
@@ -507,9 +506,9 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @param mixed $iterator
      *
-     * @return Finder The finder
-     *
      * @throws \InvalidArgumentException When the given argument is not iterable.
+     *
+     * @return Finder The finder
      */
     public function append($iterator)
     {
@@ -535,9 +534,9 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * This method implements the IteratorAggregate interface.
      *
-     * @return \Iterator An iterator
-     *
      * @throws \LogicException if the in() method has not been called
+     *
+     * @return \Iterator An iterator
      */
     public function getIterator()
     {

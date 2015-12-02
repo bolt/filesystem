@@ -3,7 +3,7 @@
 namespace Bolt\Filesystem\Iterator;
 
 use Bolt\Filesystem\Exception\IOException;
-use Bolt\Filesystem\File;
+use Bolt\Filesystem\Handler\File;
 use Symfony\Component\Finder\Iterator\FilecontentFilterIterator as FilecontentFilterIteratorBase;
 
 /**

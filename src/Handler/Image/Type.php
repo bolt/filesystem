@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Filesystem\Image;
+namespace Bolt\Filesystem\Handler\Image;
 
 use InvalidArgumentException;
 
