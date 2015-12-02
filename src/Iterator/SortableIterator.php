@@ -2,6 +2,7 @@
 
 namespace Bolt\Filesystem\Iterator;
 
+use Bolt\Filesystem\Exception\InvalidArgumentException;
 use Bolt\Filesystem\Handler\Directory;
 use Bolt\Filesystem\Handler\File;
 use Bolt\Filesystem\Handler\HandlerInterface;
@@ -27,7 +28,7 @@ class SortableIterator implements \IteratorAggregate
      * @param \Traversable $iterator The Iterator to filter
      * @param int|callable $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a PHP callback)
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function __construct(\Traversable $iterator, $sort)
     {
@@ -56,7 +57,7 @@ class SortableIterator implements \IteratorAggregate
         } elseif (is_callable($sort)) {
             $this->sort = $sort;
         } else {
-            throw new \InvalidArgumentException('The SortableIterator takes a PHP callable or a valid built-in sort algorithm as an argument.');
+            throw new InvalidArgumentException('The SortableIterator takes a PHP callable or a valid built-in sort algorithm as an argument.');
         }
     }
 

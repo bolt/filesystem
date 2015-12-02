@@ -3,6 +3,7 @@
 namespace Bolt\Filesystem\Tests\Iterator;
 
 use Bolt\Filesystem\Adapter\Local;
+use Bolt\Filesystem\Exception\InvalidArgumentException;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\Handler\File;
@@ -32,9 +33,9 @@ class SortableIteratorTest extends IteratorTestCase
     {
         try {
             new SortableIterator(new Iterator([]), 'foobar');
-            $this->fail('__construct() throws an \InvalidArgumentException exception if the mode is not valid');
+            $this->fail('__construct() throws an InvalidArgumentException exception if the mode is not valid');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException exception if the mode is not valid');
+            $this->assertInstanceOf('Bolt\Filesystem\Exception\InvalidArgumentException', $e, '__construct() throws an InvalidArgumentException exception if the mode is not valid');
         }
     }
 

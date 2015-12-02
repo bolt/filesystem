@@ -468,7 +468,7 @@ class FinderTest extends IteratorTestCase
 
     public function testInWithNonDirectoryGlob()
     {
-        $this->setExpectedException('InvalidArgumentException');
+        $this->setExpectedException('Bolt\Filesystem\Exception\InvalidArgumentException');
         $finder = new Finder($this->filesystem);
         $finder->in('/fixtures/js/a*');
     }

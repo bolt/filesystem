@@ -8,7 +8,6 @@ use Carbon\Carbon;
 use Exception;
 use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\StreamWrapper as GuzzleStreamWrapper;
-use InvalidArgumentException;
 use League\Flysystem;
 use LogicException;
 use Psr\Http\Message\StreamInterface;
@@ -138,7 +137,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
             $resource = GuzzleStreamWrapper::getResource($resource);
         }
         if (!is_resource($resource)) {
-            throw new InvalidArgumentException(__METHOD__ . ' expects argument #2 to be a valid resource.');
+            throw new Ex\InvalidArgumentException(__METHOD__ . ' expects argument #2 to be a valid resource.');
         }
 
         $path = $this->normalizePath($path);
@@ -188,7 +187,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
             $resource = GuzzleStreamWrapper::getResource($resource);
         }
         if (!is_resource($resource)) {
-            throw new InvalidArgumentException(__METHOD__ . ' expects argument #2 to be a valid resource.');
+            throw new Ex\InvalidArgumentException(__METHOD__ . ' expects argument #2 to be a valid resource.');
         }
 
         $path = $this->normalizePath($path);
@@ -241,7 +240,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
             $resource = GuzzleStreamWrapper::getResource($resource);
         }
         if (!is_resource($resource)) {
-            throw new InvalidArgumentException(__METHOD__ . ' expects argument #2 to be a valid resource.');
+            throw new Ex\InvalidArgumentException(__METHOD__ . ' expects argument #2 to be a valid resource.');
         }
 
         $path = $this->normalizePath($path);
@@ -648,8 +647,8 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
     {
         if ($e instanceof Ex\ExceptionInterface) {
             return $e;
-        } elseif ($e instanceof InvalidArgumentException) {
-            return $e;
+        } elseif ($e instanceof \InvalidArgumentException) {
+            return new Ex\InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         } elseif ($e instanceof Flysystem\NotSupportedException) {
             return new Ex\NotSupportedException($e->getMessage(), $e->getCode(), $e);
         } else {

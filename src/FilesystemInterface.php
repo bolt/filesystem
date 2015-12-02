@@ -4,6 +4,7 @@ namespace Bolt\Filesystem;
 
 use Bolt\Filesystem\Exception\FileExistsException;
 use Bolt\Filesystem\Exception\FileNotFoundException;
+use Bolt\Filesystem\Exception\InvalidArgumentException;
 use Bolt\Filesystem\Exception\IOException;
 use Bolt\Filesystem\Exception\RootViolationException;
 use Bolt\Filesystem\Handler\HandlerInterface;

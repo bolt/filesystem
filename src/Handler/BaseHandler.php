@@ -3,6 +3,7 @@
 namespace Bolt\Filesystem\Handler;
 
 use BadMethodCallException;
+use Bolt\Filesystem\Exception\InvalidArgumentException;
 use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\MountPointAwareTrait;
 use Carbon\Carbon;
@@ -38,7 +39,7 @@ class BaseHandler implements HandlerInterface
     public function __construct(FilesystemInterface $filesystem = null, $path = null)
     {
         if ($path !== null && !is_string($path)) {
-            throw new \InvalidArgumentException('Path given must be a string.');
+            throw new InvalidArgumentException('Path given must be a string.');
         }
 
         $this->filesystem = $filesystem;
@@ -67,7 +68,7 @@ class BaseHandler implements HandlerInterface
     public function setPath($path)
     {
         if (!is_string($path)) {
-            throw new \InvalidArgumentException('Path given must be a string.');
+            throw new InvalidArgumentException('Path given must be a string.');
         }
 
         $this->path = $path;

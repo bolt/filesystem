@@ -19,7 +19,7 @@ class TypeTest extends \PHPUnit_Framework_TestCase
         $type2 = Type::getById(IMAGETYPE_JPEG);
         $this->assertSame($type, $type2);
 
-        $this->setExpectedException('\InvalidArgumentException', 'Given type is not an IMAGETYPE_* constant');
+        $this->setExpectedException('Bolt\Filesystem\Exception\InvalidArgumentException', 'Given type is not an IMAGETYPE_* constant');
         Type::getById(42);
     }
 

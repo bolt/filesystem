@@ -2,7 +2,7 @@
 namespace Bolt\Filesystem;
 
 use Bolt\Filesystem\Handler\HandlerInterface;
-use InvalidArgumentException;
+use Bolt\Filesystem\Exception\InvalidArgumentException;
 use League\Flysystem\Plugin\PluggableTrait;
 use League\Flysystem\PluginInterface;
 use LogicException;
