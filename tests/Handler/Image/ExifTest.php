@@ -1,8 +1,8 @@
 <?php
 
-namespace Bolt\Filesystem\Tests\Image;
+namespace Bolt\Filesystem\Tests\Handler\Image;
 
-use Bolt\Filesystem\Image\Exif;
+use Bolt\Filesystem\Handler\Image\Exif;
 use PHPExif;
 
 /**
@@ -15,13 +15,13 @@ class ExifTest extends \PHPUnit_Framework_TestCase
     public function testConstruct()
     {
         $exif = new Exif([]);
-        $this->assertInstanceOf('Bolt\Filesystem\Image\Exif', $exif);
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Exif', $exif);
     }
 
     public function testCast()
     {
         $exif = new Exif([]);
-        $this->assertInstanceOf('Bolt\Filesystem\Image\Exif', $exif->cast(new PHPExif\Exif([])));
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Exif', $exif->cast(new PHPExif\Exif([])));
     }
 
     public function testInvalidGps()

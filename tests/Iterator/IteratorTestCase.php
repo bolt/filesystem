@@ -3,6 +3,7 @@
 namespace Bolt\Filesystem\Tests\Iterator;
 
 use Bolt\Filesystem\Tests\FilesystemTestCase;
+use Bolt\Filesystem\Handler\HandlerInterface;
 use League\Flysystem;
 
 abstract class IteratorTestCase extends FilesystemTestCase
@@ -10,7 +11,7 @@ abstract class IteratorTestCase extends FilesystemTestCase
     protected function assertIterator($expected, \Traversable $iterator)
     {
         $values = array_map(
-            function (Flysystem\Handler $handler) {
+            function (HandlerInterface $handler) {
                 return $handler->getPath();
             },
             iterator_to_array($iterator)
@@ -27,7 +28,7 @@ abstract class IteratorTestCase extends FilesystemTestCase
     protected function assertOrderedIterator($expected, \Traversable $iterator)
     {
         $values = array_map(
-            function (Flysystem\Handler $handler) {
+            function (HandlerInterface $handler) {
                 return $handler->getPath();
             },
             iterator_to_array($iterator)
@@ -46,8 +47,8 @@ abstract class IteratorTestCase extends FilesystemTestCase
     {
         $values = [];
         foreach ($iterator as $handler) {
-            /** @var Flysystem\Handler $handler */
-            $this->assertInstanceOf('League\\Flysystem\\Handler', $handler);
+            /** @var HandlerInterface $handler */
+            $this->assertInstanceOf('Bolt\\Filesystem\\Handler\\HandlerInterface', $handler);
             $values[] = $handler->getPath();
         }
 

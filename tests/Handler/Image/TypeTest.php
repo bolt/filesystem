@@ -1,9 +1,8 @@
 <?php
 
-namespace Bolt\Filesystem\Tests\Image;
+namespace Bolt\Filesystem\Tests\Handler\Image;
 
-use Bolt\Filesystem\Image\Type;
-use PHPExif;
+use Bolt\Filesystem\Handler\Image\Type;
 
 /**
  * Tests for Bolt\Filesystem\Image\Type
@@ -15,7 +14,7 @@ class TypeTest extends \PHPUnit_Framework_TestCase
     public function testGetById()
     {
         $type = Type::getById(IMAGETYPE_JPEG);
-        $this->assertInstanceOf('Bolt\Filesystem\Image\Type', $type);
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Type', $type);
 
         $type2 = Type::getById(IMAGETYPE_JPEG);
         $this->assertSame($type, $type2);
@@ -53,7 +52,7 @@ class TypeTest extends \PHPUnit_Framework_TestCase
     public function testGetTypes()
     {
         $types = Type::getTypes();
-        $this->assertInstanceOf('Bolt\Filesystem\Image\Type', $types[0]);
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Type', $types[0]);
     }
 
     public function testGetMimeTypes()

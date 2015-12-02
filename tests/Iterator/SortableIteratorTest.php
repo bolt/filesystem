@@ -2,12 +2,12 @@
 
 namespace Bolt\Filesystem\Tests\Iterator;
 
-use Bolt\Filesystem\File;
+use Bolt\Filesystem\Adapter\Local;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\FilesystemInterface;
+use Bolt\Filesystem\Handler\File;
+use Bolt\Filesystem\Handler\HandlerInterface;
 use Bolt\Filesystem\Iterator\SortableIterator;
-use Bolt\Filesystem\Adapter\Local;
-use League\Flysystem\Handler;
 use Symfony\Component\Finder\Tests\Iterator\Iterator;
 
 /**
@@ -106,7 +106,7 @@ class SortableIteratorTest extends IteratorTestCase
                 ]
             ],
             'sort by call' => [
-                function (Handler $a, Handler $b) {
+                function (HandlerInterface $a, HandlerInterface $b) {
                     return strcmp($a->getPath(), $b->getPath());
                 },
                 [

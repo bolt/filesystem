@@ -2,10 +2,10 @@
 
 namespace Bolt\Filesystem\Tests\Iterator;
 
+use Bolt\Filesystem\Adapter\Local;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\Iterator\GlobIterator;
-use Bolt\Filesystem\Adapter\Local;
 use Symfony\Component\Filesystem as Symfony;
 use Webmozart\Glob\Glob;
 

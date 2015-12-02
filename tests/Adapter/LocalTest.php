@@ -3,7 +3,6 @@
 namespace Bolt\Filesystem\Tests\Adapter;
 
 use Bolt\Filesystem\Adapter\Local;
-use Bolt\Filesystem\File;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\Tests\FilesystemTestCase;
 use League\Flysystem\Config;

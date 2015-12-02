@@ -2,13 +2,13 @@
 
 namespace Bolt\Filesystem\tests\Iterator;
 
-use Bolt\Filesystem\Directory;
+use Bolt\Filesystem\Adapter\Local;
 use Bolt\Filesystem\Exception\IOException;
-use Bolt\Filesystem\File;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\FilesystemInterface;
+use Bolt\Filesystem\Handler\Directory;
+use Bolt\Filesystem\Handler\File;
 use Bolt\Filesystem\Iterator\FileContentFilterIterator;
-use Bolt\Filesystem\Adapter\Local;
 
 class FileContentFilterIteratorTest extends IteratorTestCase
 {
@@ -42,7 +42,7 @@ class FileContentFilterIteratorTest extends IteratorTestCase
     public function testUnreadableFile()
     {
         $inner = new \ArrayIterator();
-        $mock = $this->getMock('Bolt\Filesystem\File', ['read'], [$this->filesystem, 'fixtures/base.css']);
+        $mock = $this->getMock('Bolt\Filesystem\Handler\File', ['read'], [$this->filesystem, 'fixtures/base.css']);
         $mock->expects($this->atLeastOnce())
             ->method('read')
             ->will($this->throwException(new IOException('Fake it, until you make it!')))

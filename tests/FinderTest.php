@@ -3,11 +3,11 @@
 namespace Bolt\Filesystem\Tests;
 
 use Bolt\Filesystem\Adapter\Local;
+use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\Finder;
-use Bolt\Filesystem\Filesystem;
+use Bolt\Filesystem\Handler\HandlerInterface;
 use Bolt\Filesystem\Tests\Iterator\IteratorTestCase;
-use League\Flysystem\Handler;
 
 /**
  * Tests for Bolt\Filesystem\Finder
@@ -336,7 +336,6 @@ class FinderTest extends IteratorTestCase
         $fs->touch(__DIR__ . '/temp/.foo');
         $fs->touch(__DIR__ . '/temp/.bar');
 
-
         $filesystem = new Filesystem(new Local(__DIR__ . '/temp'));
         $finder = new Finder($filesystem);
 
@@ -409,7 +408,7 @@ class FinderTest extends IteratorTestCase
     public function testSortByTime()
     {
         $fs = new \Symfony\Component\Filesystem\Filesystem();
-        $fs->mkdir( __DIR__ . '/temp/');
+        $fs->mkdir(__DIR__ . '/temp/');
         $fs->touch(__DIR__ . '/temp/bar.css', 1371227908);
         $fs->touch(__DIR__ . '/temp/foo.css', 1339690408);
 
@@ -428,21 +427,21 @@ class FinderTest extends IteratorTestCase
             'fixtures/css/style.css',
         ];
         $finder = new Finder($this->filesystem);
-        $this->assertSame($finder, $finder->sort(function (Handler $a, Handler $b) { return strcmp($a->getPath(), $b->getPath()); }));
+        $this->assertSame($finder, $finder->sort(function (HandlerInterface $a, HandlerInterface $b) { return strcmp($a->getPath(), $b->getPath()); }));
         $this->assertIterator($expected, $finder->in(self::$tmpDir . '/css')->getIterator());
     }
 
     public function testFilter()
     {
         $finder = new Finder($this->filesystem);
-        $this->assertSame($finder, $finder->filter(function (Handler $f) { return false !== strpos($f->getPath(), 'js'); }));
+        $this->assertSame($finder, $finder->filter(function (HandlerInterface $f) { return false !== strpos($f->getPath(), 'js'); }));
         $this->assertIterator(['fixtures/js', 'fixtures/js/script.js'], $finder->in(self::$tmpDir)->getIterator());
     }
 
     public function testIn()
     {
         $finder = new Finder($this->filesystem);
-        $iterator = $finder->files()->name('*.css')->depth('< 1')->in([self::$tmpDir . '/css', self::$tmpDir . '/js',])->getIterator();
+        $iterator = $finder->files()->name('*.css')->depth('< 1')->in([self::$tmpDir . '/css', self::$tmpDir . '/js'])->getIterator();
 
         $expected = [
             'fixtures/css/reset.css',
@@ -526,7 +525,7 @@ class FinderTest extends IteratorTestCase
 
         $finder = new Finder($this->filesystem);
         $a = iterator_to_array($finder->directories()->in(self::$tmpDir));
-        $a = array_values(array_map(function (Handler $a) { return $a->getPath(); }, $a));
+        $a = array_values(array_map(function (HandlerInterface $a) { return $a->getPath(); }, $a));
         sort($a);
         $this->assertEquals($expected, $a, 'implements the \IteratorAggregate interface');
     }
@@ -534,7 +533,7 @@ class FinderTest extends IteratorTestCase
     public function testAppendWithAFinder()
     {
         $finder = new Finder($this->filesystem);
-        $finder->files()->in(self::$tmpDir. '/js');
+        $finder->files()->in(self::$tmpDir . '/js');
 
         $finder1 = new Finder($this->filesystem);
         $finder1->directories()->in(self::$tmpDir . '/css');
@@ -656,8 +655,8 @@ class FinderTest extends IteratorTestCase
     public function testMultipleLocations()
     {
         $locations = [
-            self::$tmpDir.'/',
-            self::$tmpDir.'/css/',
+            self::$tmpDir . '/',
+            self::$tmpDir . '/css/',
         ];
 
         $finder = new Finder($this->filesystem);
