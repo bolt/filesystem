@@ -3,6 +3,7 @@
 namespace Bolt\Filesystem\Tests;
 
 use Bolt\Filesystem\Adapter\Local;
+use Bolt\Filesystem\Exception\LogicException;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\Finder;
@@ -492,7 +493,7 @@ class FinderTest extends IteratorTestCase
  * Fails as I can't get the logic exception to throw
  */
 //     /**
-//      * @expectedException \LogicException
+//      * @expectedException LogicException
 //      */
 //     public function testGetIteratorWithoutIn()
 //     {
@@ -603,7 +604,7 @@ class FinderTest extends IteratorTestCase
  * Failing as I can't get the exception to be thrown
  */
 //     /**
-//      * @expectedException \LogicException
+//      * @expectedException LogicException
 //      */
 //     public function testCountWithoutIn()
 //     {

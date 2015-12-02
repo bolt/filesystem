@@ -3,9 +3,9 @@ namespace Bolt\Filesystem;
 
 use Bolt\Filesystem\Handler\HandlerInterface;
 use Bolt\Filesystem\Exception\InvalidArgumentException;
+use Bolt\Filesystem\Exception\LogicException;
 use League\Flysystem\Plugin\PluggableTrait;
 use League\Flysystem\PluginInterface;
-use LogicException;
 
 class Manager implements AggregateFilesystemInterface, FilesystemInterface
 {

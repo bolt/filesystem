@@ -3,6 +3,7 @@
 namespace Bolt\Filesystem;
 
 use Bolt\Filesystem\Exception\InvalidArgumentException;
+use Bolt\Filesystem\Exception\LogicException;
 use League\Flysystem;
 use Symfony\Component\Finder as Symfony;
 
@@ -535,7 +536,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * This method implements the IteratorAggregate interface.
      *
-     * @throws \LogicException if the in() method has not been called
+     * @throws LogicException if the in() method has not been called
      *
      * @return \Iterator An iterator
      */
@@ -554,7 +555,7 @@ class Finder implements \IteratorAggregate, \Countable
             try {
                 $this->in('');
             } catch (InvalidArgumentException $e) {
-                throw new \LogicException('You must call one of in() or append() methods before iterating over a Finder with an aggregate filesystem.');
+                throw new LogicException('You must call one of in() or append() methods before iterating over a Finder with an aggregate filesystem.');
             }
         }
 

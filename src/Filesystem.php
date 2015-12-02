@@ -9,7 +9,6 @@ use Exception;
 use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\StreamWrapper as GuzzleStreamWrapper;
 use League\Flysystem;
-use LogicException;
 use Psr\Http\Message\StreamInterface;
 
 /**
@@ -649,6 +648,8 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
             return $e;
         } elseif ($e instanceof \InvalidArgumentException) {
             return new Ex\InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
+        } elseif ($e instanceof \LogicException) {
+            return new Ex\LogicException($e->getMessage(), $e->getCode(), $e);
         } elseif ($e instanceof Flysystem\NotSupportedException) {
             return new Ex\NotSupportedException($e->getMessage(), $e->getCode(), $e);
         } else {
@@ -668,7 +669,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
     {
         try {
             return Flysystem\Util::normalizePath($path);
-        } catch (LogicException $e) {
+        } catch (\LogicException $e) {
             throw new Ex\RootViolationException($e->getMessage(), $e->getCode(), $e);
         }
     }
