@@ -3,14 +3,13 @@
 namespace Bolt\Filesystem\Handler;
 
 use Bolt\Filesystem\FilesystemInterface;
-use Psr\Http\Message\StreamInterface;
 
 /**
  * This represents a filesystem file.
  *
  * @author Carson Full <carsonfull@gmail.com>
  */
-class File extends BaseHandler
+class File extends BaseHandler implements FileInterface
 {
     /** @var string cached mimetype */
     protected $mimetype;
@@ -40,9 +39,7 @@ class File extends BaseHandler
     }
 
     /**
-     * Read the file.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function read()
     {
@@ -50,9 +47,7 @@ class File extends BaseHandler
     }
 
     /**
-     * Read the file as a stream.
-     *
-     * @return StreamInterface
+     * {@inheritdoc}
      */
     public function readStream()
     {
@@ -60,9 +55,7 @@ class File extends BaseHandler
     }
 
     /**
-     * Write the new file.
-     *
-     * @param string $content
+     * {@inheritdoc}
      */
     public function write($content)
     {
@@ -70,9 +63,7 @@ class File extends BaseHandler
     }
 
     /**
-     * Write the new file using a stream.
-     *
-     * @param StreamInterface|resource $resource
+     * {@inheritdoc}
      */
     public function writeStream($resource)
     {
@@ -80,9 +71,7 @@ class File extends BaseHandler
     }
 
     /**
-     * Update the file contents.
-     *
-     * @param string $content
+     * {@inheritdoc}
      */
     public function update($content)
     {
@@ -90,9 +79,7 @@ class File extends BaseHandler
     }
 
     /**
-     * Update the file contents with a stream.
-     *
-     * @param StreamInterface|resource $resource
+     * {@inheritdoc}
      */
     public function updateStream($resource)
     {
@@ -100,11 +87,7 @@ class File extends BaseHandler
     }
 
     /**
-     * Create the file or update if exists.
-     *
-     * @param string $content
-     *
-     * @return void
+     * {@inheritdoc}
      */
     public function put($content)
     {
@@ -112,9 +95,7 @@ class File extends BaseHandler
     }
 
     /**
-     * Create the file or update if exists using a stream.
-     *
-     * @param StreamInterface|resource $resource
+     * {@inheritdoc}
      */
     public function putStream($resource)
     {
@@ -122,9 +103,7 @@ class File extends BaseHandler
     }
 
     /**
-     * Rename the file.
-     *
-     * @param string $newPath
+     * {@inheritdoc}
      */
     public function rename($newPath)
     {
@@ -133,11 +112,7 @@ class File extends BaseHandler
     }
 
     /**
-     * Copy the file.
-     *
-     * @param string $newPath
-     *
-     * @return File new file
+     * {@inheritdoc}
      */
     public function copy($newPath)
     {
@@ -147,7 +122,7 @@ class File extends BaseHandler
     }
 
     /**
-     * Delete the file.
+     * {@inheritdoc}
      */
     public function delete()
     {
@@ -155,11 +130,7 @@ class File extends BaseHandler
     }
 
     /**
-     * Get the file's MIME Type.
-     *
-     * @param bool $cache Whether to use cached info from previous call
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getMimeType($cache = true)
     {
@@ -174,11 +145,7 @@ class File extends BaseHandler
     }
 
     /**
-     * Get the file's visibility.
-     *
-     * @param bool $cache Whether to use cached info from previous call
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getVisibility($cache = true)
     {
@@ -193,11 +160,7 @@ class File extends BaseHandler
     }
 
     /**
-     * Get the file size.
-     *
-     * @param bool $cache Whether to use cached info from previous call
-     *
-     * @return int
+     * {@inheritdoc}
      */
     public function getSize($cache = true)
     {
@@ -212,11 +175,7 @@ class File extends BaseHandler
     }
 
     /**
-     * Get the file size in a human readable format.
-     *
-     * @param bool $cache Whether to use cached info from previous call
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getSizeFormatted($cache = true)
     {
