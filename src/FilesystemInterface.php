@@ -7,6 +7,8 @@ use Bolt\Filesystem\Exception\FileNotFoundException;
 use Bolt\Filesystem\Exception\InvalidArgumentException;
 use Bolt\Filesystem\Exception\IOException;
 use Bolt\Filesystem\Exception\RootViolationException;
+use Bolt\Filesystem\Handler\Directory;
+use Bolt\Filesystem\Handler\FileInterface;
 use Bolt\Filesystem\Handler\HandlerInterface;
 use Carbon\Carbon;
 use League\Flysystem\PluginInterface;
@@ -202,6 +204,29 @@ interface FilesystemInterface extends SupportsIncludeFileInterface
      * @return HandlerInterface
      */
     public function get($path, HandlerInterface $handler = null);
+
+    /**
+     * Get a file handler.
+     *
+     * @param string        $path    The path to the file.
+     * @param FileInterface $handler An optional existing file handler to populate.
+     *
+     * @throws IOException
+     *
+     * @return FileInterface
+     */
+    public function getFile($path, FileInterface $handler = null);
+
+    /**
+     * Get a directory handler.
+     *
+     * @param string $path The path to the directory.
+     *
+     * @throws IOException
+     *
+     * @return Directory
+     */
+    public function getDir($path);
 
     /**
      * Get a image handler.

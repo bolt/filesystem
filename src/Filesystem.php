@@ -3,6 +3,7 @@
 namespace Bolt\Filesystem;
 
 use Bolt\Filesystem\Exception as Ex;
+use Bolt\Filesystem\Handler\FileInterface;
 use Bolt\Filesystem\Handler\HandlerInterface;
 use Carbon\Carbon;
 use Exception;
@@ -404,6 +405,22 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         }
 
         return $handler;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFile($path, FileInterface $handler = null)
+    {
+        return $this->get($path, $handler ?: new Handler\File());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDir($path)
+    {
+        return $this->get($path, new Handler\Directory());
     }
 
     /**

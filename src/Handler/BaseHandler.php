@@ -14,7 +14,7 @@ use League\Flysystem\Util;
  *
  * @author Carson Full <carsonfull@gmail.com>
  */
-class BaseHandler implements HandlerInterface
+abstract class BaseHandler implements HandlerInterface
 {
     use MountPointAwareTrait;
 

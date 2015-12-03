@@ -42,6 +42,18 @@ interface HandlerInterface extends MountPointAwareInterface
     public function getPath();
 
     /**
+     * Returns whether the entree exists.
+     *
+     * @return bool
+     */
+    public function exists();
+
+    /**
+     * Delete the entree.
+     */
+    public function delete();
+
+    /**
      * Returns whether the entree is a directory.
      *
      * @return bool
