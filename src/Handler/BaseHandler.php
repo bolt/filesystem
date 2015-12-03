@@ -20,15 +20,15 @@ abstract class BaseHandler implements HandlerInterface
 
     /** @var FilesystemInterface */
     protected $filesystem;
-
     /** @var string */
     protected $path;
 
     /** @var array cached metadata */
     protected $metadata;
-
     /** @var int cached timestamp */
     protected $timestamp;
+    /** @var string cached visibility */
+    protected $visibility;
 
     /**
      * Constructor.
@@ -196,6 +196,30 @@ abstract class BaseHandler implements HandlerInterface
     public function getCarbon($cache = true)
     {
         return Carbon::createFromTimestamp($this->getTimestamp($cache));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVisibility($cache = true)
+    {
+        if (!$cache) {
+            $this->visibility = null;
+        }
+        if (!$this->visibility) {
+            $this->visibility = $this->filesystem->getVisibility($this->path);
+        }
+
+        return $this->visibility;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setVisibility($visibility)
+    {
+        $this->filesystem->setVisibility($this->path, $visibility);
+        $this->visibility = $visibility;
     }
 
     /**

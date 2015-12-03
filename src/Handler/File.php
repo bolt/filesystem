@@ -13,8 +13,6 @@ class File extends BaseHandler implements FileInterface
 {
     /** @var string cached mimetype */
     protected $mimetype;
-    /** @var string cached visibility */
-    protected $visibility;
     /** @var int cached size */
     protected $size;
 
@@ -138,25 +136,10 @@ class File extends BaseHandler implements FileInterface
             $this->mimetype = null;
         }
         if (!$this->mimetype) {
-            $this->mimetype = $this->filesystem->getMimetype($this->path);
+            $this->mimetype = $this->filesystem->getMimeType($this->path);
         }
 
         return $this->mimetype;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVisibility($cache = true)
-    {
-        if (!$cache) {
-            $this->visibility = null;
-        }
-        if (!$this->visibility) {
-            $this->visibility = $this->filesystem->getVisibility($this->path);
-        }
-
-        return $this->visibility;
     }
 
     /**
