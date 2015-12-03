@@ -11,7 +11,6 @@ use Bolt\Filesystem\Handler\Directory;
 use Bolt\Filesystem\Handler\FileInterface;
 use Bolt\Filesystem\Handler\HandlerInterface;
 use Carbon\Carbon;
-use League\Flysystem\PluginInterface;
 use Psr\Http\Message\StreamInterface;
 
 /**

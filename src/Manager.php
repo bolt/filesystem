@@ -5,12 +5,10 @@ use Bolt\Filesystem\Handler\FileInterface;
 use Bolt\Filesystem\Handler\HandlerInterface;
 use Bolt\Filesystem\Exception\InvalidArgumentException;
 use Bolt\Filesystem\Exception\LogicException;
-use League\Flysystem\Plugin\PluggableTrait;
-use League\Flysystem\PluginInterface;
 
 class Manager implements AggregateFilesystemInterface, FilesystemInterface
 {
-    use PluggableTrait;
+    use Plugin\PluggableTrait;
 
     /** @var FilesystemInterface[] */
     protected $filesystems = [];
@@ -98,21 +96,6 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
         }
 
         return $this;
-    }
-
-    /**
-     * Register a list of plugins.
-     *
-     * @param PluginInterface[] $plugins
-     */
-    public function addPlugins(array $plugins)
-    {
-        foreach ($plugins as $plugin) {
-            if (!$plugin instanceof PluginInterface) {
-                throw new InvalidArgumentException('Plugin must be instance of League\Flysystem\PluginInterface');
-            }
-            $this->addPlugin($plugin);
-        }
     }
 
     /**
