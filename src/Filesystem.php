@@ -21,7 +21,7 @@ use Psr\Http\Message\StreamInterface;
 class Filesystem implements FilesystemInterface, MountPointAwareInterface
 {
     use MountPointAwareTrait;
-    use Flysystem\Plugin\PluggableTrait;
+    use Plugin\PluggableTrait;
     use Flysystem\ConfigAwareTrait;
 
     /** @var Flysystem\AdapterInterface */

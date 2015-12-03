@@ -2,7 +2,7 @@
 
 namespace Bolt\Filesystem\Handler;
 
-use BadMethodCallException;
+use Bolt\Filesystem\Exception\BadMethodCallException;
 use Bolt\Filesystem\Exception\InvalidArgumentException;
 use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\MountPointAwareTrait;
@@ -215,7 +215,7 @@ abstract class BaseHandler implements HandlerInterface
 
         try {
             return call_user_func_array($callback, $arguments);
-        } catch (BadMethodCallException $e) {
+        } catch (\BadMethodCallException $e) {
             throw new BadMethodCallException(
                 'Call to undefined method '
                 . get_called_class()
