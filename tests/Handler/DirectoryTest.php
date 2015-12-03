@@ -1,12 +1,13 @@
 <?php
 
-namespace Bolt\Filesystem\Tests;
+namespace Bolt\Filesystem\Tests\Handler;
 
 use Bolt\Filesystem\Adapter\Local;
-use Bolt\Filesystem\Directory;
 use Bolt\Filesystem\Filesystem;
+use Bolt\Filesystem\Handler\Directory;
 use Bolt\Filesystem\Tests\FilesystemTestCase;
-use League\Flysystem;
+use Bolt\Filesystem\Handler\HandlerInterface;
+
 
 /**
  * Tests for Bolt\Filesystem\Directory
@@ -23,31 +24,23 @@ class DirectoryTest extends FilesystemTestCase
      */
     protected function setUp()
     {
-        $this->filesystem = new Filesystem(new Local(__DIR__));
+        $this->filesystem = new Filesystem(new Local(__DIR__ . '/../'));
     }
 
     public function testConstruct()
     {
         $dir = new Directory($this->filesystem);
-        $this->assertInstanceOf('Bolt\Filesystem\Directory', $dir);
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\Directory', $dir);
 
-        $filesystem = new Flysystem\Filesystem(new Local(__DIR__));
+        $filesystem = new Filesystem(new Local(__DIR__));
         $dir = new Directory($filesystem);
-        $this->assertInstanceOf('Bolt\Filesystem\Directory', $dir);
-    }
-
-    public function testCast()
-    {
-        $dir = new Directory($this->filesystem);
-        $filesystem = new Flysystem\Filesystem(new Local(__DIR__));
-        $dir = Directory::cast(new Flysystem\Directory($filesystem));
-        $this->assertInstanceOf('Bolt\Filesystem\Directory', $dir);
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\Directory', $dir);
     }
 
     public function testSetFilesystem()
     {
         $dir = new Directory($this->filesystem);
-        $filesystem = new Flysystem\Filesystem(new Local(__DIR__));
+        $filesystem = new Filesystem(new Local(__DIR__));
         $dir->setFilesystem($filesystem);
         $this->assertInstanceOf('Bolt\Filesystem\Filesystem', $dir->getFilesystem());
     }
@@ -55,14 +48,14 @@ class DirectoryTest extends FilesystemTestCase
     public function testGet()
     {
         $dir = new Directory($this->filesystem);
-        $this->assertInstanceOf('Bolt\Filesystem\File', $dir->get('fixtures/base.css'));
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\File', $dir->get('fixtures/base.css'));
     }
 
     public function testGetContents()
     {
         $dir = new Directory($this->filesystem);
         $content = $dir->getContents();
-        $this->assertInstanceOf('League\Flysystem\Handler', $content[0]);
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\HandlerInterface', $content[0]);
     }
 
     public function testExists()

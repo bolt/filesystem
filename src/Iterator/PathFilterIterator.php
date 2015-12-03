@@ -2,7 +2,7 @@
 
 namespace Bolt\Filesystem\Iterator;
 
-use Bolt\Filesystem\File;
+use Bolt\Filesystem\Handler\File;
 use Symfony\Component\Finder\Iterator\PathFilterIterator as PathFilterIteratorBase;
 
 /**

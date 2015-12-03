@@ -1,11 +1,11 @@
 <?php
 namespace Bolt\Filesystem;
 
-use InvalidArgumentException;
-use League\Flysystem\Handler;
+use Bolt\Filesystem\Handler\HandlerInterface;
+use Bolt\Filesystem\Exception\InvalidArgumentException;
+use Bolt\Filesystem\Exception\LogicException;
 use League\Flysystem\Plugin\PluggableTrait;
 use League\Flysystem\PluginInterface;
-use LogicException;
 
 class Manager implements AggregateFilesystemInterface, FilesystemInterface
 {
@@ -120,27 +120,26 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function listContents($directory = '', $recursive = false)
     {
         list($prefix, $directory) = $this->filterPrefix($directory);
+
         return $this->getFilesystem($prefix)->listContents($directory, $recursive);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function copy($path, $newpath)
+    public function copy($path, $newPath)
     {
         list($prefixFrom, $pathFrom) = $this->filterPrefix($path);
 
         $fsFrom = $this->getFilesystem($prefixFrom);
         $buffer = $fsFrom->readStream($pathFrom);
 
-        list($prefixTo, $pathTo) = $this->filterPrefix($newpath);
+        list($prefixTo, $pathTo) = $this->filterPrefix($newPath);
 
         $fsTo = $this->getFilesystem($prefixTo);
         $fsTo->writeStream($pathTo, $buffer);
 
         $buffer->close();
-
-        return true;
     }
 
     /**
@@ -149,6 +148,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function has($path)
     {
         list($prefix, $path) = $this->filterPrefix($path);
+
         return $this->getFilesystem($prefix)->has($path);
     }
 
@@ -158,6 +158,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function read($path)
     {
         list($prefix, $path) = $this->filterPrefix($path);
+
         return $this->getFilesystem($prefix)->read($path);
     }
 
@@ -167,6 +168,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function readStream($path)
     {
         list($prefix, $path) = $this->filterPrefix($path);
+
         return $this->getFilesystem($prefix)->readStream($path);
     }
 
@@ -176,6 +178,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function getMetadata($path)
     {
         list($prefix, $path) = $this->filterPrefix($path);
+
         return $this->getFilesystem($prefix)->getMetadata($path);
     }
 
@@ -185,6 +188,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function getSize($path)
     {
         list($prefix, $path) = $this->filterPrefix($path);
+
         return $this->getFilesystem($prefix)->getSize($path);
     }
 
@@ -194,7 +198,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function getMimetype($path)
     {
         list($prefix, $path) = $this->filterPrefix($path);
-        return $this->getFilesystem($prefix)->getMimetype($path);
+
+        return $this->getFilesystem($prefix)->getMimeType($path);
     }
 
     /**
@@ -203,6 +208,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function getTimestamp($path)
     {
         list($prefix, $path) = $this->filterPrefix($path);
+
         return $this->getFilesystem($prefix)->getTimestamp($path);
     }
 
@@ -212,6 +218,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function getCarbon($path)
     {
         list($prefix, $path) = $this->filterPrefix($path);
+
         return $this->getFilesystem($prefix)->getCarbon($path);
     }
 
@@ -221,62 +228,53 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function getVisibility($path)
     {
         list($prefix, $path) = $this->filterPrefix($path);
+
         return $this->getFilesystem($prefix)->getVisibility($path);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function write($path, $contents, array $config = [])
+    public function write($path, $contents, $config = [])
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->write($path, $contents, $config);
-
-        return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function writeStream($path, $resource, array $config = [])
+    public function writeStream($path, $resource, $config = [])
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->writeStream($path, $resource, $config);
-
-        return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function update($path, $contents, array $config = [])
+    public function update($path, $contents, $config = [])
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->update($path, $contents, $config);
-
-        return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function updateStream($path, $resource, array $config = [])
+    public function updateStream($path, $resource, $config = [])
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->updateStream($path, $resource, $config);
-
-        return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rename($path, $newpath)
+    public function rename($path, $newPath)
     {
         list($prefix, $path) = $this->filterPrefix($path);
-        $this->getFilesystem($prefix)->rename($path, $newpath);
-
-        return true;
+        $this->getFilesystem($prefix)->rename($path, $newPath);
     }
 
     /**
@@ -286,8 +284,6 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->delete($path);
-
-        return true;
     }
 
     /**
@@ -297,19 +293,15 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($prefix, $path) = $this->filterPrefix($dirname);
         $this->getFilesystem($prefix)->deleteDir($path);
-
-        return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createDir($dirname, array $config = [])
+    public function createDir($dirname, $config = [])
     {
         list($prefix, $path) = $this->filterPrefix($dirname);
         $this->getFilesystem($prefix)->createDir($path, $config);
-
-        return true;
     }
 
     /**
@@ -319,30 +311,24 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->setVisibility($path, $visibility);
-
-        return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function put($path, $contents, array $config = [])
+    public function put($path, $contents, $config = [])
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->put($path, $contents, $config);
-
-        return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function putStream($path, $resource, array $config = [])
+    public function putStream($path, $resource, $config = [])
     {
         list($prefix, $path) = $this->filterPrefix($path);
         $this->getFilesystem($prefix)->putStream($path, $resource, $config);
-
-        return true;
     }
 
     /**
@@ -351,15 +337,17 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function readAndDelete($path)
     {
         list($prefix, $path) = $this->filterPrefix($path);
+
         return $this->getFilesystem($prefix)->readAndDelete($path);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get($path, Handler $handler = null)
+    public function get($path, HandlerInterface $handler = null)
     {
         list($prefix, $path) = $this->filterPrefix($path);
+
         return $this->getFilesystem($prefix)->get($path, $handler);
     }
 
@@ -369,6 +357,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function getImage($path)
     {
         list($prefix, $path) = $this->filterPrefix($path);
+
         return $this->getFilesystem($prefix)->getImage($path);
     }
 
@@ -378,6 +367,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function getImageInfo($path)
     {
         list($prefix, $path) = $this->filterPrefix($path);
+
         return $this->getFilesystem($prefix)->getImageInfo($path);
     }
 
@@ -395,6 +385,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     public function includeFile($path, $once = true)
     {
         list($prefix, $path) = $this->filterPrefix($path);
+
         return $this->getFilesystem($prefix)->includeFile($path, $once);
     }
 

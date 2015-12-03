@@ -2,11 +2,11 @@
 
 namespace Bolt\Filesystem\Tests\Iterator;
 
+use Bolt\Filesystem\Adapter\Local;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\Iterator\DateRangeFilterIterator;
 use Bolt\Filesystem\Iterator\RecursiveDirectoryIterator;
-use Bolt\Filesystem\Adapter\Local;
 use RecursiveIteratorIterator;
 use Symfony\Component\Finder\Comparator\DateComparator;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Bolt\Filesystem\Image;
+namespace Bolt\Filesystem\Handler\Image;
 
-use InvalidArgumentException;
+use Bolt\Filesystem\Exception\InvalidArgumentException;
 
 /**
  * An object representation of an image type.

@@ -2,7 +2,8 @@
 
 namespace Bolt\Filesystem;
 
-use Bolt\Filesystem\Iterator;
+use Bolt\Filesystem\Exception\InvalidArgumentException;
+use Bolt\Filesystem\Exception\LogicException;
 use League\Flysystem;
 use Symfony\Component\Finder as Symfony;
 
@@ -467,9 +468,9 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @param string|array $dirs A directory path or an array of directories
      *
-     * @return Finder The current Finder instance
+     * @throws InvalidArgumentException if one of the directories does not exist
      *
-     * @throws \InvalidArgumentException if one of the directories does not exist
+     * @return Finder The current Finder instance
      */
     public function in($dirs)
     {
@@ -491,7 +492,7 @@ class Finder implements \IteratorAggregate, \Countable
                 }
             }
             if (!$good) {
-                throw new \InvalidArgumentException(sprintf('The "%s" directory does not exist.', $dir));
+                throw new InvalidArgumentException(sprintf('The "%s" directory does not exist.', $dir));
             }
         }
 
@@ -507,9 +508,9 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @param mixed $iterator
      *
-     * @return Finder The finder
+     * @throws InvalidArgumentException When the given argument is not iterable.
      *
-     * @throws \InvalidArgumentException When the given argument is not iterable.
+     * @return Finder The finder
      */
     public function append($iterator)
     {
@@ -524,7 +525,7 @@ class Finder implements \IteratorAggregate, \Countable
             }
             $this->iterators[] = $it;
         } else {
-            throw new \InvalidArgumentException('Finder::append() method wrong argument type.');
+            throw new InvalidArgumentException('Finder::append() method wrong argument type.');
         }
 
         return $this;
@@ -535,9 +536,9 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * This method implements the IteratorAggregate interface.
      *
-     * @return \Iterator An iterator
+     * @throws LogicException if the in() method has not been called
      *
-     * @throws \LogicException if the in() method has not been called
+     * @return \Iterator An iterator
      */
     public function getIterator()
     {
@@ -553,8 +554,8 @@ class Finder implements \IteratorAggregate, \Countable
              */
             try {
                 $this->in('');
-            } catch (\InvalidArgumentException $e) {
-                throw new \LogicException('You must call one of in() or append() methods before iterating over a Finder with an aggregate filesystem.');
+            } catch (InvalidArgumentException $e) {
+                throw new LogicException('You must call one of in() or append() methods before iterating over a Finder with an aggregate filesystem.');
             }
         }
 

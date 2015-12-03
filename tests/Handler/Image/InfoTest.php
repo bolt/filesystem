@@ -1,13 +1,12 @@
 <?php
 
-namespace Bolt\Filesystem\Tests\Image;
+namespace Bolt\Filesystem\Tests\Handler\Image;
 
 use Bolt\Filesystem\Adapter\Local;
 use Bolt\Filesystem\Filesystem;
-use Bolt\Filesystem\Image\Exif;
-use Bolt\Filesystem\Image\Info;
-use Bolt\Filesystem\Image\Type;
-use PHPExif;
+use Bolt\Filesystem\Handler\Image\Exif;
+use Bolt\Filesystem\Handler\Image\Info;
+use Bolt\Filesystem\Handler\Image\Type;
 
 /**
  * Tests for Bolt\Filesystem\Image\Info
@@ -24,7 +23,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->filesystem = new Filesystem(new Local(__DIR__ . '/../'));
+        $this->filesystem = new Filesystem(new Local(__DIR__ . '/../../'));
     }
 
     public function testConstruct()
@@ -32,17 +31,17 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $exif = new Exif([]);
         $type = Type::getById(IMAGETYPE_JPEG);
         $info = new Info(1024, 768, $type, 2, 7, 'Marcel Marceau', $exif);
-        $this->assertInstanceOf('Bolt\Filesystem\Image\Info', $info);
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Info', $info);
     }
 
     public function testCreateFromFile()
     {
-        $file = dirname(__DIR__) . '/fixtures/images/1-top-left.jpg';
+        $file = dirname(dirname(__DIR__)) . '/fixtures/images/1-top-left.jpg';
         $info = Info::createFromFile($file);
 
-        $this->assertInstanceOf('Bolt\Filesystem\Image\Info', $info);
-        $this->assertInstanceOf('Bolt\Filesystem\Image\Type', $info->getType());
-        $this->assertInstanceOf('Bolt\Filesystem\Image\Exif', $info->getExif());
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Info', $info);
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Type', $info->getType());
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Exif', $info->getExif());
 
         $this->assertSame(400, $info->getWidth());
         $this->assertSame(200, $info->getHeight());
@@ -67,9 +66,9 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $file = $this->filesystem->get('fixtures/images/1-top-left.jpg')->read();
         $info = Info::createFromString($file);
 
-        $this->assertInstanceOf('Bolt\Filesystem\Image\Info', $info);
-        $this->assertInstanceOf('Bolt\Filesystem\Image\Type', $info->getType());
-        $this->assertInstanceOf('Bolt\Filesystem\Image\Exif', $info->getExif());
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Info', $info);
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Type', $info->getType());
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Exif', $info->getExif());
 
         $this->assertSame(400, $info->getWidth());
         $this->assertSame(200, $info->getHeight());

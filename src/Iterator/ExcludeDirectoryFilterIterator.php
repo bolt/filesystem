@@ -2,8 +2,8 @@
 
 namespace Bolt\Filesystem\Iterator;
 
-use Bolt\Filesystem\Directory;
-use Bolt\Filesystem\File;
+use Bolt\Filesystem\Handler\Directory;
+use Bolt\Filesystem\Handler\File;
 
 class ExcludeDirectoryFilterIterator extends \FilterIterator implements \RecursiveIterator
 {

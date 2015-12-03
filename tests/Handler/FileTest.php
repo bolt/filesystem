@@ -1,15 +1,14 @@
 <?php
 
-namespace Bolt\Filesystem\Tests;
+namespace Bolt\Filesystem\Tests\Handler;
 
 use Bolt\Filesystem\Adapter\Local;
-use Bolt\Filesystem\File;
 use Bolt\Filesystem\Filesystem;
+use Bolt\Filesystem\Handler\File;
 use Bolt\Filesystem\Tests\FilesystemTestCase;
-use League\Flysystem;
 
 /**
- * Tests for Bolt\Filesystem\File
+ * Tests for Bolt\Filesystem\Handler\File
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
@@ -24,31 +23,23 @@ class FileTest extends FilesystemTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->filesystem = new Filesystem(new Local(__DIR__));
+        $this->filesystem = new Filesystem(new Local(__DIR__ . '/../'));
     }
 
     public function testConstruct()
     {
         $file = new File($this->filesystem, 'fixtures/images/2-top-right.jpg');
-        $this->assertInstanceOf('Bolt\Filesystem\File', $file);
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\File', $file);
 
-        $filesystem = new Flysystem\Filesystem(new Local(__DIR__));
+        $filesystem = new Filesystem(new Local(__DIR__));
         $file = new File($filesystem);
-        $this->assertInstanceOf('Bolt\Filesystem\File', $file);
-    }
-
-    public function testCast()
-    {
-        $file = new File($this->filesystem, 'fixtures/images/2-top-right.jpg');
-        $filesystem = new Flysystem\Filesystem(new Local(__DIR__));
-        $file = File::cast(new Flysystem\File($filesystem));
-        $this->assertInstanceOf('Bolt\Filesystem\File', $file);
+        $this->assertInstanceOf('Bolt\Filesystem\Handler\File', $file);
     }
 
     public function testSetFilesystem()
     {
         $file = new File($this->filesystem, 'fixtures/images/2-top-right.jpg');
-        $filesystem = new Flysystem\Filesystem(new Local(__DIR__));
+        $filesystem = new Filesystem(new Local(__DIR__));
         $file->setFilesystem($filesystem);
         $this->assertInstanceOf('Bolt\Filesystem\Filesystem', $file->getFilesystem());
     }

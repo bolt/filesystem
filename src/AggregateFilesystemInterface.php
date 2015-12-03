@@ -2,7 +2,7 @@
 
 namespace Bolt\Filesystem;
 
-use LogicException;
+use Bolt\Filesystem\Exception\LogicException;
 
 interface AggregateFilesystemInterface
 {

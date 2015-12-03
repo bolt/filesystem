@@ -3,29 +3,49 @@
 namespace Bolt\Filesystem;
 
 use Bolt\Filesystem\Exception as Ex;
+use Bolt\Filesystem\Handler\HandlerInterface;
 use Carbon\Carbon;
 use Exception;
 use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\StreamWrapper as GuzzleStreamWrapper;
-use InvalidArgumentException;
 use League\Flysystem;
-use LogicException;
 use Psr\Http\Message\StreamInterface;
 
-class Filesystem extends Flysystem\Filesystem implements FilesystemInterface, MountPointAwareInterface
+/**
+ * A filesystem implementation.
+ *
+ * @author Carson Full <carsonfull@gmail.com>
+ * @author Gawain Lynch <gawain.lynch@gmail.com>
+ */
+class Filesystem implements FilesystemInterface, MountPointAwareInterface
 {
     use MountPointAwareTrait;
+    use Flysystem\Plugin\PluggableTrait;
+    use Flysystem\ConfigAwareTrait;
+
+    /** @var Flysystem\AdapterInterface */
+    protected $adapter;
 
     /**
-     * {@inheritdoc}
+     * Constructor.
+     *
+     * @param Flysystem\AdapterInterface $adapter
+     * @param Flysystem\Config|array     $config
      */
-    public static function cast(Flysystem\FilesystemInterface $filesystem)
+    public function __construct(Flysystem\AdapterInterface $adapter, $config = null)
     {
-        if (!$filesystem instanceof Flysystem\Filesystem) {
-            throw new LogicException('Cannot cast Flysystem\FilesystemInterface, only Flysystem\Filesystem');
-        }
+        $this->adapter = $adapter;
+        $this->setConfig($config);
+    }
 
-        return new static($filesystem->getAdapter(), $filesystem->getConfig());
+    /**
+     * Get the Adapter.
+     *
+     * @return Flysystem\AdapterInterface
+     */
+    public function getAdapter()
+    {
+        return $this->adapter;
     }
 
     /**
@@ -33,132 +53,13 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface, Mo
      */
     public function has($path)
     {
+        $path = $this->normalizePath($path);
+
         try {
-            return parent::has($path);
+            return (bool) $this->getAdapter()->has($path);
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function write($path, $contents, array $config = [])
-    {
-        try {
-            if (!parent::write($path, $contents, $config)) {
-                throw new Ex\IOException('Failed to write to file', $path);
-            }
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
-
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function writeStream($path, $resource, array $config = [])
-    {
-        if ($resource instanceof StreamInterface) {
-            $resource = GuzzleStreamWrapper::getResource($resource);
-        }
-        try {
-            if (!parent::writeStream($path, $resource, $config)) {
-                throw new Ex\IOException('Failed to write to file', $path);
-            }
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
-
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function put($path, $contents, array $config = [])
-    {
-        try {
-            if (!parent::put($path, $contents, $config)) {
-                throw new Ex\IOException('Failed to write to file', $path);
-            }
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
-
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function putStream($path, $resource, array $config = [])
-    {
-        if ($resource instanceof StreamInterface) {
-            $resource = GuzzleStreamWrapper::getResource($resource);
-        }
-        try {
-            if (!parent::putStream($path, $resource, $config)) {
-                throw new Ex\IOException('Failed to write to file', $path);
-            }
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
-
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function readAndDelete($path)
-    {
-        try {
-            $contents = parent::readAndDelete($path);
-            if ($contents === false) {
-                throw new Ex\IOException('Failed to read file', $path);
-            }
-            return $contents;
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function update($path, $contents, array $config = [])
-    {
-        try {
-            if (!parent::update($path, $contents, $config)) {
-                throw new Ex\IOException('Failed to write to file', $path);
-            }
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
-
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function updateStream($path, $resource, array $config = [])
-    {
-        if ($resource instanceof StreamInterface) {
-            $resource = GuzzleStreamWrapper::getResource($resource);
-        }
-        try {
-            if (!parent::updateStream($path, $resource, $config)) {
-                throw new Ex\IOException('Failed to write to file', $path);
-            }
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
-
-        return true;
     }
 
     /**
@@ -166,15 +67,20 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface, Mo
      */
     public function read($path)
     {
+        $path = $this->normalizePath($path);
+        $this->assertPresent($path);
+
         try {
-            $contents = parent::read($path);
-            if ($contents === false) {
-                throw new Ex\IOException('Failed to read file', $path);
-            }
-            return $contents;
+            $object = $this->getAdapter()->read($path);
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
+
+        if ($object === false || !isset($object['contents'])) {
+            throw new Ex\IOException('Failed to read file', $path);
+        }
+
+        return $object['contents'];
     }
 
     /**
@@ -182,47 +88,236 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface, Mo
      */
     public function readStream($path)
     {
+        $path = $this->normalizePath($path);
+        $this->assertPresent($path);
+
         try {
-            $resource = parent::readStream($path);
-            if ($resource === false) {
-                throw new Ex\IOException('Failed to open stream', $path);
-            }
-            return new Stream($resource);
+            $object = $this->getAdapter()->readStream($path);
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
+        }
+
+        if ($object === false || !isset($object['stream']) || !is_resource($object['stream'])) {
+            throw new Ex\IOException('Failed to open stream', $path);
+        }
+
+        /** @var resource $resource */
+        $resource = $object['stream'];
+        return new Stream($resource);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function write($path, $contents, $config = [])
+    {
+        $path = $this->normalizePath($path);
+        $this->assertAbsent($path);
+
+        $config = $this->prepareConfig($config);
+
+        try {
+            $result = (bool) $this->getAdapter()->write($path, $contents, $config);
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+
+        if ($result === false) {
+            throw new Ex\IOException('Failed to write to file', $path);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rename($path, $newpath)
+    public function writeStream($path, $resource, $config = [])
     {
+        if ($resource instanceof StreamInterface) {
+            $resource = GuzzleStreamWrapper::getResource($resource);
+        }
+        if (!is_resource($resource)) {
+            throw new Ex\InvalidArgumentException(__METHOD__ . ' expects argument #2 to be a valid resource.');
+        }
+
+        $path = $this->normalizePath($path);
+        $this->assertAbsent($path);
+
+        $config = $this->prepareConfig($config);
+        Flysystem\Util::rewindStream($resource);
+
         try {
-            if (!parent::rename($path, $newpath)) {
-                throw new Ex\IOException('Failed to rename file', $path);
-            }
+            $result = (bool) $this->getAdapter()->writeStream($path, $resource, $config);
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
 
-        return true;
+        if ($result === false) {
+            throw new Ex\IOException('Failed to write stream to file', $path);
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function copy($path, $newpath)
+    public function update($path, $contents, $config = [])
     {
+        $path = $this->normalizePath($path);
+        $this->assertPresent($path);
+
+        $config = $this->prepareConfig($config);
+
         try {
-            if (!parent::copy($path, $newpath)) {
-                throw new Ex\IOException('Failed to copy file', $path);
+            $result = (bool) $this->getAdapter()->update($path, $contents, $config);
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+
+        if ($result === false) {
+            throw new Ex\IOException('Failed to write to file', $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateStream($path, $resource, $config = [])
+    {
+        if ($resource instanceof StreamInterface) {
+            $resource = GuzzleStreamWrapper::getResource($resource);
+        }
+        if (!is_resource($resource)) {
+            throw new Ex\InvalidArgumentException(__METHOD__ . ' expects argument #2 to be a valid resource.');
+        }
+
+        $path = $this->normalizePath($path);
+        $this->assertPresent($path);
+
+        $config = $this->prepareConfig($config);
+        Flysystem\Util::rewindStream($resource);
+
+        try {
+            $result = (bool) $this->getAdapter()->updateStream($path, $resource, $config);
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+
+        if ($result === false) {
+            throw new Ex\IOException('Failed to write stream to file', $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function put($path, $contents, $config = [])
+    {
+        $path = $this->normalizePath($path);
+        $config = $this->prepareConfig($config);
+
+        try {
+            if ($has = $this->getAdapter()->has($path)) {
+                $result = (bool) $this->getAdapter()->update($path, $contents, $config);
+            } else {
+                $result = (bool) $this->getAdapter()->write($path, $contents, $config);
             }
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
 
-        return true;
+        if ($result === false) {
+            $op = $has ? 'update' : 'write';
+            throw new Ex\IOException("Failed to $op to file", $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function putStream($path, $resource, $config = [])
+    {
+        if ($resource instanceof StreamInterface) {
+            $resource = GuzzleStreamWrapper::getResource($resource);
+        }
+        if (!is_resource($resource)) {
+            throw new Ex\InvalidArgumentException(__METHOD__ . ' expects argument #2 to be a valid resource.');
+        }
+
+        $path = $this->normalizePath($path);
+
+        $config = $this->prepareConfig($config);
+        Flysystem\Util::rewindStream($resource);
+
+        try {
+            if ($has = $this->getAdapter()->has($path)) {
+                $result = (bool) $this->getAdapter()->updateStream($path, $resource, $config);
+            } else {
+                $result = (bool) $this->getAdapter()->writeStream($path, $resource, $config);
+            }
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+
+        if ($result === false) {
+            $op = $has ? 'update' : 'write';
+            throw new Ex\IOException("Failed to $op stream to file", $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function readAndDelete($path)
+    {
+        $path = $this->normalizePath($path);
+        $this->assertPresent($path);
+
+        $contents = $this->read($path);
+
+        $this->delete($path);
+
+        return $contents;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rename($path, $newPath)
+    {
+        $path = $this->normalizePath($path);
+        $newPath = $this->normalizePath($newPath);
+        $this->assertPresent($path);
+        $this->assertAbsent($newPath);
+
+        try {
+            $result = (bool) $this->getAdapter()->rename($path, $newPath);
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+
+        if ($result === false) {
+            throw new Ex\IOException('Failed to rename file', $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function copy($path, $newPath)
+    {
+        $path = $this->normalizePath($path);
+        $newPath = $this->normalizePath($newPath);
+        $this->assertPresent($path);
+        $this->assertAbsent($newPath);
+
+        try {
+            $result = (bool) $this->getAdapter()->copy($path, $newPath);
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+
+        if ($result === false) {
+            throw new Ex\IOException('Failed to copy file', $path);
+        }
     }
 
     /**
@@ -230,15 +325,18 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface, Mo
      */
     public function delete($path)
     {
+        $path = $this->normalizePath($path);
+        $this->assertPresent($path);
+
         try {
-            if (!parent::delete($path)) {
-                throw new Ex\IOException('Failed to delete file', $path);
-            }
+            $result = (bool) $this->getAdapter()->delete($path);
         } catch (Exception $e) {
             throw $this->handleEx($e, $path);
         }
 
-        return true;
+        if ($result === false) {
+            throw new Ex\IOException('Failed to delete file', $path);
+        }
     }
 
     /**
@@ -246,31 +344,219 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface, Mo
      */
     public function deleteDir($dirname)
     {
+        $dirname = $this->normalizePath($dirname);
+        if ($dirname === '') {
+            throw new Ex\RootViolationException('Root directories can not be deleted.');
+        }
+
         try {
-            if (!parent::deleteDir($dirname)) {
-                throw new Ex\IOException('Failed to delete directory', $dirname);
-            }
+            $result = (bool) $this->getAdapter()->deleteDir($dirname);
         } catch (Exception $e) {
             throw $this->handleEx($e, $dirname);
         }
 
-        return true;
+        if ($result === false) {
+            throw new Ex\IOException('Failed to delete directory', $dirname);
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createDir($dirname, array $config = [])
+    public function createDir($dirname, $config = [])
     {
+        $dirname = $this->normalizePath($dirname);
+        $config = $this->prepareConfig($config);
+
         try {
-            if (!parent::createDir($dirname, $config)) {
-                throw new Ex\DirectoryCreationException($dirname);
-            }
+            $result = (bool) $this->getAdapter()->createDir($dirname, $config);
         } catch (Exception $e) {
             throw $this->handleEx($e, $dirname);
         }
 
-        return true;
+        if ($result === false) {
+            throw new Ex\DirectoryCreationException($dirname);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get($path, HandlerInterface $handler = null)
+    {
+        $path = $this->normalizePath($path);
+
+        if ($handler === null) {
+            $metadata = $this->getMetadata($path);
+            if ($metadata['type'] === 'dir') {
+                $handler = new Handler\Directory($this, $path);
+            } elseif ($metadata['type'] === 'image') {
+                $handler = new Handler\Image($this, $path);
+            } else {
+                $handler = new Handler\File($this, $path);
+            }
+        }
+
+        $handler->setPath($path);
+        $handler->setFilesystem($this);
+        if ($handler instanceof MountPointAwareInterface) {
+            $handler->setMountPoint($this->mountPoint);
+        }
+
+        return $handler;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getImage($path)
+    {
+        return $this->get($path, new Handler\Image());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSize($path)
+    {
+        $path = $this->normalizePath($path);
+
+        try {
+            $object = $this->getAdapter()->getSize($path);
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+
+        if ($object === false || !isset($object['size']) || !is_numeric($object['size'])) {
+            throw new Ex\IOException("Failed to get file's size", $path);
+        }
+
+        return (int) $object['size'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTimestamp($path)
+    {
+        $path = $this->normalizePath($path);
+        $this->assertPresent($path);
+
+        try {
+            $object = $this->getAdapter()->getTimestamp($path);
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+
+        if ($object === false || !isset($object['timestamp'])) {
+            throw new Ex\IOException("Failed to get file's timestamp", $path);
+        }
+
+        return $object['timestamp'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCarbon($path)
+    {
+        return Carbon::createFromTimestamp($this->getTimestamp($path));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMimeType($path)
+    {
+        $path = $this->normalizePath($path);
+        $this->assertPresent($path);
+
+        try {
+            $object = $this->getAdapter()->getMimetype($path);
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+
+        if ($object === false || !isset($object['mimetype'])) {
+            throw new Ex\IOException("Failed to get file's MIME-type", $path);
+        }
+
+        return $object['mimetype'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMetadata($path)
+    {
+        $path = $this->normalizePath($path);
+        $this->assertPresent($path);
+
+        try {
+            $metadata = $this->getAdapter()->getMetadata($path);
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+
+        if ($metadata === false) {
+            throw new Ex\IOException("Failed to get file's metadata", $path);
+        }
+
+        $ext = pathinfo($metadata['path'], PATHINFO_EXTENSION);
+        if (in_array($ext, Handler\Image\Type::getExtensions())) {
+            $metadata['type'] = 'image';
+        } elseif (in_array($ext, $this->getDocumentExtensions())) {
+            $metadata['type'] = 'document';
+        }
+
+        return $metadata;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getImageInfo($path)
+    {
+        return Handler\Image\Info::createFromString($this->read($path));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVisibility($path)
+    {
+        $path = $this->normalizePath($path);
+        $this->assertPresent($path);
+
+        try {
+            $object = $this->getAdapter()->getVisibility($path);
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+
+        if ($object === false || !isset($object['visibility'])) {
+            throw new Ex\IOException("Failed to get file's visibility", $path);
+        }
+
+        return $object['visibility'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setVisibility($path, $visibility)
+    {
+        $path = $this->normalizePath($path);
+
+        try {
+            $result = (bool) $this->getAdapter()->setVisibility($path, $visibility);
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+
+        if ($result === false) {
+            throw new Ex\IOException("Failed to set file's visibility", $path);
+        }
     }
 
     /**
@@ -278,20 +564,25 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface, Mo
      */
     public function listContents($directory = '', $recursive = false)
     {
+        $directory = $this->normalizePath($directory);
+
         try {
-            $contents = parent::listContents($directory, $recursive);
+            $contents = $this->getAdapter()->listContents($directory, $recursive);
         } catch (Exception $e) {
             throw $this->handleEx($e, $directory);
         }
 
+        $formatter = new Flysystem\Util\ContentListingFormatter($directory, $recursive);
+        $contents = $formatter->formatListing($contents);
+
         $contents = array_map(
             function ($entry) {
                 if ($entry['type'] === 'dir') {
-                    $handler = new Directory($this, $entry['path']);
-                } elseif (isset($entry['extension']) && in_array($entry['extension'], Image\Type::getExtensions())) {
-                    $handler = Image::createFromListingEntry($this, $entry);
+                    $handler = new Handler\Directory($this, $entry['path']);
+                } elseif (isset($entry['extension']) && in_array($entry['extension'], Handler\Image\Type::getExtensions())) {
+                    $handler = Handler\Image::createFromListingEntry($this, $entry);
                 } else {
-                    $handler = File::createFromListingEntry($this, $entry);
+                    $handler = Handler\File::createFromListingEntry($this, $entry);
                 }
                 $handler->setMountPoint($this->mountPoint);
 
@@ -314,172 +605,21 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface, Mo
     /**
      * {@inheritdoc}
      */
-    public function getMimetype($path)
-    {
-        try {
-            $mimeType = parent::getMimetype($path);
-            if ($mimeType === false) {
-                throw new Ex\IOException("Failed to get file's MIME-type", $path);
-            }
-            return $mimeType;
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTimestamp($path)
-    {
-        try {
-            $ts = parent::getTimestamp($path);
-            if ($ts === false) {
-                throw new Ex\IOException("Failed to get file's timestamp", $path);
-            }
-            return $ts;
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVisibility($path)
-    {
-        try {
-            $visibility = parent::getVisibility($path);
-            if ($visibility === false) {
-                throw new Ex\IOException("Failed to get file's visibility", $path);
-            }
-            return $visibility;
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSize($path)
-    {
-        try {
-            $size = parent::getSize($path);
-            if ($size === false) {
-                throw new Ex\IOException("Failed to get file's size", $path);
-            }
-            return $size;
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setVisibility($path, $visibility)
-    {
-        try {
-            if (!parent::setVisibility($path, $visibility)) {
-                throw new Ex\IOException("Failed to set file's visibility", $path);
-            }
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
-
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetadata($path)
-    {
-        try {
-            $metadata = parent::getMetadata($path);
-            if ($metadata === false) {
-                throw new Ex\IOException("Failed to get file's metadata", $path);
-            }
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
-
-        $ext = pathinfo($metadata['path'], PATHINFO_EXTENSION);
-        if (in_array($ext, Image\Type::getExtensions())) {
-            $metadata['type'] = 'image';
-        } elseif (in_array($ext, $this->getDocumentExtensions())) {
-            $metadata['type'] = 'document';
-        }
-
-        return $metadata;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function get($path, Flysystem\Handler $handler = null)
-    {
-        if ($handler === null) {
-            $metadata = $this->getMetadata($path);
-            if ($metadata['type'] === 'dir') {
-                $handler = new Directory($this, $path);
-            } elseif ($metadata['type'] === 'image') {
-                $handler = new Image($this, $path);
-            } else {
-                $handler = new File($this, $path);
-            }
-        }
-        if ($handler instanceof MountPointAwareInterface) {
-            $handler->setMountPoint($this->mountPoint);
-        }
-        try {
-            return parent::get($path, $handler);
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getImage($path)
-    {
-        return $this->get($path, new Image());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getImageInfo($path)
-    {
-        return Image\Info::createFromString($this->read($path));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getCarbon($path)
-    {
-        return Carbon::createFromTimestamp($this->getTimestamp($path));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function includeFile($path, $once = true)
     {
-        if (!$this->adapter instanceof SupportsIncludeFileInterface) {
+        $adapter = $this->getAdapter();
+
+        if (!$adapter instanceof SupportsIncludeFileInterface) {
             throw new Ex\NotSupportedException('Filesystem does not support including PHP files.', $path);
         }
 
-        return $this->adapter->includeFile($path, $once);
+        return $adapter->includeFile($path, $once);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function assertPresent($path)
+    protected function assertPresent($path)
     {
         if (!$this->has($path)) {
             throw new Ex\FileNotFoundException($path);
@@ -489,7 +629,7 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface, Mo
     /**
      * {@inheritdoc}
      */
-    public function assertAbsent($path)
+    protected function assertAbsent($path)
     {
         if ($this->has($path)) {
             throw new Ex\FileExistsException($path);
@@ -498,7 +638,7 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface, Mo
 
     /**
      * @param Exception $e
-     * @param string     $path
+     * @param string    $path
      *
      * @return Exception
      */
@@ -506,21 +646,12 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface, Mo
     {
         if ($e instanceof Ex\ExceptionInterface) {
             return $e;
-        } elseif ($e instanceof InvalidArgumentException) {
-            return $e;
-        } elseif ($e instanceof Flysystem\RootViolationException) {
-            return new Ex\RootViolationException($e->getMessage(), $e->getCode(), $e);
+        } elseif ($e instanceof \InvalidArgumentException) {
+            return new Ex\InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
+        } elseif ($e instanceof \LogicException) {
+            return new Ex\LogicException($e->getMessage(), $e->getCode(), $e);
         } elseif ($e instanceof Flysystem\NotSupportedException) {
             return new Ex\NotSupportedException($e->getMessage(), $e->getCode(), $e);
-        } elseif ($e instanceof Flysystem\FileNotFoundException) {
-            return new Ex\FileNotFoundException($e->getPath(), $e->getCode(), $e);
-        } elseif ($e instanceof Flysystem\FileExistsException) {
-            return new Ex\FileExistsException($e->getPath(), $e->getCode(), $e);
-        } elseif ($e instanceof LogicException) {
-            if (strpos($e->getMessage(), 'Path is outside of the defined root') === 0) {
-                return new Ex\RootViolationException($e->getMessage(), $e->getCode(), $e);
-            }
-            return new Ex\IOException($e->getMessage(), $path, $e->getCode(), $e);
         } else {
             return new Ex\IOException($e->getMessage(), $path, $e->getCode(), $e);
         }
@@ -532,5 +663,14 @@ class Filesystem extends Flysystem\Filesystem implements FilesystemInterface, Mo
             'doc_extensions',
             ['doc', 'docx', 'txt', 'md', 'pdf', 'xls', 'xlsx', 'ppt', 'pptx', 'csv']
         );
+    }
+
+    protected function normalizePath($path)
+    {
+        try {
+            return Flysystem\Util::normalizePath($path);
+        } catch (\LogicException $e) {
+            throw new Ex\RootViolationException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 }

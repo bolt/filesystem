@@ -12,8 +12,8 @@ class DirectoryCreationException extends IOException
     /**
      * Constructor.
      *
-     * @param string      $path
-     * @param \Exception  $previous
+     * @param string     $path
+     * @param \Exception $previous
      */
     public function __construct($path, \Exception $previous = null)
     {

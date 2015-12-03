@@ -1,9 +1,9 @@
 <?php
 
-namespace Bolt\Filesystem;
+namespace Bolt\Filesystem\Handler;
 
 /**
- * An image file.
+ * This represents an image file.
  *
  * @author Carson Full <carsonfull@gmail.com>
  */
@@ -27,6 +27,7 @@ class Image extends File
         if (!$this->info) {
             $this->info = $this->filesystem->getImageInfo($this->path);
         }
+
         return $this->info;
     }
 

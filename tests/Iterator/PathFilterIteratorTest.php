@@ -2,11 +2,11 @@
 
 namespace Bolt\Filesystem\tests\Iterator;
 
-use Bolt\Filesystem\File;
+use Bolt\Filesystem\Adapter\Local;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\FilesystemInterface;
+use Bolt\Filesystem\Handler\File;
 use Bolt\Filesystem\Iterator\PathFilterIterator;
-use Bolt\Filesystem\Adapter\Local;
 use Symfony\Component\Finder\Tests\Iterator\MockFileListIterator;
 
 /**

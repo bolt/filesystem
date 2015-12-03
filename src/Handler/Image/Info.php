@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Filesystem\Image;
+namespace Bolt\Filesystem\Handler\Image;
 
 use Bolt\Filesystem\Exception\IOException;
 use PHPExif\Reader\Reader;
@@ -109,6 +109,7 @@ class Info
             'channels' => 0,
             'mime'     => '',
         ];
+
         return new static(
             $info[0],
             $info[1],
@@ -132,6 +133,7 @@ class Info
         }
         try {
             $exif = static::$exifReader->read($file);
+
             return Exif::cast($exif);
         } catch (\RuntimeException $e) {
             return new Exif();

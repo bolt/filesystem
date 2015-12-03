@@ -2,8 +2,8 @@
 
 namespace Bolt\Filesystem\Iterator;
 
-use Bolt\Filesystem\Directory;
-use Bolt\Filesystem\File;
+use Bolt\Filesystem\Handler\Directory;
+use Bolt\Filesystem\Handler\File;
 use Bolt\Filesystem\FilesystemInterface;
 use RecursiveIterator;
 use SeekableIterator;
@@ -182,6 +182,7 @@ class RecursiveDirectoryIterator implements RecursiveIterator, SeekableIterator
         if (!isset($this->contents[$this->position])) {
             $this->current = null;
             $this->key = null;
+
             return;
         }
 
