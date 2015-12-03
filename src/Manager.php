@@ -1,6 +1,7 @@
 <?php
 namespace Bolt\Filesystem;
 
+use Bolt\Filesystem\Handler\FileInterface;
 use Bolt\Filesystem\Handler\HandlerInterface;
 use Bolt\Filesystem\Exception\InvalidArgumentException;
 use Bolt\Filesystem\Exception\LogicException;
@@ -349,6 +350,26 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
         list($prefix, $path) = $this->filterPrefix($path);
 
         return $this->getFilesystem($prefix)->get($path, $handler);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFile($path, FileInterface $handler = null)
+    {
+        list($prefix, $path) = $this->filterPrefix($path);
+
+        return $this->getFilesystem($prefix)->get($path, $handler);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDir($path)
+    {
+        list($prefix, $path) = $this->filterPrefix($path);
+
+        return $this->getFilesystem($prefix)->get($path);
     }
 
     /**

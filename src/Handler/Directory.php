@@ -48,6 +48,35 @@ class Directory extends BaseHandler
     }
 
     /**
+     * Get a file handler.
+     *
+     * @param string        $path    The path to the file.
+     * @param FileInterface $handler An optional existing file handler to populate.
+     *
+     * @throws IOException
+     *
+     * @return FileInterface
+     */
+    public function getFile($path, FileInterface $handler = null)
+    {
+        return $this->filesystem->getFile($this->path . '/' . $path, $handler);
+    }
+
+    /**
+     * Get a directory handler.
+     *
+     * @param string $path The path to the directory.
+     *
+     * @throws IOException
+     *
+     * @return Directory
+     */
+    public function getDir($path)
+    {
+        return $this->filesystem->getDir($this->path . '/' . $path);
+    }
+
+    /**
      * List the directory contents.
      *
      * @param bool $recursive
