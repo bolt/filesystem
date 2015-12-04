@@ -42,6 +42,13 @@ interface HandlerInterface extends MountPointAwareInterface
     public function getPath();
 
     /**
+     * Returns the entree path with the mount point prefixed (if set).
+     *
+     * @return string
+     */
+    public function getFullPath();
+
+    /**
      * Returns whether the entree exists.
      *
      * @return bool

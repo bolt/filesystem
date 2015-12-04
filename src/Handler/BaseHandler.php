@@ -79,6 +79,14 @@ abstract class BaseHandler implements HandlerInterface
      */
     public function getPath()
     {
+        return $this->path;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFullPath()
+    {
         return (!empty($this->mountPoint) ? $this->mountPoint . '://' : '') . $this->path;
     }
 
