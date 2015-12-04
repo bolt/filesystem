@@ -13,6 +13,13 @@ use Bolt\Filesystem\Finder;
 interface DirectoryInterface extends HandlerInterface
 {
     /**
+     * Returns whether this directory is the root directory.
+     *
+     * @return bool
+     */
+    public function isRoot();
+
+    /**
      * Create the directory.
      *
      * @throws IOException

@@ -49,6 +49,17 @@ interface HandlerInterface extends MountPointAwareInterface
     public function getFullPath();
 
     /**
+     * Returns the directory for this entree.
+     *
+     * Note: If this entree is the root directory, a different
+     * instance of the same directory is returned.
+     * This can also be checked with {@see DirectoryInterface::isRoot}
+     *
+     * @return DirectoryInterface
+     */
+    public function getParent();
+
+    /**
      * Returns whether the entree exists.
      *
      * @return bool
