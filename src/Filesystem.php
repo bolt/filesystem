@@ -55,7 +55,11 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
     public function has($path)
     {
         $path = $this->normalizePath($path);
+        return $this->doHas($path);
+    }
 
+    private function doHas($path)
+    {
         try {
             return (bool) $this->getAdapter()->has($path);
         } catch (Exception $e) {
@@ -71,6 +75,11 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $path = $this->normalizePath($path);
         $this->assertPresent($path);
 
+        return $this->doRead($path);
+    }
+
+    private function doRead($path)
+    {
         try {
             $object = $this->getAdapter()->read($path);
         } catch (Exception $e) {
@@ -92,6 +101,11 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $path = $this->normalizePath($path);
         $this->assertPresent($path);
 
+        return $this->doReadStream($path);
+    }
+
+    private function doReadStream($path)
+    {
         try {
             $object = $this->getAdapter()->readStream($path);
         } catch (Exception $e) {
@@ -117,6 +131,11 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
 
         $config = $this->prepareConfig($config);
 
+        $this->doWrite($path, $contents, $config);
+    }
+
+    private function doWrite($path, $contents, Flysystem\Config $config)
+    {
         try {
             $result = (bool) $this->getAdapter()->write($path, $contents, $config);
         } catch (Exception $e) {
@@ -133,19 +152,18 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
      */
     public function writeStream($path, $resource, $config = [])
     {
-        if ($resource instanceof StreamInterface) {
-            $resource = GuzzleStreamWrapper::getResource($resource);
-        }
-        if (!is_resource($resource)) {
-            throw new Ex\InvalidArgumentException(__METHOD__ . ' expects argument #2 to be a valid resource.');
-        }
-
+        $resource = $this->normalizeResource($resource, __METHOD__);
         $path = $this->normalizePath($path);
         $this->assertAbsent($path);
 
         $config = $this->prepareConfig($config);
         Flysystem\Util::rewindStream($resource);
 
+        $this->doWriteStream($path, $resource, $config);
+    }
+
+    private function doWriteStream($path, $resource, Flysystem\Config $config)
+    {
         try {
             $result = (bool) $this->getAdapter()->writeStream($path, $resource, $config);
         } catch (Exception $e) {
@@ -167,6 +185,11 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
 
         $config = $this->prepareConfig($config);
 
+        $this->doUpdate($path, $contents, $config);
+    }
+
+    private function doUpdate($path, $contents, Flysystem\Config $config)
+    {
         try {
             $result = (bool) $this->getAdapter()->update($path, $contents, $config);
         } catch (Exception $e) {
@@ -183,19 +206,18 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
      */
     public function updateStream($path, $resource, $config = [])
     {
-        if ($resource instanceof StreamInterface) {
-            $resource = GuzzleStreamWrapper::getResource($resource);
-        }
-        if (!is_resource($resource)) {
-            throw new Ex\InvalidArgumentException(__METHOD__ . ' expects argument #2 to be a valid resource.');
-        }
-
+        $resource = $this->normalizeResource($resource, __METHOD__);
         $path = $this->normalizePath($path);
         $this->assertPresent($path);
 
         $config = $this->prepareConfig($config);
         Flysystem\Util::rewindStream($resource);
 
+        $this->doUpdateStream($path, $resource, $config);
+    }
+
+    private function doUpdateStream($path, $resource, Flysystem\Config $config)
+    {
         try {
             $result = (bool) $this->getAdapter()->updateStream($path, $resource, $config);
         } catch (Exception $e) {
@@ -215,19 +237,15 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $path = $this->normalizePath($path);
         $config = $this->prepareConfig($config);
 
-        try {
-            if ($has = $this->getAdapter()->has($path)) {
-                $result = (bool) $this->getAdapter()->update($path, $contents, $config);
-            } else {
-                $result = (bool) $this->getAdapter()->write($path, $contents, $config);
-            }
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
+        $this->doPut($path, $contents, $config);
+    }
 
-        if ($result === false) {
-            $op = $has ? 'update' : 'write';
-            throw new Ex\IOException("Failed to $op to file", $path);
+    private function doPut($path, $contents, Flysystem\Config $config)
+    {
+        if ($this->doHas($path)) {
+            $this->doUpdate($path, $contents, $config);
+        } else {
+            $this->doWrite($path, $contents, $config);
         }
     }
 
@@ -236,31 +254,21 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
      */
     public function putStream($path, $resource, $config = [])
     {
-        if ($resource instanceof StreamInterface) {
-            $resource = GuzzleStreamWrapper::getResource($resource);
-        }
-        if (!is_resource($resource)) {
-            throw new Ex\InvalidArgumentException(__METHOD__ . ' expects argument #2 to be a valid resource.');
-        }
-
+        $resource = $this->normalizeResource($resource, __METHOD__);
         $path = $this->normalizePath($path);
 
         $config = $this->prepareConfig($config);
         Flysystem\Util::rewindStream($resource);
 
-        try {
-            if ($has = $this->getAdapter()->has($path)) {
-                $result = (bool) $this->getAdapter()->updateStream($path, $resource, $config);
-            } else {
-                $result = (bool) $this->getAdapter()->writeStream($path, $resource, $config);
-            }
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
+        $this->doPutStream($path, $resource, $config);
+    }
 
-        if ($result === false) {
-            $op = $has ? 'update' : 'write';
-            throw new Ex\IOException("Failed to $op stream to file", $path);
+    private function doPutStream($path, $resource, Flysystem\Config $config)
+    {
+        if ($this->doHas($path)) {
+            $this->doUpdateStream($path, $resource, $config);
+        } else {
+            $this->doWriteStream($path, $resource, $config);
         }
     }
 
@@ -272,9 +280,14 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $path = $this->normalizePath($path);
         $this->assertPresent($path);
 
-        $contents = $this->read($path);
+        return $this->doReadAndDelete($path);
+    }
 
-        $this->delete($path);
+    private function doReadAndDelete($path)
+    {
+        $contents = $this->doRead($path);
+
+        $this->doDelete($path);
 
         return $contents;
     }
@@ -289,6 +302,11 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $this->assertPresent($path);
         $this->assertAbsent($newPath);
 
+        $this->doRename($path, $newPath);
+    }
+
+    private function doRename($path, $newPath)
+    {
         try {
             $result = (bool) $this->getAdapter()->rename($path, $newPath);
         } catch (Exception $e) {
@@ -310,6 +328,11 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $this->assertPresent($path);
         $this->assertAbsent($newPath);
 
+        $this->doCopy($path, $newPath);
+    }
+
+    private function doCopy($path, $newPath)
+    {
         try {
             $result = (bool) $this->getAdapter()->copy($path, $newPath);
         } catch (Exception $e) {
@@ -329,6 +352,11 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $path = $this->normalizePath($path);
         $this->assertPresent($path);
 
+        $this->doDelete($path);
+    }
+
+    private function doDelete($path)
+    {
         try {
             $result = (bool) $this->getAdapter()->delete($path);
         } catch (Exception $e) {
@@ -350,14 +378,19 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
             throw new Ex\RootViolationException('Root directories can not be deleted.');
         }
 
+        $this->doDeleteDir($dirname);
+    }
+
+    private function doDeleteDir($path)
+    {
         try {
-            $result = (bool) $this->getAdapter()->deleteDir($dirname);
+            $result = (bool) $this->getAdapter()->deleteDir($path);
         } catch (Exception $e) {
-            throw $this->handleEx($e, $dirname);
+            throw $this->handleEx($e, $path);
         }
 
         if ($result === false) {
-            throw new Ex\IOException('Failed to delete directory', $dirname);
+            throw new Ex\IOException('Failed to delete directory', $path);
         }
     }
 
@@ -369,14 +402,19 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $dirname = $this->normalizePath($dirname);
         $config = $this->prepareConfig($config);
 
+        $this->doCreateDir($dirname, $config);
+    }
+
+    private function doCreateDir($path, Flysystem\Config $config)
+    {
         try {
-            $result = (bool) $this->getAdapter()->createDir($dirname, $config);
+            $result = (bool) $this->getAdapter()->createDir($path, $config);
         } catch (Exception $e) {
-            throw $this->handleEx($e, $dirname);
+            throw $this->handleEx($e, $path);
         }
 
         if ($result === false) {
-            throw new Ex\DirectoryCreationException($dirname);
+            throw new Ex\DirectoryCreationException($path);
         }
     }
 
@@ -438,6 +476,11 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
     {
         $path = $this->normalizePath($path);
 
+        return $this->doGetSize($path);
+    }
+
+    private function doGetSize($path)
+    {
         try {
             $object = $this->getAdapter()->getSize($path);
         } catch (Exception $e) {
@@ -459,6 +502,11 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $path = $this->normalizePath($path);
         $this->assertPresent($path);
 
+        return $this->doGetTimestamp($path);
+    }
+
+    private function doGetTimestamp($path)
+    {
         try {
             $object = $this->getAdapter()->getTimestamp($path);
         } catch (Exception $e) {
@@ -488,6 +536,11 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $path = $this->normalizePath($path);
         $this->assertPresent($path);
 
+        return $this->doGetMimeType($path);
+    }
+
+    private function doGetMimeType($path)
+    {
         try {
             $object = $this->getAdapter()->getMimetype($path);
         } catch (Exception $e) {
@@ -509,6 +562,11 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $path = $this->normalizePath($path);
         $this->assertPresent($path);
 
+        return $this->doGetMetadata($path);
+    }
+
+    private function doGetMetadata($path)
+    {
         try {
             $metadata = $this->getAdapter()->getMetadata($path);
         } catch (Exception $e) {
@@ -545,6 +603,11 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $path = $this->normalizePath($path);
         $this->assertPresent($path);
 
+        return $this->doGetVisibility($path);
+    }
+
+    private function doGetVisibility($path)
+    {
         try {
             $object = $this->getAdapter()->getVisibility($path);
         } catch (Exception $e) {
@@ -564,7 +627,11 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
     public function setVisibility($path, $visibility)
     {
         $path = $this->normalizePath($path);
+        $this->doSetVisibility($path, $visibility);
+    }
 
+    private function doSetVisibility($path, $visibility)
+    {
         try {
             $result = (bool) $this->getAdapter()->setVisibility($path, $visibility);
         } catch (Exception $e) {
@@ -638,7 +705,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
      */
     protected function assertPresent($path)
     {
-        if (!$this->has($path)) {
+        if (!$this->doHas($path)) {
             throw new Ex\FileNotFoundException($path);
         }
     }
@@ -648,7 +715,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
      */
     protected function assertAbsent($path)
     {
-        if ($this->has($path)) {
+        if ($this->doHas($path)) {
             throw new Ex\FileExistsException($path);
         }
     }
@@ -689,5 +756,18 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         } catch (\LogicException $e) {
             throw new Ex\RootViolationException($e->getMessage(), $e->getCode(), $e);
         }
+    }
+
+    protected function normalizeResource($resource, $method)
+    {
+        if ($resource instanceof StreamInterface) {
+            $resource = GuzzleStreamWrapper::getResource($resource);
+        } elseif (!is_resource($resource)) {
+            throw new Ex\InvalidArgumentException(
+                $method . ' expects $resource to be a resource or instance of Psr\Http\Message\StreamInterface.'
+            );
+        }
+
+        return $resource;
     }
 }
