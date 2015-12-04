@@ -112,11 +112,11 @@ class File extends BaseHandler implements FileInterface
     /**
      * {@inheritdoc}
      */
-    public function copy($newPath)
+    public function copy($target, $override = null)
     {
-        $this->filesystem->copy($this->path, $newPath);
+        $this->filesystem->copy($this->path, $target, $override);
 
-        return new static($this->filesystem, $newPath);
+        return new static($this->filesystem, $target);
     }
 
     /**

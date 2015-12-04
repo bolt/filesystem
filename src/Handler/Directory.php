@@ -28,6 +28,16 @@ class Directory extends BaseHandler implements DirectoryInterface
     /**
      * {@inheritdoc}
      */
+    public function copy($target, $override = null)
+    {
+        $this->filesystem->copyDir($this->path, $target, $override);
+
+        return new static($this->filesystem, $target);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function get($path, HandlerInterface $handler = null)
     {
         return $this->filesystem->get($this->path . '/' . $path, $handler);
