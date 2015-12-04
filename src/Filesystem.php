@@ -492,10 +492,11 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $path = $this->normalizePath($path);
 
         if ($handler === null) {
-            $metadata = $this->getMetadata($path);
-            if ($metadata['type'] === 'dir') {
+            $this->assertPresent($path);
+            $type = $this->doGetType($path);
+            if ($type === 'dir') {
                 $handler = new Handler\Directory($this, $path);
-            } elseif ($metadata['type'] === 'image') {
+            } elseif ($type === 'image') {
                 $handler = new Handler\Image($this, $path);
             } else {
                 $handler = new Handler\File($this, $path);
@@ -533,6 +534,39 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
     public function getImage($path)
     {
         return $this->get($path, new Handler\Image());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getType($path)
+    {
+        $path = $this->normalizePath($path);
+        $this->assertPresent($path);
+
+        return $this->doGetType($path);
+    }
+
+    private function doGetType($path)
+    {
+        try {
+            $metadata = $this->getAdapter()->getMetadata($path);
+        } catch (Exception $e) {
+            throw $this->handleEx($e, $path);
+        }
+
+        if ($metadata === false || !isset($metadata['type'])) {
+            throw new Ex\IOException("Failed to get file's type", $path);
+        }
+
+        $ext = pathinfo($metadata['path'], PATHINFO_EXTENSION);
+        if (in_array($ext, Handler\Image\Type::getExtensions())) {
+            return 'image';
+        } elseif (in_array($ext, $this->getDocumentExtensions())) {
+            return 'document';
+        }
+
+        return $metadata['type'];
     }
 
     /**
@@ -618,39 +652,6 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         }
 
         return $object['mimetype'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetadata($path)
-    {
-        $path = $this->normalizePath($path);
-        $this->assertPresent($path);
-
-        return $this->doGetMetadata($path);
-    }
-
-    private function doGetMetadata($path)
-    {
-        try {
-            $metadata = $this->getAdapter()->getMetadata($path);
-        } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
-        }
-
-        if ($metadata === false) {
-            throw new Ex\IOException("Failed to get file's metadata", $path);
-        }
-
-        $ext = pathinfo($metadata['path'], PATHINFO_EXTENSION);
-        if (in_array($ext, Handler\Image\Type::getExtensions())) {
-            $metadata['type'] = 'image';
-        } elseif (in_array($ext, $this->getDocumentExtensions())) {
-            $metadata['type'] = 'document';
-        }
-
-        return $metadata;
     }
 
     /**

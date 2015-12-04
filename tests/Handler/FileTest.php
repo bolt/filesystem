@@ -4,6 +4,7 @@ namespace Bolt\Filesystem\Tests\Handler;
 
 use Bolt\Filesystem\Adapter\Local;
 use Bolt\Filesystem\Filesystem;
+use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\Handler\File;
 use Bolt\Filesystem\Tests\FilesystemTestCase;
 
@@ -44,10 +45,10 @@ class FileTest extends FilesystemTestCase
         $this->assertInstanceOf('Bolt\Filesystem\Filesystem', $file->getFilesystem());
     }
 
-    public function testGetMimetype()
+    public function testGetMimeType()
     {
         $file = new File($this->filesystem, 'fixtures/images/2-top-right.jpg');
-        $this->assertSame('image/jpeg', $file->getMimetype(false));
+        $this->assertSame('image/jpeg', $file->getMimeType(false));
     }
 
     public function testGetVisibility()
@@ -56,13 +57,10 @@ class FileTest extends FilesystemTestCase
         $this->assertSame('public', $file->getVisibility(false));
     }
 
-    public function testGetMetadata()
+    public function testGetType()
     {
         $file = new File($this->filesystem, 'fixtures/images/2-top-right.jpg');
-        $meta = $file->getMetadata(false);
-        $this->assertSame('image', $meta['type']);
-        $this->assertSame('fixtures/images/2-top-right.jpg', $meta['path']);
-        $this->assertSame(7023, $meta['size']);
+        $this->assertSame('image', $file->getType(false));
     }
 
     public function testGetSize()

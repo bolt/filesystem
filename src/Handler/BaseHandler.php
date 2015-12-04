@@ -23,8 +23,8 @@ abstract class BaseHandler implements HandlerInterface
     /** @var string */
     protected $path;
 
-    /** @var array cached metadata */
-    protected $metadata;
+    /** @var array cached type */
+    protected $type;
     /** @var int cached timestamp */
     protected $timestamp;
     /** @var string cached visibility */
@@ -159,28 +159,16 @@ abstract class BaseHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function getType()
-    {
-        return $this->getMetadata()['type'];
-    }
-
-    /**
-     * Get the file's metadata.
-     *
-     * @param bool $cache Whether to use cached info from previous call
-     *
-     * @return array
-     */
-    public function getMetadata($cache = true)
+    public function getType($cache = true)
     {
         if (!$cache) {
-            $this->metadata = null;
+            $this->type = null;
         }
-        if (!$this->metadata) {
-            $this->metadata = $this->filesystem->getMetadata($this->path);
+        if (!$this->type) {
+            $this->type = $this->filesystem->getType($this->path);
         }
 
-        return $this->metadata;
+        return $this->type;
     }
 
     /**
