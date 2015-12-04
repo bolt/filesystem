@@ -61,6 +61,19 @@ interface HandlerInterface extends MountPointAwareInterface
     public function delete();
 
     /**
+     * Copy the file/directory.
+     *
+     * By default, if the target already exists, it is only overridden if the source is newer.
+     *
+     * @param string    $target   Path to the target file.
+     * @param bool|null $override Whether to override an existing file.
+     *                            true  = always override the target.
+     *                            false = never override the target.
+     *                            null  = only override the target if the source is newer.
+     */
+    public function copy($target, $override = null);
+
+    /**
      * Returns whether the entree is a directory.
      *
      * @return bool

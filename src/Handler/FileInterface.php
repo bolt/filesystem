@@ -77,15 +77,6 @@ interface FileInterface extends HandlerInterface
     public function rename($newPath);
 
     /**
-     * Copy the file.
-     *
-     * @param string $newPath
-     *
-     * @return File new file
-     */
-    public function copy($newPath);
-
-    /**
      * Get the file's MIME Type.
      *
      * @param bool $cache Whether to use cached info from previous call

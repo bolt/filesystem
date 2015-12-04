@@ -2,20 +2,15 @@
 
 namespace Bolt\Filesystem\Handler;
 
-use Bolt\Filesystem\Exception\IOException;
-use Bolt\Filesystem\Finder;
-
 /**
  * This represents a filesystem directory.
  *
  * @author Carson Full <carsonfull@gmail.com>
  */
-class Directory extends BaseHandler
+class Directory extends BaseHandler implements DirectoryInterface
 {
     /**
-     * Create the directory.
-     *
-     * @throws IOException
+     * {@inheritdoc}
      */
     public function create()
     {
@@ -23,9 +18,7 @@ class Directory extends BaseHandler
     }
 
     /**
-     * Delete the directory.
-     *
-     * @throws IOException
+     * {@inheritdoc}
      */
     public function delete()
     {
@@ -33,14 +26,25 @@ class Directory extends BaseHandler
     }
 
     /**
-     * Get a handler for an entree.
-     *
-     * @param string           $path    The path to the file.
-     * @param HandlerInterface $handler An optional existing handler to populate.
-     *
-     * @throws IOException
-     *
-     * @return HandlerInterface
+     * {@inheritdoc}
+     */
+    public function copy($target, $override = null)
+    {
+        $this->filesystem->copyDir($this->path, $target, $override);
+
+        return new static($this->filesystem, $target);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mirror($target, $config = [])
+    {
+        $this->filesystem->mirror($this->path, $target, $config);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function get($path, HandlerInterface $handler = null)
     {
@@ -48,14 +52,7 @@ class Directory extends BaseHandler
     }
 
     /**
-     * Get a file handler.
-     *
-     * @param string        $path    The path to the file.
-     * @param FileInterface $handler An optional existing file handler to populate.
-     *
-     * @throws IOException
-     *
-     * @return FileInterface
+     * {@inheritdoc}
      */
     public function getFile($path, FileInterface $handler = null)
     {
@@ -63,13 +60,7 @@ class Directory extends BaseHandler
     }
 
     /**
-     * Get a directory handler.
-     *
-     * @param string $path The path to the directory.
-     *
-     * @throws IOException
-     *
-     * @return Directory
+     * {@inheritdoc}
      */
     public function getDir($path)
     {
@@ -77,11 +68,15 @@ class Directory extends BaseHandler
     }
 
     /**
-     * List the directory contents.
-     *
-     * @param bool $recursive
-     *
-     * @return HandlerInterface[]
+     * {@inheritdoc}
+     */
+    public function getImage($path)
+    {
+        return $this->filesystem->getImage($this->path . '/' . $path);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getContents($recursive = false)
     {
@@ -89,9 +84,7 @@ class Directory extends BaseHandler
     }
 
     /**
-     * Returns a finder instance set to this directory.
-     *
-     * @return Finder
+     * {@inheritdoc}
      */
     public function find()
     {
