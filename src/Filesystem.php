@@ -559,14 +559,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
             throw new Ex\IOException("Failed to get file's type", $path);
         }
 
-        $ext = pathinfo($metadata['path'], PATHINFO_EXTENSION);
-        if (in_array($ext, Handler\Image\Type::getExtensions())) {
-            return 'image';
-        } elseif (in_array($ext, $this->getDocumentExtensions())) {
-            return 'document';
-        }
-
-        return $metadata['type'];
+        return $this->getTypeFromMetadata($metadata);
     }
 
     /**
@@ -728,9 +721,12 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
 
         $contents = array_map(
             function ($entry) {
-                if ($entry['type'] === 'dir') {
+                $type = $this->getTypeFromMetadata($entry);
+                $entry['type'] = $type;
+
+                if ($type === 'dir') {
                     $handler = new Handler\Directory($this, $entry['path']);
-                } elseif (isset($entry['extension']) && in_array($entry['extension'], Handler\Image\Type::getExtensions())) {
+                } elseif ($type === 'image') {
                     $handler = Handler\Image::createFromListingEntry($this, $entry);
                 } else {
                     $handler = Handler\File::createFromListingEntry($this, $entry);
@@ -808,14 +804,6 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         }
     }
 
-    protected function getDocumentExtensions()
-    {
-        return $this->getConfig()->get(
-            'doc_extensions',
-            ['doc', 'docx', 'txt', 'md', 'pdf', 'xls', 'xlsx', 'ppt', 'pptx', 'csv']
-        );
-    }
-
     protected function normalizePath($path)
     {
         try {
@@ -836,5 +824,25 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         }
 
         return $resource;
+    }
+
+    protected function getTypeFromMetadata($metadata)
+    {
+        $ext = pathinfo($metadata['path'], PATHINFO_EXTENSION);
+        if (in_array($ext, Handler\Image\Type::getExtensions())) {
+            return 'image';
+        } elseif (in_array($ext, $this->getDocumentExtensions())) {
+            return 'document';
+        }
+
+        return $metadata['type'];
+    }
+
+    protected function getDocumentExtensions()
+    {
+        return $this->getConfig()->get(
+            'doc_extensions',
+            ['doc', 'docx', 'txt', 'md', 'pdf', 'xls', 'xlsx', 'ppt', 'pptx', 'csv']
+        );
     }
 }
