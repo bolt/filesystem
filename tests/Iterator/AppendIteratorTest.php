@@ -12,6 +12,10 @@ class AppendIteratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testBug()
     {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('Bug does not exist on HHVM');
+        }
+
         $this->assertSequence(new \AppendIterator(), '..123.456');
     }
 
