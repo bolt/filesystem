@@ -7,7 +7,7 @@ use Bolt\Filesystem\Exception\FileNotFoundException;
 use Bolt\Filesystem\Exception\InvalidArgumentException;
 use Bolt\Filesystem\Exception\IOException;
 use Bolt\Filesystem\Exception\RootViolationException;
-use Bolt\Filesystem\Handler\Directory;
+use Bolt\Filesystem\Handler\DirectoryInterface;
 use Bolt\Filesystem\Handler\FileInterface;
 use Bolt\Filesystem\Handler\HandlerInterface;
 use Carbon\Carbon;
@@ -253,7 +253,7 @@ interface FilesystemInterface extends SupportsIncludeFileInterface
      *
      * @throws IOException
      *
-     * @return Directory
+     * @return DirectoryInterface
      */
     public function getDir($path);
 
