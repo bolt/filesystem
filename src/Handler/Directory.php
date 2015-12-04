@@ -38,6 +38,14 @@ class Directory extends BaseHandler implements DirectoryInterface
     /**
      * {@inheritdoc}
      */
+    public function mirror($target, $config = [])
+    {
+        $this->filesystem->mirror($this->path, $target, $config);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function get($path, HandlerInterface $handler = null)
     {
         return $this->filesystem->get($this->path . '/' . $path, $handler);

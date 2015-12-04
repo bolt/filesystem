@@ -20,6 +20,18 @@ interface DirectoryInterface extends HandlerInterface
     public function create();
 
     /**
+     * Mirrors the directory to another.
+     *
+     * Note: By default, this will delete files in target if they are not in source.
+     *
+     * @param string $targetDir The target directory
+     * @param array  $config    Valid options are:
+     *                          - delete   = Whether to delete files that are not in the source directory (default: true)
+     *                          - override = See {@see copyDir}'s $override parameter for details (default: null)
+     */
+    public function mirror($targetDir, $config = []);
+
+    /**
      * Get a handler for an entree.
      *
      * @param string           $path    The path to the file.
