@@ -4,6 +4,7 @@ namespace Bolt\Filesystem\Tests\Handler\Image;
 
 use Bolt\Filesystem\Adapter\Local;
 use Bolt\Filesystem\Filesystem;
+use Bolt\Filesystem\Handler\Image\Dimensions;
 use Bolt\Filesystem\Handler\Image\Exif;
 use Bolt\Filesystem\Handler\Image\Info;
 use Bolt\Filesystem\Handler\Image\Type;
@@ -30,7 +31,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
     {
         $exif = new Exif([]);
         $type = Type::getById(IMAGETYPE_JPEG);
-        $info = new Info(1024, 768, $type, 2, 7, 'Marcel Marceau', $exif);
+        $info = new Info(new Dimensions(1024, 768), $type, 2, 7, 'Marcel Marceau', $exif);
         $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Info', $info);
     }
 
