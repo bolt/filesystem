@@ -153,14 +153,19 @@ interface FilesystemInterface extends SupportsIncludeFileInterface
     /**
      * Copy a file.
      *
-     * @param string $path    Path to the existing file.
-     * @param string $newPath The new path of the file.
+     * By default, if the target already exists, it is only overridden if the source is newer.
      *
-     * @throws FileExistsException   Thrown if $newPath exists.
+     * @param string    $origin   Path to the original file.
+     * @param string    $target   Path to the target file.
+     * @param bool|null $override Whether to override an existing file.
+     *                            true  = always override the target.
+     *                            false = never override the target.
+     *                            null  = only override the target if the source is newer.
+     *
      * @throws FileNotFoundException Thrown if $path does not exist.
      * @throws IOException
      */
-    public function copy($path, $newPath);
+    public function copy($origin, $target, $override = null);
 
     /**
      * Delete a file.
@@ -191,6 +196,31 @@ interface FilesystemInterface extends SupportsIncludeFileInterface
      * @throws IOException
      */
     public function createDir($dirname, $config = []);
+
+    /**
+     * Copies a directory and its contents to another.
+     *
+     * @param string    $originDir The origin directory
+     * @param string    $targetDir The target directory
+     * @param bool|null $override  Whether to override an existing file.
+     *                             true  = always override the target.
+     *                             false = never override the target.
+     *                             null  = only override the target if the source is newer.
+     */
+    public function copyDir($originDir, $targetDir, $override = null);
+
+    /**
+     * Mirrors a directory to another.
+     *
+     * Note: By default, this will delete files in target if they are not in source.
+     *
+     * @param string $originDir The origin directory
+     * @param string $targetDir The target directory
+     * @param array  $config    Valid options are:
+     *                          - delete   = Whether to delete files that are not in the source directory (default: true)
+     *                          - override = See {@see copyDir}'s $override parameter for details (default: null)
+     */
+    public function mirror($originDir, $targetDir, $config = []);
 
     /**
      * Get a handler.
