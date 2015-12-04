@@ -137,6 +137,24 @@ interface HandlerInterface extends MountPointAwareInterface
     public function getCarbon($cache = true);
 
     /**
+     * Returns whether the entree's visibility is public.
+     *
+     * @param bool $cache Whether to use cached info from previous call
+     *
+     * @return bool
+     */
+    public function isPublic($cache = true);
+
+    /**
+     * Returns whether the entree's visibility is private.
+     *
+     * @param bool $cache Whether to use cached info from previous call
+     *
+     * @return bool
+     */
+    public function isPrivate($cache = true);
+
+    /**
      * Returns the entree's visibility (public|private).
      *
      * @param bool $cache Whether to use cached info from previous call

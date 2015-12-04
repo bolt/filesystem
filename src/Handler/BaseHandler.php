@@ -207,6 +207,22 @@ abstract class BaseHandler implements HandlerInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function isPublic($cache = true)
+    {
+        return $this->getVisibility($cache) === 'public';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isPrivate($cache = true)
+    {
+        return $this->getVisibility($cache) === 'private';
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getVisibility($cache = true)
