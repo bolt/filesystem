@@ -153,14 +153,19 @@ interface FilesystemInterface extends SupportsIncludeFileInterface
     /**
      * Copy a file.
      *
-     * @param string $path    Path to the existing file.
-     * @param string $newPath The new path of the file.
+     * By default, if the target already exists, it is only overridden if the source is newer.
      *
-     * @throws FileExistsException   Thrown if $newPath exists.
+     * @param string    $origin   Path to the original file.
+     * @param string    $target   Path to the target file.
+     * @param bool|null $override Whether to override an existing file.
+     *                            true  = always override the target.
+     *                            false = never override the target.
+     *                            null  = only override the target if the source is newer.
+     *
      * @throws FileNotFoundException Thrown if $path does not exist.
      * @throws IOException
      */
-    public function copy($path, $newPath);
+    public function copy($origin, $target, $override = null);
 
     /**
      * Delete a file.

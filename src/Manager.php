@@ -111,17 +111,28 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     /**
      * {@inheritdoc}
      */
-    public function copy($path, $newPath)
+    public function copy($origin, $target, $override = null)
     {
-        list($prefixFrom, $pathFrom) = $this->filterPrefix($path);
+        list($fsOrigin, $origin) = $this->filterPrefix($origin);
+        list($fsTarget, $target) = $this->filterPrefix($target);
 
-        $fsFrom = $this->getFilesystem($prefixFrom);
-        $buffer = $fsFrom->readStream($pathFrom);
+        $fsOrigin = $this->getFilesystem($fsOrigin);
+        $fsTarget = $this->getFilesystem($fsTarget);
 
-        list($prefixTo, $pathTo) = $this->filterPrefix($newPath);
+        if ($fsTarget->has($target) &&
+            (
+                $override === false ||
+                (
+                    $override === null &&
+                    $fsOrigin->getTimestamp($origin) <= $fsTarget->getTimestamp($target)
+                )
+            )
+        ) {
+            return;
+        }
 
-        $fsTo = $this->getFilesystem($prefixTo);
-        $fsTo->writeStream($pathTo, $buffer);
+        $buffer = $fsOrigin->readStream($origin);
+        $fsTarget->putStream($target, $buffer);
 
         $buffer->close();
     }

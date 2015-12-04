@@ -321,26 +321,32 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function copy($path, $newPath)
+    public function copy($origin, $target, $override = null)
     {
-        $path = $this->normalizePath($path);
-        $newPath = $this->normalizePath($newPath);
-        $this->assertPresent($path);
-        $this->assertAbsent($newPath);
+        $origin = $this->normalizePath($origin);
+        $target = $this->normalizePath($target);
+        $this->assertPresent($origin);
 
-        $this->doCopy($path, $newPath);
+        $this->doCopy($origin, $target, $override);
     }
 
-    private function doCopy($path, $newPath)
+    private function doCopy($origin, $target, $override)
     {
+        if ($this->doHas($target)) {
+            if ($override === false || ($override === null && $this->doGetTimestamp($origin) <= $this->doGetTimestamp($target))) {
+                return;
+            }
+            $this->doDelete($target);
+        }
+
         try {
-            $result = (bool) $this->getAdapter()->copy($path, $newPath);
+            $result = (bool) $this->getAdapter()->copy($origin, $target);
         } catch (Exception $e) {
-            throw $this->handleEx($e, $path);
+            throw $this->handleEx($e, $origin);
         }
 
         if ($result === false) {
-            throw new Ex\IOException('Failed to copy file', $path);
+            throw new Ex\IOException('Failed to copy file', $origin);
         }
     }
 
