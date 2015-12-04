@@ -175,11 +175,11 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     /**
      * {@inheritdoc}
      */
-    public function getMetadata($path)
+    public function getType($path)
     {
         list($prefix, $path) = $this->filterPrefix($path);
 
-        return $this->getFilesystem($prefix)->getMetadata($path);
+        return $this->getFilesystem($prefix)->getType($path);
     }
 
     /**
@@ -195,7 +195,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     /**
      * {@inheritdoc}
      */
-    public function getMimetype($path)
+    public function getMimeType($path)
     {
         list($prefix, $path) = $this->filterPrefix($path);
 

@@ -269,6 +269,15 @@ interface FilesystemInterface extends SupportsIncludeFileInterface
     public function getImage($path);
 
     /**
+     * Returns the type of the file.
+     *
+     * @param string $path The path to the file.
+     *
+     * @return string
+     */
+    public function getType($path);
+
+    /**
      * Get a file's size.
      *
      * @param string $path The path to the file.
@@ -314,18 +323,6 @@ interface FilesystemInterface extends SupportsIncludeFileInterface
      * @return string
      */
     public function getMimeType($path);
-
-    /**
-     * Get a file's metadata.
-     *
-     * @param string $path The path to the file.
-     *
-     * @throws FileNotFoundException
-     * @throws IOException
-     *
-     * @return array
-     */
-    public function getMetadata($path);
 
     /**
      * Return the info for an image.

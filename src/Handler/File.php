@@ -27,7 +27,7 @@ class File extends BaseHandler implements FileInterface
     public static function createFromListingEntry(FilesystemInterface $filesystem, array $entry)
     {
         $file = new static($filesystem, $entry['path']);
-        foreach (['timestamp', 'mimetype', 'visibility', 'size'] as $property) {
+        foreach (['type', 'timestamp', 'mimetype', 'visibility', 'size'] as $property) {
             if (isset($entry[$property])) {
                 $file->$property = $entry[$property];
             }
