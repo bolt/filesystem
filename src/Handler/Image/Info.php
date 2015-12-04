@@ -13,10 +13,8 @@ use PHPExif\Reader\ReaderInterface;
  */
 class Info
 {
-    /** @var int */
-    protected $width;
-    /** @var int */
-    protected $height;
+    /** @var Dimensions */
+    protected $dimensions;
     /** @var Type */
     protected $type;
     /** @var int */
@@ -32,20 +30,18 @@ class Info
     protected static $exifReader;
 
     /**
-     * Info constructor.
+     * Constructor.
      *
-     * @param int    $width
-     * @param int    $height
-     * @param Type   $type
-     * @param int    $bits
-     * @param int    $channels
-     * @param string $mime
-     * @param Exif   $exif
+     * @param Dimensions $dimensions
+     * @param Type       $type
+     * @param int        $bits
+     * @param int        $channels
+     * @param string     $mime
+     * @param Exif       $exif
      */
-    public function __construct($width, $height, Type $type, $bits, $channels, $mime, Exif $exif)
+    public function __construct(Dimensions $dimensions, Type $type, $bits, $channels, $mime, Exif $exif)
     {
-        $this->width = (int) $width;
-        $this->height = (int) $height;
+        $this->dimensions = $dimensions;
         $this->type = $type;
         $this->bits = (int) $bits;
         $this->channels = (int) $channels;
@@ -111,8 +107,7 @@ class Info
         ];
 
         return new static(
-            $info[0],
-            $info[1],
+            new Dimensions($info[0], $info[1]),
             Type::getById($info[2]),
             $info['bits'],
             $info['channels'],
@@ -141,13 +136,23 @@ class Info
     }
 
     /**
+     * Returns the image's dimensions.
+     *
+     * @return Dimensions
+     */
+    public function getDimensions()
+    {
+        return $this->dimensions;
+    }
+
+    /**
      * Returns the image width.
      *
      * @return int
      */
     public function getWidth()
     {
-        return $this->width;
+        return $this->dimensions->getWidth();
     }
 
     /**
@@ -157,7 +162,7 @@ class Info
      */
     public function getHeight()
     {
-        return $this->height;
+        return $this->dimensions->getHeight();
     }
 
     /**
@@ -167,16 +172,16 @@ class Info
      */
     public function getAspectRatio()
     {
-        if ($this->width === 0 || $this->height === 0) {
+        if ($this->getWidth() === 0 || $this->getHeight() === 0) {
             return 0.0;
         }
 
         // Account for image rotation
         if (in_array($this->exif->getOrientation(), [5, 6, 7, 8])) {
-            return $this->height / $this->width;
+            return $this->getHeight() / $this->getWidth();
         }
 
-        return $this->width / $this->height;
+        return $this->getWidth() / $this->getHeight();
     }
 
     /**
