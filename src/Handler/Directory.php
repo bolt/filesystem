@@ -12,6 +12,14 @@ class Directory extends BaseHandler implements DirectoryInterface
     /**
      * {@inheritdoc}
      */
+    public function isRoot()
+    {
+        return $this->path === '';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function create()
     {
         $this->filesystem->createDir($this->path);

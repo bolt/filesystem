@@ -93,6 +93,14 @@ abstract class BaseHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
+    public function getParent()
+    {
+        return new Directory($this->filesystem, $this->getDirname());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getExtension()
     {
         return pathinfo($this->path, PATHINFO_EXTENSION);
