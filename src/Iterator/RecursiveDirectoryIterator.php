@@ -128,7 +128,7 @@ class RecursiveDirectoryIterator implements RecursiveIterator, SeekableIterator
             return false;
         }
 
-        $path = $this->current->getPath();
+        $path = $this->current->getFullPath();
         if (!isset($this->children[$path])) {
             $this->children[$path] = $this->doFetch($path);
         }
@@ -141,7 +141,7 @@ class RecursiveDirectoryIterator implements RecursiveIterator, SeekableIterator
      */
     public function getChildren()
     {
-        $path = $this->current->getPath();
+        $path = $this->current->getFullPath();
         $it = new static($this->filesystem, $path);
 
         $it->contents = $this->children[$path];
@@ -188,7 +188,7 @@ class RecursiveDirectoryIterator implements RecursiveIterator, SeekableIterator
 
         $this->current = $this->contents[$this->position];
 
-        $path = $this->current->getPath();
+        $path = $this->current->getFullPath();
         if ($this->mode & static::KEY_FOR_GLOB) {
             // Glob code requires absolute paths, so prefix path
             // with leading slash, but not before mount point
