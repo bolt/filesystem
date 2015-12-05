@@ -27,6 +27,25 @@ class Exif extends PHPExif\Exif
     }
 
     /**
+     * Returns the aspect ratio.
+     *
+     * @return float
+     */
+    public function getAspectRatio()
+    {
+        if ($this->getWidth() == 0 || $this->getHeight() == 0) {
+            return 0.0;
+        }
+
+        // Account for image rotation
+        if (in_array($this->getOrientation(), [5, 6, 7, 8])) {
+            return $this->getHeight() / $this->getWidth();
+        }
+
+        return $this->getWidth() / $this->getHeight();
+    }
+
+    /**
      * Returns the latitude from the GPS data, if it exists.
      *
      * @return bool|float
