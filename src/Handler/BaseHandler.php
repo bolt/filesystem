@@ -123,7 +123,7 @@ abstract class BaseHandler implements HandlerInterface
     }
 
     /**
-     * Returns whether the entree exists.
+     * Returns whether the entry exists.
      *
      * @return bool
      */
