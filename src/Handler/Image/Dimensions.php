@@ -83,7 +83,7 @@ class Dimensions
      */
     public function __toString()
     {
-        return $this->width . 'x' . $this->height;
+        return $this->width . ' x ' . $this->height . ' px';
     }
 
     /**
