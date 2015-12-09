@@ -30,11 +30,11 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function mountFilesystems(array $filesystems)
     {
-        foreach ($filesystems as $prefix => $filesystem) {
+        foreach ($filesystems as $mountPoint => $filesystem) {
             if (!$filesystem instanceof FilesystemInterface) {
                 throw new InvalidArgumentException('Filesystem must be instance of Bolt\Filesystem\FilesystemInterface');
             }
-            $this->mountFilesystem($prefix, $filesystem);
+            $this->mountFilesystem($mountPoint, $filesystem);
         }
 
         return $this;
@@ -43,16 +43,16 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     /**
      * {@inheritdoc}
      */
-    public function mountFilesystem($prefix, FilesystemInterface $filesystem)
+    public function mountFilesystem($mountPoint, FilesystemInterface $filesystem)
     {
-        if (!is_string($prefix)) {
-            throw new InvalidArgumentException(__METHOD__ . ' expects $prefix argument to be a string.');
+        if (!is_string($mountPoint)) {
+            throw new InvalidArgumentException(__METHOD__ . ' expects $mountPoint argument to be a string.');
         }
 
-        $this->filesystems[$prefix] = $filesystem;
+        $this->filesystems[$mountPoint] = $filesystem;
 
         if ($filesystem instanceof MountPointAwareInterface) {
-            $filesystem->setMountPoint($prefix);
+            $filesystem->setMountPoint($mountPoint);
         }
 
         // Propagate our plugins to filesystem
@@ -66,21 +66,21 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     /**
      * {@inheritdoc}
      */
-    public function getFilesystem($prefix)
+    public function getFilesystem($mountPoint)
     {
-        if (!isset($this->filesystems[$prefix])) {
-            throw new LogicException(sprintf('No filesystem mounted with prefix "%s"', $prefix));
+        if (!isset($this->filesystems[$mountPoint])) {
+            throw new LogicException(sprintf('No filesystem with mount point "%s"', $mountPoint));
         }
 
-        return $this->filesystems[$prefix];
+        return $this->filesystems[$mountPoint];
     }
 
     /**
      * @inheritdoc
      */
-    public function hasFilesystem($prefix)
+    public function hasFilesystem($mountPoint)
     {
-        return isset($this->filesystems[$prefix]);
+        return isset($this->filesystems[$mountPoint]);
     }
 
     /**
@@ -103,9 +103,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function listContents($directory = '', $recursive = false)
     {
-        list($prefix, $directory) = $this->filterPrefix($directory);
+        list($mountPoint, $directory) = $this->parsePath($directory);
 
-        return $this->getFilesystem($prefix)->listContents($directory, $recursive);
+        return $this->getFilesystem($mountPoint)->listContents($directory, $recursive);
     }
 
     /**
@@ -113,8 +113,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function copy($origin, $target, $override = null)
     {
-        list($fsOrigin, $origin) = $this->filterPrefix($origin);
-        list($fsTarget, $target) = $this->filterPrefix($target);
+        list($fsOrigin, $origin) = $this->parsePath($origin);
+        list($fsTarget, $target) = $this->parsePath($target);
 
         $fsOrigin = $this->getFilesystem($fsOrigin);
         $fsTarget = $this->getFilesystem($fsTarget);
@@ -147,9 +147,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function has($path)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
+        list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($prefix)->has($path);
+        return $this->getFilesystem($mountPoint)->has($path);
     }
 
     /**
@@ -157,9 +157,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function read($path)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
+        list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($prefix)->read($path);
+        return $this->getFilesystem($mountPoint)->read($path);
     }
 
     /**
@@ -167,9 +167,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function readStream($path)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
+        list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($prefix)->readStream($path);
+        return $this->getFilesystem($mountPoint)->readStream($path);
     }
 
     /**
@@ -177,9 +177,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function getType($path)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
+        list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($prefix)->getType($path);
+        return $this->getFilesystem($mountPoint)->getType($path);
     }
 
     /**
@@ -187,9 +187,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function getSize($path)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
+        list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($prefix)->getSize($path);
+        return $this->getFilesystem($mountPoint)->getSize($path);
     }
 
     /**
@@ -197,9 +197,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function getMimeType($path)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
+        list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($prefix)->getMimeType($path);
+        return $this->getFilesystem($mountPoint)->getMimeType($path);
     }
 
     /**
@@ -207,9 +207,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function getTimestamp($path)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
+        list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($prefix)->getTimestamp($path);
+        return $this->getFilesystem($mountPoint)->getTimestamp($path);
     }
 
     /**
@@ -217,9 +217,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function getCarbon($path)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
+        list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($prefix)->getCarbon($path);
+        return $this->getFilesystem($mountPoint)->getCarbon($path);
     }
 
     /**
@@ -227,9 +227,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function getVisibility($path)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
+        list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($prefix)->getVisibility($path);
+        return $this->getFilesystem($mountPoint)->getVisibility($path);
     }
 
     /**
@@ -237,8 +237,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function write($path, $contents, $config = [])
     {
-        list($prefix, $path) = $this->filterPrefix($path);
-        $this->getFilesystem($prefix)->write($path, $contents, $config);
+        list($mountPoint, $path) = $this->parsePath($path);
+        $this->getFilesystem($mountPoint)->write($path, $contents, $config);
     }
 
     /**
@@ -246,8 +246,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function writeStream($path, $resource, $config = [])
     {
-        list($prefix, $path) = $this->filterPrefix($path);
-        $this->getFilesystem($prefix)->writeStream($path, $resource, $config);
+        list($mountPoint, $path) = $this->parsePath($path);
+        $this->getFilesystem($mountPoint)->writeStream($path, $resource, $config);
     }
 
     /**
@@ -255,8 +255,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function update($path, $contents, $config = [])
     {
-        list($prefix, $path) = $this->filterPrefix($path);
-        $this->getFilesystem($prefix)->update($path, $contents, $config);
+        list($mountPoint, $path) = $this->parsePath($path);
+        $this->getFilesystem($mountPoint)->update($path, $contents, $config);
     }
 
     /**
@@ -264,8 +264,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function updateStream($path, $resource, $config = [])
     {
-        list($prefix, $path) = $this->filterPrefix($path);
-        $this->getFilesystem($prefix)->updateStream($path, $resource, $config);
+        list($mountPoint, $path) = $this->parsePath($path);
+        $this->getFilesystem($mountPoint)->updateStream($path, $resource, $config);
     }
 
     /**
@@ -273,8 +273,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function rename($path, $newPath)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
-        $this->getFilesystem($prefix)->rename($path, $newPath);
+        list($mountPoint, $path) = $this->parsePath($path);
+        $this->getFilesystem($mountPoint)->rename($path, $newPath);
     }
 
     /**
@@ -282,8 +282,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function delete($path)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
-        $this->getFilesystem($prefix)->delete($path);
+        list($mountPoint, $path) = $this->parsePath($path);
+        $this->getFilesystem($mountPoint)->delete($path);
     }
 
     /**
@@ -291,8 +291,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function deleteDir($dirname)
     {
-        list($prefix, $path) = $this->filterPrefix($dirname);
-        $this->getFilesystem($prefix)->deleteDir($path);
+        list($mountPoint, $path) = $this->parsePath($dirname);
+        $this->getFilesystem($mountPoint)->deleteDir($path);
     }
 
     /**
@@ -300,8 +300,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function createDir($dirname, $config = [])
     {
-        list($prefix, $path) = $this->filterPrefix($dirname);
-        $this->getFilesystem($prefix)->createDir($path, $config);
+        list($mountPoint, $path) = $this->parsePath($dirname);
+        $this->getFilesystem($mountPoint)->createDir($path, $config);
     }
 
     /**
@@ -322,8 +322,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
             'override' => null,
         ];
 
-        list($fsOrigin, $originDir) = $this->filterPrefix($originDir);
-        list($fsTarget, $targetDir) = $this->filterPrefix($targetDir);
+        list($fsOrigin, $originDir) = $this->parsePath($originDir);
+        list($fsTarget, $targetDir) = $this->parsePath($targetDir);
 
         $fsOrigin = $this->getFilesystem($fsOrigin);
         $fsTarget = $this->getFilesystem($fsTarget);
@@ -365,8 +365,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function setVisibility($path, $visibility)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
-        $this->getFilesystem($prefix)->setVisibility($path, $visibility);
+        list($mountPoint, $path) = $this->parsePath($path);
+        $this->getFilesystem($mountPoint)->setVisibility($path, $visibility);
     }
 
     /**
@@ -374,8 +374,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function put($path, $contents, $config = [])
     {
-        list($prefix, $path) = $this->filterPrefix($path);
-        $this->getFilesystem($prefix)->put($path, $contents, $config);
+        list($mountPoint, $path) = $this->parsePath($path);
+        $this->getFilesystem($mountPoint)->put($path, $contents, $config);
     }
 
     /**
@@ -383,8 +383,8 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function putStream($path, $resource, $config = [])
     {
-        list($prefix, $path) = $this->filterPrefix($path);
-        $this->getFilesystem($prefix)->putStream($path, $resource, $config);
+        list($mountPoint, $path) = $this->parsePath($path);
+        $this->getFilesystem($mountPoint)->putStream($path, $resource, $config);
     }
 
     /**
@@ -392,9 +392,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function readAndDelete($path)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
+        list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($prefix)->readAndDelete($path);
+        return $this->getFilesystem($mountPoint)->readAndDelete($path);
     }
 
     /**
@@ -402,9 +402,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function get($path, HandlerInterface $handler = null)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
+        list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($prefix)->get($path, $handler);
+        return $this->getFilesystem($mountPoint)->get($path, $handler);
     }
 
     /**
@@ -412,9 +412,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function getFile($path, FileInterface $handler = null)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
+        list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($prefix)->get($path, $handler);
+        return $this->getFilesystem($mountPoint)->get($path, $handler);
     }
 
     /**
@@ -422,9 +422,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function getDir($path)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
+        list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($prefix)->get($path);
+        return $this->getFilesystem($mountPoint)->get($path);
     }
 
     /**
@@ -432,9 +432,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function getImage($path)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
+        list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($prefix)->getImage($path);
+        return $this->getFilesystem($mountPoint)->getImage($path);
     }
 
     /**
@@ -442,9 +442,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function getImageInfo($path)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
+        list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($prefix)->getImageInfo($path);
+        return $this->getFilesystem($mountPoint)->getImageInfo($path);
     }
 
     /**
@@ -460,26 +460,26 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      */
     public function includeFile($path, $once = true)
     {
-        list($prefix, $path) = $this->filterPrefix($path);
+        list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($prefix)->includeFile($path, $once);
+        return $this->getFilesystem($mountPoint)->includeFile($path, $once);
     }
 
     /**
-     * Separates the filesystem prefix from the path.
+     * Separates the filesystem mount point from the path.
      *
      * @param string $path
      *
      * @return array [prefix, path]
      */
-    protected function filterPrefix($path)
+    protected function parsePath($path)
     {
         if (!is_string($path)) {
-            throw new InvalidArgumentException('First argument should be a string');
+            throw new InvalidArgumentException('First argument, $path, should be a string');
         }
 
         if (!preg_match('#^.+\:\/\/.*#', $path)) {
-            throw new InvalidArgumentException('No prefix detected in path: ' . $path);
+            throw new InvalidArgumentException('No mount point detected in path: ' . $path);
         }
 
         return explode('://', $path, 2);
