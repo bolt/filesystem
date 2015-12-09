@@ -2,6 +2,7 @@
 
 namespace Bolt\Filesystem\Exception;
 
+use Seld\JsonLint\ParsingException as JsonParseException;
 use Symfony\Component\Yaml\Exception\ParseException as YamlParseException;
 
 class ParseException extends RuntimeException
@@ -43,6 +44,40 @@ class ParseException extends RuntimeException
     {
         $message = static::parseRawMessage($exception->getMessage());
         return new static($message, $exception->getParsedLine(), $exception->getSnippet(), $exception);
+    }
+
+    /**
+     * Casts JsonLint ParseException to ours.
+     *
+     * @param JsonParseException $exception
+     *
+     * @return ParseException
+     */
+    public static function castFromJson(JsonParseException $exception)
+    {
+        $details = $exception->getDetails();
+        $message = $exception->getMessage();
+        $line = isset($details['line']) ? $details['line'] : -1;
+        $snippet = null;
+
+        if (preg_match("/^Parse error on line (?<line>\\d+):\n(?<snippet>.+)\n.+\n(?<message>.+)$/", $message, $matches)) {
+            $line = (int) $matches[1];
+            $snippet = $matches[2];
+            $message = $matches[3];
+        }
+
+        $trailingComma = false;
+        $pos = strpos($message, ' - It appears you have an extra trailing comma');
+        if ($pos > 0) {
+            $message = substr($message, 0, $pos);
+            $trailingComma = true;
+        }
+
+        if (strpos($message, 'Expected') === 0 && $trailingComma) {
+            $message = 'It appears you have an extra trailing comma';
+        }
+
+        return new static($message, $line, $snippet);
     }
 
     /**
