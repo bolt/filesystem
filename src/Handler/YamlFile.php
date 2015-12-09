@@ -2,6 +2,9 @@
 
 namespace Bolt\Filesystem\Handler;
 
+use Bolt\Filesystem\Exception\DumpException;
+use Bolt\Filesystem\Exception\ParseException;
+use Symfony\Component\Yaml\Exception as Symfony;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -17,14 +20,24 @@ class YamlFile extends File implements ParsableInterface
      */
     public function parse()
     {
-        return Yaml::parse($this->read());
+        $contents = $this->read();
+        try {
+            return Yaml::parse($contents);
+        } catch (Symfony\ParseException $e) {
+            throw ParseException::castFromYaml($e);
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function dump($content)
+    public function dump($contents)
     {
-        $this->put(Yaml::dump($content));
+        try {
+            $contents = Yaml::dump($contents);
+        } catch (Symfony\DumpException $e) {
+            throw new DumpException($e->getMessage(), $e->getCode(), $e);
+        }
+        $this->put($contents);
     }
 }
