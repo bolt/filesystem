@@ -15,18 +15,28 @@ class JsonFile extends File implements ParsableInterface
     /**
      * {@inheritdoc}
      */
-    public function parse()
+    public function parse($options = [])
     {
+        $options += [
+            'depth' => 512,
+            'flags' => 0,
+        ];
+
         $contents = $this->read();
-        return Json::parse($contents);
+
+        return Json::parse($contents, $options['depth'], $options['flags']);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function dump($content)
+    public function dump($contents, $options = [])
     {
-        $content = Json::dump($content);
+        $options += [
+            'flags' => 448,
+        ];
+
+        $content = Json::dump($contents, $options['flags']);
         $this->put($content);
     }
 }

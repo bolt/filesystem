@@ -18,11 +18,22 @@ class YamlFile extends File implements ParsableInterface
     /**
      * {@inheritdoc}
      */
-    public function parse()
+    public function parse($options = [])
     {
+        $options += [
+            'exceptionsOnInvalidType' => false,
+            'objectSupport'           => false,
+            'objectForMap'            => false,
+        ];
+
         $contents = $this->read();
         try {
-            return Yaml::parse($contents);
+            return Yaml::parse(
+                $contents,
+                $options['exceptionsOnInvalidType'],
+                $options['objectSupport'],
+                $options['objectForMap']
+            );
         } catch (Symfony\ParseException $e) {
             throw ParseException::castFromYaml($e);
         }
@@ -31,10 +42,23 @@ class YamlFile extends File implements ParsableInterface
     /**
      * {@inheritdoc}
      */
-    public function dump($contents)
+    public function dump($contents, $options = [])
     {
+        $options += [
+            'inline'                  => 2,
+            'indent'                  => 4,
+            'exceptionsOnInvalidType' => false,
+            'objectSupport'           => false,
+        ];
+
         try {
-            $contents = Yaml::dump($contents);
+            $contents = Yaml::dump(
+                $contents,
+                $options['inline'],
+                $options['indent'],
+                $options['exceptionsOnInvalidType'],
+                $options['objectSupport']
+            );
         } catch (Symfony\DumpException $e) {
             throw new DumpException($e->getMessage(), $e->getCode(), $e);
         }
