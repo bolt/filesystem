@@ -145,7 +145,7 @@ abstract class BaseHandler implements HandlerInterface
      */
     public function isFile()
     {
-        return in_array($this->getType(), ['file', 'image', 'document']);
+        return !$this->isDir();
     }
 
     /**
