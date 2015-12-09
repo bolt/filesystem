@@ -102,7 +102,7 @@ class JsonFile extends File implements ParsableInterface
      */
     public static function parseJson($json, $file = null)
     {
-        if (null === $json) {
+        if ($json === null) {
             return null;
         }
         $data = json_decode($json, true);
