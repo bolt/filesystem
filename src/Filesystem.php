@@ -498,6 +498,10 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
                 $handler = new Handler\Directory($this, $path);
             } elseif ($type === 'image') {
                 $handler = new Handler\Image($this, $path);
+            } elseif ($type === 'json') {
+                $handler = new Handler\JsonFile($this, $path);
+            } elseif ($type === 'yaml') {
+                $handler = new Handler\YamlFile($this, $path);
             } else {
                 $handler = new Handler\File($this, $path);
             }
@@ -831,6 +835,10 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $ext = pathinfo($metadata['path'], PATHINFO_EXTENSION);
         if (in_array($ext, Handler\Image\Type::getExtensions())) {
             return 'image';
+        } elseif ($ext === 'json') {
+            return 'json';
+        } elseif ($ext === 'yaml' || $ext === 'yml') {
+            return 'yaml';
         } elseif (in_array($ext, $this->getDocumentExtensions())) {
             return 'document';
         }

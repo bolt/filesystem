@@ -7,7 +7,7 @@ namespace Bolt\Filesystem\Exception;
  *
  * @author Carson Full <carsonfull@gmail.com>
  */
-class IOException extends \RuntimeException implements ExceptionInterface
+class IOException extends RuntimeException
 {
     /** @var string|null */
     private $path;
