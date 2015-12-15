@@ -327,7 +327,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see ExcludeDirectoryFilterIterator
      */
-    public function ignoreDotFiles($ignoreDotFiles)
+    public function ignoreDotFiles($ignoreDotFiles = true)
     {
         if ($ignoreDotFiles) {
             $this->ignore |= static::IGNORE_DOT_FILES;
@@ -347,7 +347,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see ExcludeDirectoryFilterIterator
      */
-    public function ignoreVCS($ignoreVCS)
+    public function ignoreVCS($ignoreVCS = true)
     {
         if ($ignoreVCS) {
             $this->ignore |= static::IGNORE_VCS_FILES;
