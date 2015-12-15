@@ -470,7 +470,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
      *
      * @param string $path
      *
-     * @return array [prefix, path]
+     * @return array [mount point, path]
      */
     protected function parsePath($path)
     {

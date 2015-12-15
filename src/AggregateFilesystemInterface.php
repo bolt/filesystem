@@ -9,39 +9,35 @@ interface AggregateFilesystemInterface
     /**
      * Mount filesystems.
      *
-     * @param array $filesystems [prefix => Filesystem]
-     *
-     * @return $this
+     * @param array $filesystems [string mount point => Filesystem]
      */
     public function mountFilesystems(array $filesystems);
 
     /**
      * Mount a filesystem.
      *
-     * @param string              $prefix
+     * @param string              $mountPoint
      * @param FilesystemInterface $filesystem
-     *
-     * @return $this
      */
-    public function mountFilesystem($prefix, FilesystemInterface $filesystem);
+    public function mountFilesystem($mountPoint, FilesystemInterface $filesystem);
 
     /**
-     * Get the filesystem with the given prefix.
+     * Get the filesystem at the given mount point.
      *
-     * @param string $prefix
+     * @param string $mountPoint
      *
      * @throws LogicException If the filesystem does not exist.
      *
      * @return FilesystemInterface
      */
-    public function getFilesystem($prefix);
+    public function getFilesystem($mountPoint);
 
     /**
-     * Check if the filesystem with the given prefix exists.
+     * Check if the filesystem at the given mount point exists.
      *
-     * @param string $prefix
+     * @param string $mountPoint
      *
      * @return bool
      */
-    public function hasFilesystem($prefix);
+    public function hasFilesystem($mountPoint);
 }
