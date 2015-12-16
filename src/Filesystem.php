@@ -811,7 +811,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
     protected function normalizePath($path)
     {
         // Strip mount point from path, if needed
-        if ($this->mountPoint && strpos($path, $this->mountPoint) === 0) {
+        if ($this->mountPoint && strpos($path, $this->mountPoint . '://') === 0) {
             $path = substr($path, strlen($this->mountPoint) + 3);
         }
 
