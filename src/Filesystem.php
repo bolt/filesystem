@@ -763,6 +763,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         if (!$adapter instanceof SupportsIncludeFileInterface) {
             throw new Ex\NotSupportedException('Filesystem does not support including PHP files.', $path);
         }
+        $this->assertPresent($path);
 
         return $adapter->includeFile($path, $once);
     }
