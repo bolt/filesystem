@@ -2,8 +2,16 @@
 
 namespace Bolt\Filesystem\Exception;
 
-use League\Flysystem;
-
-class FileNotFoundException extends Flysystem\FileNotFoundException implements ExceptionInterface
+class FileNotFoundException extends IOException
 {
+    /**
+     * Constructor.
+     *
+     * @param string          $path
+     * @param \Exception|null $previous
+     */
+    public function __construct($path, \Exception $previous = null)
+    {
+        parent::__construct('File not found at path: ' . $path, $path, 0, $previous);
+    }
 }

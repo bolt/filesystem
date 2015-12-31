@@ -17,6 +17,6 @@ class DirectoryCreationException extends IOException
      */
     public function __construct($path, \Exception $previous = null)
     {
-        parent::__construct('Failed to create directory', $path, 0, $previous);
+        parent::__construct('Failed to create directory: ' . $path, $path, 0, $previous);
     }
 }
