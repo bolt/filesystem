@@ -50,6 +50,16 @@ class Info
     }
 
     /**
+     * Creates an empty Info. Useful for when image does not exists to prevent null checks.
+     *
+     * @return Info
+     */
+    public static function createEmpty()
+    {
+        return new static(new Dimensions(0, 0), Type::unknown(), 0, 0, null, new Exif([]));
+    }
+
+    /**
      * Creates an Info from a file.
      *
      * @param string $file A filepath

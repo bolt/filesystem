@@ -94,6 +94,16 @@ final class Type
     }
 
     /**
+     * Shortcut for unknown image type.
+     *
+     * @return Type
+     */
+    public static function unknown()
+    {
+        return static::getById(IMAGETYPE_UNKNOWN);
+    }
+
+    /**
      * Returns the IMAGETYPE_* constant.
      *
      * @return int
