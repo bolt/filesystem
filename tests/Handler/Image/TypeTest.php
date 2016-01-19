@@ -26,20 +26,20 @@ class TypeTest extends \PHPUnit_Framework_TestCase
     public function testToId()
     {
         $type = Type::getById(IMAGETYPE_JPEG);
-        $this->assertSame(2, $type->toId());
+        $this->assertSame(2, $type->getId());
     }
 
     public function testToMimeType()
     {
         $type = Type::getById(IMAGETYPE_JPEG);
-        $this->assertSame('image/jpeg', $type->toMimeType());
+        $this->assertSame('image/jpeg', $type->getMimeType());
     }
 
     public function testToExtension()
     {
         $type = Type::getById(IMAGETYPE_JPEG);
-        $this->assertSame('.jpeg', $type->toExtension(true));
-        $this->assertSame('jpeg', $type->toExtension(false));
+        $this->assertSame('.jpeg', $type->getExtension(true));
+        $this->assertSame('jpeg', $type->getExtension(false));
     }
 
     public function testToString()

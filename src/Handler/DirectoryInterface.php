@@ -80,7 +80,7 @@ interface DirectoryInterface extends HandlerInterface
      *
      * @throws IOException
      *
-     * @return Image
+     * @return ImageInterface
      */
     public function getImage($path);
 

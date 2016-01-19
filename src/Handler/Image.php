@@ -7,17 +7,13 @@ namespace Bolt\Filesystem\Handler;
  *
  * @author Carson Full <carsonfull@gmail.com>
  */
-class Image extends File
+class Image extends File implements ImageInterface
 {
     /** @var Image\Info */
     protected $info;
 
     /**
-     * Returns the info for this image.
-     *
-     * @param bool $cache Whether to use cached info from previous call
-     *
-     * @return Image\Info
+     * {@inheritdoc}
      */
     public function getInfo($cache = true)
     {

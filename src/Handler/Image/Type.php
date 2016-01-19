@@ -65,7 +65,7 @@ final class Type
     {
         return array_map(
             function (Type $type) {
-                return $type->toMimeType();
+                return $type->getMimeType();
             },
             static::getTypes()
         );
@@ -83,7 +83,7 @@ final class Type
         $extensions = array_filter(
             array_map(
                 function (Type $type) use ($includeDot) {
-                    return $type->toExtension($includeDot);
+                    return $type->getExtension($includeDot);
                 },
                 static::getTypes()
             )
@@ -94,11 +94,21 @@ final class Type
     }
 
     /**
+     * Shortcut for unknown image type.
+     *
+     * @return Type
+     */
+    public static function unknown()
+    {
+        return static::getById(IMAGETYPE_UNKNOWN);
+    }
+
+    /**
      * Returns the IMAGETYPE_* constant.
      *
      * @return int
      */
-    public function toId()
+    public function getId()
     {
         return $this->id;
     }
@@ -108,7 +118,7 @@ final class Type
      *
      * @return string
      */
-    public function toMimeType()
+    public function getMimeType()
     {
         return image_type_to_mime_type($this->id);
     }
@@ -120,7 +130,7 @@ final class Type
      *
      * @return string
      */
-    public function toExtension($includeDot = true)
+    public function getExtension($includeDot = true)
     {
         return image_type_to_extension($this->id, $includeDot);
     }

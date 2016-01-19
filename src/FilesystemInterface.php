@@ -10,6 +10,7 @@ use Bolt\Filesystem\Exception\RootViolationException;
 use Bolt\Filesystem\Handler\DirectoryInterface;
 use Bolt\Filesystem\Handler\FileInterface;
 use Bolt\Filesystem\Handler\HandlerInterface;
+use Bolt\Filesystem\Handler\ImageInterface;
 use Carbon\Carbon;
 use Psr\Http\Message\StreamInterface;
 
@@ -264,7 +265,7 @@ interface FilesystemInterface extends SupportsIncludeFileInterface
      *
      * @throws IOException
      *
-     * @return Handler\Image
+     * @return ImageInterface
      */
     public function getImage($path);
 

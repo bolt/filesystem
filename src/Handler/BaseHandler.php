@@ -95,7 +95,7 @@ abstract class BaseHandler implements HandlerInterface
      */
     public function getParent()
     {
-        return new Directory($this->filesystem, $this->getDirname());
+        return $this->filesystem->getDir($this->getDirname());
     }
 
     /**
