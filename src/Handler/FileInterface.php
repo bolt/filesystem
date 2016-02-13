@@ -107,8 +107,9 @@ interface FileInterface extends HandlerInterface
      * Get the file size in a human readable format.
      *
      * @param bool $cache Whether to use cached info from previous call
+     * @param bool $fuzzy Return results according to IEC standards (ie. 4.60 KiB) or fuzzy but end-user friendly using SI (ie. 4.7 kb)
      *
      * @return string
      */
-    public function getSizeFormatted($cache = true);
+    public function getSizeFormatted($cache = true, $si = false);
 }
