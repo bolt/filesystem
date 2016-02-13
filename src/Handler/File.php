@@ -160,11 +160,11 @@ class File extends BaseHandler implements FileInterface
     /**
      * {@inheritdoc}
      */
-    public function getSizeFormatted($cache = true, $fluffy = false)
+    public function getSizeFormatted($cache = true, $fuzzy = false)
     {
         $size = $this->getSize($cache);
 
-        if ($fluffy) {
+        if ($fuzzy) {
             return $this->getSizeFormattedFluffy($size);
         } else {
             return $this->getSizeFormattedExact($size);
