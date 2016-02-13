@@ -160,12 +160,12 @@ class File extends BaseHandler implements FileInterface
     /**
      * {@inheritdoc}
      */
-    public function getSizeFormatted($cache = true, $fuzzy = false)
+    public function getSizeFormatted($cache = true, $si = false)
     {
         $size = $this->getSize($cache);
 
-        if ($fuzzy) {
-            return $this->getSizeFormattedFluffy($size);
+        if ($si) {
+            return $this->getSizeFormattedSi($size);
         } else {
             return $this->getSizeFormattedExact($size);
         }
@@ -191,19 +191,19 @@ class File extends BaseHandler implements FileInterface
 
     /**
      * Format a filesize as 'end user friendly', so this should be seen as something that'd
-     * be used in a quick glance. For example: '4734 bytes' -> '4.7 kb'
+     * be used in a quick glance. For example: '4734 bytes' -> '4.7 kB'
      *
      * @param integer $size
      * @return string
      */
-    private function getSizeFormattedFluffy($size)
+    private function getSizeFormattedSi($size)
     {
         if ($size > 1000 * 1000) {
-            return sprintf('%0.1f mb', ($size / 1000 / 1000));
+            return sprintf('%0.1f MB', ($size / 1000 / 1000));
         } elseif ($size > 1000) {
-            return sprintf('%0.1f kb', ($size / 1000));
+            return sprintf('%0.1f KB', ($size / 1000));
         } else {
-            return $size . ' b';
+            return $size . ' B';
         }
     }
 }
