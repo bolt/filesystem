@@ -414,7 +414,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($mountPoint)->get($path, $handler);
+        return $this->getFilesystem($mountPoint)->getFile($path, $handler);
     }
 
     /**
@@ -424,7 +424,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     {
         list($mountPoint, $path) = $this->parsePath($path);
 
-        return $this->getFilesystem($mountPoint)->get($path);
+        return $this->getFilesystem($mountPoint)->getDir($path);
     }
 
     /**
