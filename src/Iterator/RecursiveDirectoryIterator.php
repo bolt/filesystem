@@ -2,6 +2,7 @@
 
 namespace Bolt\Filesystem\Iterator;
 
+use Bolt\Filesystem\Exception\FileNotFoundException;
 use Bolt\Filesystem\Handler\Directory;
 use Bolt\Filesystem\Handler\File;
 use Bolt\Filesystem\FilesystemInterface;
@@ -124,7 +125,11 @@ class RecursiveDirectoryIterator implements RecursiveIterator, SeekableIterator
      */
     public function hasChildren()
     {
-        if (!$this->current || !$this->current->isDir()) {
+        try {
+            if (!$this->current || !$this->current->isDir()) {
+                return false;
+            }
+        } catch (FileNotFoundException $e) {
             return false;
         }
 
