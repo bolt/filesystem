@@ -145,47 +145,37 @@ interface HandlerInterface extends MountPointAwareInterface
     /**
      * Returns the entree's timestamp.
      *
-     * @param bool $cache Whether to use cached info from previous call
-     *
      * @return int unix timestamp
      */
-    public function getTimestamp($cache = true);
+    public function getTimestamp();
 
     /**
      * Returns the entree's timestamp as a Carbon instance.
      *
-     * @param bool $cache Whether to use cached info from previous call
-     *
      * @return Carbon The Carbon instance.
      */
-    public function getCarbon($cache = true);
+    public function getCarbon();
 
     /**
      * Returns whether the entree's visibility is public.
      *
-     * @param bool $cache Whether to use cached info from previous call
-     *
      * @return bool
      */
-    public function isPublic($cache = true);
+    public function isPublic();
 
     /**
      * Returns whether the entree's visibility is private.
      *
-     * @param bool $cache Whether to use cached info from previous call
-     *
      * @return bool
      */
-    public function isPrivate($cache = true);
+    public function isPrivate();
 
     /**
      * Returns the entree's visibility (public|private).
      *
-     * @param bool $cache Whether to use cached info from previous call
-     *
      * @return string
      */
-    public function getVisibility($cache = true);
+    public function getVisibility();
 
     /**
      * Set the visibility.

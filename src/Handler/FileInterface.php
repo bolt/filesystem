@@ -79,37 +79,23 @@ interface FileInterface extends HandlerInterface
     /**
      * Get the file's MIME Type.
      *
-     * @param bool $cache Whether to use cached info from previous call
-     *
      * @return string
      */
-    public function getMimeType($cache = true);
-
-    /**
-     * Get the file's visibility.
-     *
-     * @param bool $cache Whether to use cached info from previous call
-     *
-     * @return string
-     */
-    public function getVisibility($cache = true);
+    public function getMimeType();
 
     /**
      * Get the file size.
      *
-     * @param bool $cache Whether to use cached info from previous call
-     *
      * @return int
      */
-    public function getSize($cache = true);
+    public function getSize();
 
     /**
      * Get the file size in a human readable format.
      *
-     * @param bool $cache Whether to use cached info from previous call
-     * @param bool $fuzzy Return results according to IEC standards (ie. 4.60 KiB) or fuzzy but end-user friendly using SI (ie. 4.7 kb)
+     * @param bool $si Return results according to IEC standards (ie. 4.60 KiB) or SI standards (ie. 4.7 kb)
      *
      * @return string
      */
-    public function getSizeFormatted($cache = true, $si = false);
+    public function getSizeFormatted($si = false);
 }

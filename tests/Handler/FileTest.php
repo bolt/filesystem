@@ -71,17 +71,9 @@ class FileTest extends FilesystemTestCase
 
     public function testGetSizeFormatted()
     {
-        $file2 = File::createFromListingEntry($this->filesystem, ['path' => 'fixtures/images/2-top-right.jpg', 'size' => 123]);
-        $this->assertSame('123 B', $file2->getSizeFormatted(true));
-        $this->assertSame('123 B', $file2->getSizeFormatted(true, true));
-
         $file = new File($this->filesystem, 'fixtures/images/2-top-right.jpg');
-        $this->assertSame('6.86 KiB', $file->getSizeFormatted(false));
-        $this->assertSame('7.0 KB', $file->getSizeFormatted(false, true));
-
-        $file2 = File::createFromListingEntry($this->filesystem, ['path' => 'fixtures/images/2-top-right.jpg', 'size' => 12345678]);
-        $this->assertSame('11.77 MiB', $file2->getSizeFormatted(true));
-        $this->assertSame('12.3 MB', $file2->getSizeFormatted(true, true));
+        $this->assertSame('6.86 KiB', $file->getSizeFormatted());
+        $this->assertSame('7.0 KB', $file->getSizeFormatted(true));
     }
 
     public function testReadStream()

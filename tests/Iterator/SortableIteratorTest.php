@@ -3,9 +3,7 @@
 namespace Bolt\Filesystem\Tests\Iterator;
 
 use Bolt\Filesystem\Adapter\Local;
-use Bolt\Filesystem\Exception\InvalidArgumentException;
 use Bolt\Filesystem\Filesystem;
-use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\Handler\File;
 use Bolt\Filesystem\Handler\HandlerInterface;
 use Bolt\Filesystem\Iterator\SortableIterator;
@@ -18,7 +16,7 @@ use Symfony\Component\Finder\Tests\Iterator\Iterator;
  */
 class SortableIteratorTest extends IteratorTestCase
 {
-    /** @var FilesystemInterface */
+    /** @var Filesystem */
     protected $filesystem;
 
     /**
@@ -44,16 +42,31 @@ class SortableIteratorTest extends IteratorTestCase
      */
     public function testAccept($mode, array $expected)
     {
+        $filesystem = $this->getMock(Filesystem::class, ['getTimestamp'], [$this->filesystem->getAdapter()]);
+        $filesystem->method('getTimestamp')
+            ->willReturnMap([
+                ['fixtures/js/script.js',           1],
+                ['fixtures/css/reset.css',          9],
+                ['fixtures',                        2],
+                ['fixtures/css/old/old_style.css',  8],
+                ['fixtures/base.css',               4],
+                ['fixtures/css/style.css',          7],
+                ['fixtures/css/old',                5],
+                ['fixtures/js',                     6],
+                ['fixtures/css',                    3],
+            ])
+        ;
+
         $iterator = new \ArrayIterator([
-            File::createFromListingEntry($this->filesystem, ['timestamp' => 1, 'path' => 'fixtures/js/script.js']),
-            File::createFromListingEntry($this->filesystem, ['timestamp' => 9, 'path' => 'fixtures/css/reset.css']),
-            File::createFromListingEntry($this->filesystem, ['timestamp' => 2, 'path' => 'fixtures']),
-            File::createFromListingEntry($this->filesystem, ['timestamp' => 8, 'path' => 'fixtures/css/old/old_style.css']),
-            File::createFromListingEntry($this->filesystem, ['timestamp' => 4, 'path' => 'fixtures/base.css']),
-            File::createFromListingEntry($this->filesystem, ['timestamp' => 7, 'path' => 'fixtures/css/style.css']),
-            File::createFromListingEntry($this->filesystem, ['timestamp' => 5, 'path' => 'fixtures/css/old']),
-            File::createFromListingEntry($this->filesystem, ['timestamp' => 6, 'path' => 'fixtures/js']),
-            File::createFromListingEntry($this->filesystem, ['timestamp' => 3, 'path' => 'fixtures/css']),
+            new File($filesystem, 'fixtures/js/script.js'),
+            new File($filesystem, 'fixtures/css/reset.css'),
+            new File($filesystem, 'fixtures'),
+            new File($filesystem, 'fixtures/css/old/old_style.css'),
+            new File($filesystem, 'fixtures/base.css'),
+            new File($filesystem, 'fixtures/css/style.css'),
+            new File($filesystem, 'fixtures/css/old'),
+            new File($filesystem, 'fixtures/js'),
+            new File($filesystem, 'fixtures/css'),
         ]);
 
         $iterator = new SortableIterator($iterator, $mode);
