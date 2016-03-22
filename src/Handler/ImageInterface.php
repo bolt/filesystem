@@ -12,9 +12,7 @@ interface ImageInterface
     /**
      * Returns the info for this image.
      *
-     * @param bool $cache Whether to use cached info from previous call
-     *
      * @return Image\Info
      */
-    public function getInfo($cache = true);
+    public function getInfo();
 }
