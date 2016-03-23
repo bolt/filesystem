@@ -726,14 +726,13 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $contents = array_map(
             function ($entry) {
                 $type = $this->getTypeFromMetadata($entry);
-                $entry['type'] = $type;
 
                 if ($type === 'dir') {
                     $handler = new Handler\Directory($this, $entry['path']);
                 } elseif ($type === 'image') {
-                    $handler = Handler\Image::createFromListingEntry($this, $entry);
+                    $handler = new Handler\Image($this, $entry['path']);
                 } else {
-                    $handler = Handler\File::createFromListingEntry($this, $entry);
+                    $handler = new Handler\File($this, $entry['path']);
                 }
                 $handler->setMountPoint($this->mountPoint);
 

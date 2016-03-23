@@ -23,13 +23,6 @@ abstract class BaseHandler implements HandlerInterface
     /** @var string */
     protected $path;
 
-    /** @var array cached type */
-    protected $type;
-    /** @var int cached timestamp */
-    protected $timestamp;
-    /** @var string cached visibility */
-    protected $visibility;
-
     /**
      * Constructor.
      *
@@ -167,70 +160,49 @@ abstract class BaseHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function getType($cache = true)
+    public function getType()
     {
-        if (!$cache) {
-            $this->type = null;
-        }
-        if (!$this->type) {
-            $this->type = $this->filesystem->getType($this->path);
-        }
-
-        return $this->type;
+        return $this->filesystem->getType($this->path);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getTimestamp($cache = true)
+    public function getTimestamp()
     {
-        if (!$cache) {
-            $this->timestamp = null;
-        }
-        if (!$this->timestamp) {
-            $this->timestamp = $this->filesystem->getTimestamp($this->path);
-        }
-
-        return $this->timestamp;
+        return $this->filesystem->getTimestamp($this->path);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCarbon($cache = true)
+    public function getCarbon()
     {
-        return Carbon::createFromTimestamp($this->getTimestamp($cache));
+        return Carbon::createFromTimestamp($this->getTimestamp());
     }
 
     /**
      * @inheritDoc
      */
-    public function isPublic($cache = true)
+    public function isPublic()
     {
-        return $this->getVisibility($cache) === 'public';
+        return $this->getVisibility() === 'public';
     }
 
     /**
      * @inheritDoc
      */
-    public function isPrivate($cache = true)
+    public function isPrivate()
     {
-        return $this->getVisibility($cache) === 'private';
+        return $this->getVisibility() === 'private';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getVisibility($cache = true)
+    public function getVisibility()
     {
-        if (!$cache) {
-            $this->visibility = null;
-        }
-        if (!$this->visibility) {
-            $this->visibility = $this->filesystem->getVisibility($this->path);
-        }
-
-        return $this->visibility;
+        return $this->filesystem->getVisibility($this->path);
     }
 
     /**
@@ -239,7 +211,6 @@ abstract class BaseHandler implements HandlerInterface
     public function setVisibility($visibility)
     {
         $this->filesystem->setVisibility($this->path, $visibility);
-        $this->visibility = $visibility;
     }
 
     /**

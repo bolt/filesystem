@@ -2,8 +2,6 @@
 
 namespace Bolt\Filesystem\Handler;
 
-use Bolt\Filesystem\FilesystemInterface;
-
 /**
  * This represents a filesystem file.
  *
@@ -11,31 +9,6 @@ use Bolt\Filesystem\FilesystemInterface;
  */
 class File extends BaseHandler implements FileInterface
 {
-    /** @var string cached mimetype */
-    protected $mimetype;
-    /** @var int cached size */
-    protected $size;
-
-    /**
-     * Helper for creating a handler from a listContents entry.
-     *
-     * @param FilesystemInterface $filesystem
-     * @param array               $entry
-     *
-     * @return File
-     */
-    public static function createFromListingEntry(FilesystemInterface $filesystem, array $entry)
-    {
-        $file = new static($filesystem, $entry['path']);
-        foreach (['type', 'timestamp', 'mimetype', 'visibility', 'size'] as $property) {
-            if (isset($entry[$property])) {
-                $file->$property = $entry[$property];
-            }
-        }
-
-        return $file;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -50,6 +23,14 @@ class File extends BaseHandler implements FileInterface
     public function readStream()
     {
         return $this->filesystem->readStream($this->path);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function includeFile($once = true)
+    {
+        return $this->filesystem->includeFile($this->path, $once);
     }
 
     /**
@@ -130,39 +111,25 @@ class File extends BaseHandler implements FileInterface
     /**
      * {@inheritdoc}
      */
-    public function getMimeType($cache = true)
+    public function getMimeType()
     {
-        if (!$cache) {
-            $this->mimetype = null;
-        }
-        if (!$this->mimetype) {
-            $this->mimetype = $this->filesystem->getMimeType($this->path);
-        }
-
-        return $this->mimetype;
+        return $this->filesystem->getMimeType($this->path);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSize($cache = true)
+    public function getSize()
     {
-        if (!$cache) {
-            $this->size = null;
-        }
-        if (!$this->size) {
-            $this->size = $this->filesystem->getSize($this->path);
-        }
-
-        return $this->size;
+        return $this->filesystem->getSize($this->path);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSizeFormatted($cache = true, $si = false)
+    public function getSizeFormatted($si = false)
     {
-        $size = $this->getSize($cache);
+        $size = $this->getSize();
 
         if ($si) {
             return $this->getSizeFormattedSi($size);
@@ -174,7 +141,7 @@ class File extends BaseHandler implements FileInterface
     /**
      * Format a filesize according to IEC standard. For example: '4734 bytes' -> '4.62 KiB'
      *
-     * @param integer $size
+     * @param int $size
      *
      * @return string
      */
@@ -193,7 +160,8 @@ class File extends BaseHandler implements FileInterface
      * Format a filesize as 'end user friendly', so this should be seen as something that'd
      * be used in a quick glance. For example: '4734 bytes' -> '4.7 kB'
      *
-     * @param integer $size
+     * @param int $size
+     *
      * @return string
      */
     private function getSizeFormattedSi($size)
