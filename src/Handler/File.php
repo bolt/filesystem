@@ -28,6 +28,14 @@ class File extends BaseHandler implements FileInterface
     /**
      * {@inheritdoc}
      */
+    public function includeFile($once = true)
+    {
+        return $this->filesystem->includeFile($this->path, $once);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function write($content)
     {
         $this->filesystem->write($this->path, $content);
