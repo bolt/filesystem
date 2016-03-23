@@ -2,10 +2,14 @@
 
 namespace Bolt\Filesystem;
 
+use Bolt\Filesystem\Handler\Directory;
+use Bolt\Filesystem\Handler\DirectoryInterface;
+use Bolt\Filesystem\Handler\File;
+use Bolt\Filesystem\Handler\FileInterface;
+use Bolt\Filesystem\Handler\HandlerInterface;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Cache;
 use GuzzleHttp\Psr7\Stream;
-use League\Flysystem;
 use Psr\Http\Message\StreamInterface;
 
 /**
@@ -37,7 +41,7 @@ class StreamWrapper
      */
     public $context;
 
-    /** @var File|Directory for current path */
+    /** @var HandlerInterface for current path */
     private $handler;
     /** @var string The opened protocol */
     private $protocol;
@@ -108,9 +112,9 @@ class StreamWrapper
      * to determine if it is a directory or file.
      *
      * @param string            $path    In the form of protocol://path
-     * @param Flysystem\Handler $handler An optional handler to populate
+     * @param HandlerInterface  $handler An optional handler to populate
      *
-     * @return Directory|File
+     * @return HandlerInterface
      */
     public static function getHandler($path, $handler = null)
     {
@@ -568,8 +572,8 @@ class StreamWrapper
     /**
      * Creates a url_stat array with the given handler.
      *
-     * @param File|Directory $handler
-     * @param int            $flags
+     * @param HandlerInterface $handler
+     * @param int              $flags
      *
      * @return array
      */
@@ -615,10 +619,10 @@ class StreamWrapper
     }
 
     /**
-     * @param Flysystem\Handler $handler Optional handler, to skip file exists check
+     * @param FileInterface|DirectoryInterface $handler Optional handler, to skip file exists check
      * @param int  $flags
      *
-     * @return array|Directory|File|false
+     * @return FileInterface|DirectoryInterface|false
      */
     private function getThisHandler($handler = null, $flags = null)
     {
