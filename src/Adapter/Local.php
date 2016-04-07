@@ -8,9 +8,19 @@ use Bolt\Filesystem\SupportsIncludeFileInterface;
 use League\Flysystem\Adapter\Local as LocalBase;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
+use Webmozart\PathUtil\Path;
 
 class Local extends LocalBase implements SupportsIncludeFileInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct($root, $writeFlags = LOCK_EX, $linkHandling = self::DISALLOW_LINKS, array $permissions = [])
+    {
+        $root = Path::canonicalize($root);
+        parent::__construct($root, $writeFlags, $linkHandling, $permissions);
+    }
+
     /**
      * {@inheritdoc}
      */
