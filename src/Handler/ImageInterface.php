@@ -7,7 +7,7 @@ namespace Bolt\Filesystem\Handler;
  *
  * @author Carson Full <carsonfull@gmail.com>
  */
-interface ImageInterface
+interface ImageInterface extends FileInterface
 {
     /**
      * Returns the info for this image.
