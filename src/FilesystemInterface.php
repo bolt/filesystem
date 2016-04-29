@@ -19,7 +19,7 @@ use Psr\Http\Message\StreamInterface;
  *
  * @author Carson Full <carsonfull@gmail.com>
  */
-interface FilesystemInterface extends SupportsIncludeFileInterface
+interface FilesystemInterface extends Capability\IncludeFile
 {
     /**
      * Check whether a file exists.
