@@ -492,19 +492,13 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $path = $this->normalizePath($path);
 
         if ($handler === null) {
-            $this->assertPresent($path);
-            $type = $this->doGetType($path);
-            if ($type === 'dir') {
-                $handler = new Handler\Directory($this, $path);
-            } elseif ($type === 'image') {
-                $handler = new Handler\Image($this, $path);
-            } elseif ($type === 'json') {
-                $handler = new Handler\JsonFile($this, $path);
-            } elseif ($type === 'yaml') {
-                $handler = new Handler\YamlFile($this, $path);
+            if ($path === '') {
+                $type = 'dir'; // Shortcut for root path
             } else {
-                $handler = new Handler\File($this, $path);
+                $this->assertPresent($path);
+                $type = $this->doGetType($path);
             }
+            $handler = $this->getHandlerForType($path, $type);
         }
 
         $handler->setPath($path);
@@ -521,7 +515,18 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
      */
     public function getFile($path, FileInterface $handler = null)
     {
-        return $this->get($path, $handler ?: new Handler\File());
+        if ($handler === null) {
+            $path = $this->normalizePath($path);
+
+            if ($this->doHas($path)) {
+                $type = $this->doGetType($path);
+            } else {
+                $type = $this->getTypeFromPath($path);
+            }
+
+            $handler = $this->getHandlerForType($path, $type);
+        }
+        return $this->get($path, $handler);
     }
 
     /**
@@ -835,9 +840,46 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         return $resource;
     }
 
-    protected function getTypeFromMetadata($metadata)
+    /**
+     * @param string $path
+     * @param string $type
+     *
+     * @return HandlerInterface
+     */
+    private function getHandlerForType($path, $type)
     {
-        $ext = pathinfo($metadata['path'], PATHINFO_EXTENSION);
+        switch ($type) {
+            case 'dir':
+                return new Handler\Directory($this, $path);
+            case 'image':
+                return new Handler\Image($this, $path);
+            case 'json':
+                return new Handler\JsonFile($this, $path);
+            case 'yaml':
+                return new Handler\YamlFile($this, $path);
+            default:
+                return new Handler\File($this, $path);
+        }
+    }
+
+    private function getTypeFromMetadata($metadata)
+    {
+        switch ($metadata['type']) {
+            case 'dir':
+                return 'dir';
+            /** @noinspection PhpMissingBreakStatementInspection */
+            case 'file':
+                if ($type = $this->getTypeFromPath($metadata['path'])) {
+                    return $type;
+                }
+            default:
+                return $metadata['type'];
+        }
+    }
+
+    private function getTypeFromPath($path)
+    {
+        $ext = pathinfo($path, PATHINFO_EXTENSION);
         if (in_array($ext, Handler\Image\Type::getExtensions())) {
             return 'image';
         } elseif ($ext === 'json') {
@@ -848,10 +890,10 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
             return 'document';
         }
 
-        return $metadata['type'];
+        return null;
     }
 
-    protected function getDocumentExtensions()
+    private function getDocumentExtensions()
     {
         return $this->getConfig()->get(
             'doc_extensions',
