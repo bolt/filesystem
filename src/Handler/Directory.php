@@ -20,9 +20,9 @@ class Directory extends BaseHandler implements DirectoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create()
+    public function create($config = [])
     {
-        $this->filesystem->createDir($this->path);
+        $this->filesystem->createDir($this->path, $config);
     }
 
     /**

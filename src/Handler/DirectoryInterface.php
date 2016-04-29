@@ -2,6 +2,7 @@
 
 namespace Bolt\Filesystem\Handler;
 
+use Bolt\Filesystem\Exception\DirectoryCreationException;
 use Bolt\Filesystem\Exception\IOException;
 use Bolt\Filesystem\Finder;
 
@@ -22,9 +23,12 @@ interface DirectoryInterface extends HandlerInterface
     /**
      * Create the directory.
      *
+     * @param array $config
+     *
+     * @throws DirectoryCreationException
      * @throws IOException
      */
-    public function create();
+    public function create($config = []);
 
     /**
      * Mirrors the directory to another.
