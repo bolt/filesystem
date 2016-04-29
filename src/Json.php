@@ -100,7 +100,7 @@ final class Json
      *
      * @return string
      */
-    private function errorToString($code)
+    private static function errorToString($code)
     {
         switch ($code) {
             case JSON_ERROR_DEPTH:          return 'Maximum stack depth exceeded';
