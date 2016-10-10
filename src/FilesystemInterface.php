@@ -19,7 +19,7 @@ use Psr\Http\Message\StreamInterface;
  *
  * @author Carson Full <carsonfull@gmail.com>
  */
-interface FilesystemInterface extends Capability\IncludeFile
+interface FilesystemInterface extends Capability\ImageInfo, Capability\IncludeFile
 {
     /**
      * Check whether a file exists.
@@ -324,17 +324,6 @@ interface FilesystemInterface extends Capability\IncludeFile
      * @return string
      */
     public function getMimeType($path);
-
-    /**
-     * Return the info for an image.
-     *
-     * @param string $path The path to the file.
-     *
-     * @throws IOException
-     *
-     * @return Handler\Image\Info
-     */
-    public function getImageInfo($path);
 
     /**
      * Get a file's visibility (public|private).

@@ -661,7 +661,15 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
      */
     public function getImageInfo($path)
     {
-        return Handler\Image\Info::createFromString($this->read($path));
+        $path = $this->normalizePath($path);
+        $this->assertPresent($path);
+
+        $adapter = $this->getAdapter();
+        if ($adapter instanceof Capability\ImageInfo) {
+            return $adapter->getImageInfo($path);
+        }
+
+        return Handler\Image\Info::createFromString($this->doRead($path));
     }
 
     /**
