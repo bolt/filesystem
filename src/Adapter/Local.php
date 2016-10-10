@@ -5,12 +5,13 @@ namespace Bolt\Filesystem\Adapter;
 use Bolt\Filesystem\Capability;
 use Bolt\Filesystem\Exception\DirectoryCreationException;
 use Bolt\Filesystem\Exception\IncludeFileException;
+use Bolt\Filesystem\Handler\Image;
 use League\Flysystem\Adapter\Local as LocalBase;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
 use Webmozart\PathUtil\Path;
 
-class Local extends LocalBase implements Capability\IncludeFile
+class Local extends LocalBase implements Capability\ImageInfo, Capability\IncludeFile
 {
     /**
      * {@inheritdoc}
@@ -103,6 +104,16 @@ class Local extends LocalBase implements Capability\IncludeFile
         }
 
         return parent::deleteDir($dirname);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getImageInfo($path)
+    {
+        $location = $this->applyPathPrefix($path);
+
+        return Image\Info::createFromFile($location);
     }
 
     /**
