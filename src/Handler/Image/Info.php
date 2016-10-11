@@ -3,15 +3,17 @@
 namespace Bolt\Filesystem\Handler\Image;
 
 use Bolt\Filesystem\Exception\IOException;
+use JsonSerializable;
 use PHPExif\Reader\Reader;
 use PHPExif\Reader\ReaderInterface;
+use Serializable;
 
 /**
  * An object representation of properties returned from getimagesize() and EXIF data
  *
  * @author Carson Full <carsonfull@gmail.com>
  */
-class Info
+class Info implements JsonSerializable, Serializable
 {
     /** @var Dimensions */
     protected $dimensions;
@@ -96,6 +98,25 @@ class Info
         $exif = static::readExif($file);
 
         return static::createFromArray($info, $exif);
+    }
+
+    /**
+     * Creates info from a previous json serialized object.
+     *
+     * @param array $data
+     *
+     * @return Info
+     */
+    public static function createFromJson(array $data)
+    {
+        return new static(
+            new Dimensions($data['dims'][0], $data['dims'][1]),
+            Type::getById($data['type']),
+            $data['bits'],
+            $data['channels'],
+            $data['mime'],
+            new Exif($data['exif'])
+        );
     }
 
     /**
@@ -286,10 +307,48 @@ class Info
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function __clone()
     {
         $this->exif = clone $this->exif;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'dims'     => [$this->dimensions->getWidth(), $this->dimensions->getHeight()],
+            'type'     => $this->type->getId(),
+            'bits'     => $this->bits,
+            'channels' => $this->channels,
+            'mime'     => $this->mime,
+            'exif'     => $this->exif->getData(),
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize($this->jsonSerialize());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        $data = unserialize($serialized);
+
+        $this->dimensions = new Dimensions($data['dims'][0], $data['dims'][1]);
+        $this->type = Type::getById($data['type']);
+        $this->bits = $data['bits'];
+        $this->channels = $data['channels'];
+        $this->mime = $data['mime'];
+        $this->exif = new Exif($data['exif']);
     }
 }

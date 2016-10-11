@@ -95,4 +95,34 @@ class InfoTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotSame($clone->getExif(), $info->getExif());
     }
+
+    public function testSerialize()
+    {
+        $file = $this->filesystem->getFile('fixtures/images/1-top-left.jpg')->read();
+        $expected = Image\Info::createFromString($file);
+        /** @var Image\Info $actual */
+        $actual = unserialize(serialize($expected));
+
+        $this->assertInstanceOf(Image\Info::class, $actual);
+        $this->assertEquals($expected->getDimensions(), $actual->getDimensions());
+        $this->assertSame($expected->getType(), $actual->getType());
+        $this->assertSame($expected->getBits(), $actual->getBits());
+        $this->assertSame($expected->getChannels(), $actual->getChannels());
+        $this->assertSame($expected->getMime(), $actual->getMime());
+        $this->assertEquals($expected->getExif()->getData(), $actual->getExif()->getData());
+    }
+
+    public function testJsonSerialize()
+    {
+        $file = $this->filesystem->getFile('fixtures/images/1-top-left.jpg')->read();
+        $expected = Image\Info::createFromString($file);
+        $actual = Image\Info::createFromJson(json_decode(json_encode($expected), true));
+
+        $this->assertEquals($expected->getDimensions(), $actual->getDimensions());
+        $this->assertSame($expected->getType(), $actual->getType());
+        $this->assertSame($expected->getBits(), $actual->getBits());
+        $this->assertSame($expected->getChannels(), $actual->getChannels());
+        $this->assertSame($expected->getMime(), $actual->getMime());
+        $this->assertEquals($expected->getExif()->getData(), $actual->getExif()->getData());
+    }
 }
