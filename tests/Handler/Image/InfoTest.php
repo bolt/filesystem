@@ -3,11 +3,9 @@
 namespace Bolt\Filesystem\Tests\Handler\Image;
 
 use Bolt\Filesystem\Adapter\Local;
+use Bolt\Filesystem\Exception\IOException;
 use Bolt\Filesystem\Filesystem;
-use Bolt\Filesystem\Handler\Image\Dimensions;
-use Bolt\Filesystem\Handler\Image\Exif;
-use Bolt\Filesystem\Handler\Image\Info;
-use Bolt\Filesystem\Handler\Image\Type;
+use Bolt\Filesystem\Handler\Image;
 
 /**
  * Tests for Bolt\Filesystem\Image\Info
@@ -29,20 +27,20 @@ class InfoTest extends \PHPUnit_Framework_TestCase
 
     public function testConstruct()
     {
-        $exif = new Exif([]);
-        $type = Type::getById(IMAGETYPE_JPEG);
-        $info = new Info(new Dimensions(1024, 768), $type, 2, 7, 'Marcel Marceau', $exif);
-        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Info', $info);
+        $exif = new Image\Exif([]);
+        $type = Image\Type::getById(IMAGETYPE_JPEG);
+        $info = new Image\Info(new Image\Dimensions(1024, 768), $type, 2, 7, 'Marcel Marceau', $exif);
+        $this->assertInstanceOf(Image\Info::class, $info);
     }
 
     public function testCreateFromFile()
     {
         $file = dirname(dirname(__DIR__)) . '/fixtures/images/1-top-left.jpg';
-        $info = Info::createFromFile($file);
+        $info = Image\Info::createFromFile($file);
 
-        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Info', $info);
-        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Type', $info->getType());
-        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Exif', $info->getExif());
+        $this->assertInstanceOf(Image\Info::class, $info);
+        $this->assertInstanceOf(Image\Type::class, $info->getType());
+        $this->assertInstanceOf(Image\Exif::class, $info->getExif());
 
         $this->assertSame(400, $info->getWidth());
         $this->assertSame(200, $info->getHeight());
@@ -58,18 +56,18 @@ class InfoTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFromFileFail()
     {
-        $this->setExpectedException('Bolt\Filesystem\Exception\IOException', 'Failed to get image data from file');
-        Info::createFromFile('drop-bear.jpg');
+        $this->setExpectedException(IOException::class, 'Failed to get image data from file');
+        Image\Info::createFromFile('drop-bear.jpg');
     }
 
     public function testCreateFromString()
     {
-        $file = $this->filesystem->get('fixtures/images/1-top-left.jpg')->read();
-        $info = Info::createFromString($file);
+        $file = $this->filesystem->getFile('fixtures/images/1-top-left.jpg')->read();
+        $info = Image\Info::createFromString($file);
 
-        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Info', $info);
-        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Type', $info->getType());
-        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Exif', $info->getExif());
+        $this->assertInstanceOf(Image\Info::class, $info);
+        $this->assertInstanceOf(Image\Type::class, $info->getType());
+        $this->assertInstanceOf(Image\Exif::class, $info->getExif());
 
         $this->assertSame(400, $info->getWidth());
         $this->assertSame(200, $info->getHeight());
@@ -85,16 +83,46 @@ class InfoTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFromStringFail()
     {
-        $this->setExpectedException('Bolt\Filesystem\Exception\IOException', 'Failed to get image data from string');
-        Info::createFromString('drop-bear.jpg');
+        $this->setExpectedException(IOException::class, 'Failed to get image data from string');
+        Image\Info::createFromString('drop-bear.jpg');
     }
 
     public function testClone()
     {
-        $file = $this->filesystem->get('fixtures/images/1-top-left.jpg')->read();
-        $info = Info::createFromString($file);
+        $file = $this->filesystem->getFile('fixtures/images/1-top-left.jpg')->read();
+        $info = Image\Info::createFromString($file);
         $clone = clone $info;
 
         $this->assertNotSame($clone->getExif(), $info->getExif());
+    }
+
+    public function testSerialize()
+    {
+        $file = $this->filesystem->getFile('fixtures/images/1-top-left.jpg')->read();
+        $expected = Image\Info::createFromString($file);
+        /** @var Image\Info $actual */
+        $actual = unserialize(serialize($expected));
+
+        $this->assertInstanceOf(Image\Info::class, $actual);
+        $this->assertEquals($expected->getDimensions(), $actual->getDimensions());
+        $this->assertSame($expected->getType(), $actual->getType());
+        $this->assertSame($expected->getBits(), $actual->getBits());
+        $this->assertSame($expected->getChannels(), $actual->getChannels());
+        $this->assertSame($expected->getMime(), $actual->getMime());
+        $this->assertEquals($expected->getExif()->getData(), $actual->getExif()->getData());
+    }
+
+    public function testJsonSerialize()
+    {
+        $file = $this->filesystem->getFile('fixtures/images/1-top-left.jpg')->read();
+        $expected = Image\Info::createFromString($file);
+        $actual = Image\Info::createFromJson(json_decode(json_encode($expected), true));
+
+        $this->assertEquals($expected->getDimensions(), $actual->getDimensions());
+        $this->assertSame($expected->getType(), $actual->getType());
+        $this->assertSame($expected->getBits(), $actual->getBits());
+        $this->assertSame($expected->getChannels(), $actual->getChannels());
+        $this->assertSame($expected->getMime(), $actual->getMime());
+        $this->assertEquals($expected->getExif()->getData(), $actual->getExif()->getData());
     }
 }
