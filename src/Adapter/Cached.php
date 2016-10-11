@@ -89,7 +89,7 @@ class Cached extends CachedAdapter implements Capability\ImageInfo, Capability\I
     {
         $adapter = $this->getAdapter();
         if (!$adapter instanceof Capability\IncludeFile) {
-            throw new NotSupportedException('Filesystem does not support including PHP files.', $path);
+            throw new NotSupportedException('Filesystem does not support including PHP files.');
         }
 
         return $adapter->includeFile($path, $once);
