@@ -7,6 +7,8 @@ use Aws\S3\Exception\S3Exception;
 use Bolt\Filesystem\Exception\IOException;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\Config;
+use League\Flysystem\Util;
 
 /**
  * S3 adapter that better supports directories and buckets.
@@ -167,5 +169,33 @@ class S3 extends AwsS3Adapter
         }
 
         return substr($path, strlen($pathPrefix));
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * Only call Util::getStreamSize if $body is a resource.
+     */
+    protected function upload($path, $body, Config $config)
+    {
+        $key = $this->applyPathPrefix($path);
+        $options = $this->getOptionsFromConfig($config);
+        $acl = isset($options['ACL']) ? $options['ACL'] : 'private';
+
+        if ( ! isset($options['ContentType']) && is_string($body)) {
+            $options['ContentType'] = Util::guessMimeType($path, $body);
+        }
+
+        if ( ! isset($options['ContentLength'])) {
+            $options['ContentLength'] = is_string($body) ? Util::contentSize($body) : is_resource($body) ? Util::getStreamSize($body) : null;
+        }
+
+        if ($options['ContentLength'] === null) {
+            unset($options['ContentLength']);
+        }
+
+        $this->s3Client->upload($this->bucket, $key, $body, $acl, ['params' => $options]);
+
+        return $this->normalizeResponse($options, $key);
     }
 }
