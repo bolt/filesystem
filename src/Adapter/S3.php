@@ -175,6 +175,7 @@ class S3 extends AwsS3Adapter
      * @inheritdoc
      *
      * Only call Util::getStreamSize if $body is a resource.
+     * Fixed prefix not being removed from response.
      */
     protected function upload($path, $body, Config $config)
     {
@@ -196,6 +197,6 @@ class S3 extends AwsS3Adapter
 
         $this->s3Client->upload($this->bucket, $key, $body, $acl, ['params' => $options]);
 
-        return $this->normalizeResponse($options, $key);
+        return $this->normalizeResponse($options, $path);
     }
 }
