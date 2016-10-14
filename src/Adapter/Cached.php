@@ -32,6 +32,27 @@ class Cached extends CachedAdapter implements Capability\ImageInfo, Capability\I
     /**
      * {@inheritdoc}
      */
+    public function read($path)
+    {
+        $result = $this->cache->read($path);
+
+        if ($result !== false && isset($result['contents']) && $result['contents'] !== false) {
+            return $result;
+        }
+
+        $result = $this->getAdapter()->read($path);
+
+        if ($result) {
+            $object = $result + compact('path');
+            $this->cache->updateObject($path, $object, true);
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getImageInfo($path)
     {
         // If cache doesn't support image info, just pass through to adapter.
