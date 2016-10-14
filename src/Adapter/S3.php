@@ -4,7 +4,6 @@ namespace Bolt\Filesystem\Adapter;
 
 use Aws\Result;
 use Aws\S3\Exception\S3Exception;
-use Bolt\Filesystem\Exception\IOException;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Config;
@@ -32,7 +31,7 @@ class S3 extends AwsS3Adapter
 
         $location = $this->applyPathPrefix($path);
 
-        if (!$location) {
+        if ($location === '') {
             $command = $this->s3Client->getCommand(
                 'headBucket',
                 [
@@ -56,19 +55,29 @@ class S3 extends AwsS3Adapter
             $response = $exception->getResponse();
 
             if ($response !== null && $response->getStatusCode() === 404) {
-
-                // Check if directory exists, if so return basically nothing.
+                /*
+                 * Path could be a directory. If so, return enough info to treat it as a directory.
+                 * We should really never get here and the path not be a directory, since existence
+                 * has already been verified.
+                 */
                 if ($this->doesDirectoryExist($location)) {
                     return $dirResult;
-                } else {
-                    return false;
                 }
             }
 
             throw $exception;
         }
 
-        if (!$location) {
+        /*
+         * Root paths may not throw an exception because:
+         * - headBucket() always has a valid response (since existence has already been verified).
+         * - Applying prefix to empty path will result in a trailing slash. If an exception is not
+         *   thrown for this object it is a fake directory (see createDir()).
+         *
+         * Both of these cases mean the path is a directory. We return that here,
+         * because empty paths aren't handled correctly by normalizeResponse.
+         */
+        if ($path === '') {
             return $dirResult;
         }
 
@@ -84,7 +93,7 @@ class S3 extends AwsS3Adapter
     {
         $location = $this->applyPathPrefix($path);
 
-        if (!$location) {
+        if ($location === '') {
             return $this->s3Client->doesBucketExist($this->bucket);
         }
 
@@ -105,7 +114,14 @@ class S3 extends AwsS3Adapter
     protected function getRawVisibility($path)
     {
         $location = $this->applyPathPrefix($path);
-        if ($location) {
+        if ($location === '') {
+            $command = $this->s3Client->getCommand(
+                'getBucketAcl',
+                [
+                    'Bucket' => $this->bucket,
+                ]
+            );
+        } else {
             $command = $this->s3Client->getCommand(
                 'getObjectAcl',
                 [
@@ -113,26 +129,35 @@ class S3 extends AwsS3Adapter
                     'Key' => $location,
                 ]
             );
-        } else {
-            $command = $this->s3Client->getCommand(
-                'getBucketAcl',
-                [
-                    'Bucket' => $this->bucket,
-                ]
-            );
         }
 
         try {
             $result = $this->s3Client->execute($command);
         } catch (S3Exception $e) {
-            if ($e->getStatusCode() === 404) {
-                // Dirs don't have ACL, just say public.
+            $response = $e->getResponse();
+
+            if ($response !== null && $response->getStatusCode() === 404) {
+                /*
+                 * Path could be a directory. If so, return "public" since directories don't have ACL.
+                 * We should really never get here and the path not be a directory, since existence
+                 * has already been verified.
+                 */
                 if ($this->doesDirectoryExist($location)) {
                     return AdapterInterface::VISIBILITY_PUBLIC;
                 }
             }
 
-            throw new IOException("Failed to get file's visibility", $path, 0, $e);
+            throw $e;
+        }
+
+        /*
+         * See note in getMetadata().
+         *
+         * TODO We say buckets are always public since we treat them like directories, which we say are public.
+         * But buckets actually have visibility. Should we use that instead of assuming it is public?
+         */
+        if ($path === '') {
+            return AdapterInterface::VISIBILITY_PUBLIC;
         }
 
         $visibility = AdapterInterface::VISIBILITY_PRIVATE;
