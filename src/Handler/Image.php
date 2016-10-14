@@ -2,6 +2,8 @@
 
 namespace Bolt\Filesystem\Handler;
 
+use Bolt\Filesystem\Exception\BadMethodCallException;
+
 /**
  * This represents an image file.
  *
@@ -28,7 +30,7 @@ class Image extends File implements ImageInterface
     }
 
     /**
-     * Pass-through to Image\Info, then plugins. This is for BC.
+     * Pass-through to plugins, then Image\Info. This is for BC.
      *
      * @param string $method
      * @param array  $arguments
@@ -37,13 +39,18 @@ class Image extends File implements ImageInterface
      */
     public function __call($method, array $arguments)
     {
+        try {
+            return parent::__call($method, $arguments);
+        } catch (BadMethodCallException $e) {
+        }
+
         $info = $this->getInfo();
         if (method_exists($info, 'get' . $method)) {
             return call_user_func([$info, 'get' . $method]);
         } elseif (method_exists($info, 'is' . $method)) {
             return call_user_func([$info, 'is' . $method]);
-        } else {
-            return parent::__call($method, $arguments);
         }
+
+        throw $e;
     }
 }
