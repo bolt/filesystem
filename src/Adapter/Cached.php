@@ -30,6 +30,14 @@ class Cached extends CachedAdapter implements Capability\ImageInfo, Capability\I
     }
 
     /**
+     * Flush the cache.
+     */
+    public function flush()
+    {
+        $this->cache->flush();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function read($path)
