@@ -213,7 +213,7 @@ class S3 extends AwsS3Adapter
         }
 
         if ( ! isset($options['ContentLength'])) {
-            $options['ContentLength'] = is_string($body) ? Util::contentSize($body) : is_resource($body) ? Util::getStreamSize($body) : null;
+            $options['ContentLength'] = is_string($body) ? Util::contentSize($body) : (is_resource($body) ? Util::getStreamSize($body) : null);
         }
 
         if ($options['ContentLength'] === null) {
