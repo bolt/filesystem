@@ -201,6 +201,7 @@ class S3 extends AwsS3Adapter
      *
      * Only call Util::getStreamSize if $body is a resource.
      * Fixed prefix not being removed from response.
+     * Guess mime type even when body is a resource.
      */
     protected function upload($path, $body, Config $config)
     {
@@ -208,7 +209,7 @@ class S3 extends AwsS3Adapter
         $options = $this->getOptionsFromConfig($config);
         $acl = isset($options['ACL']) ? $options['ACL'] : 'private';
 
-        if ( ! isset($options['ContentType']) && is_string($body)) {
+        if ( ! isset($options['ContentType'])) {
             $options['ContentType'] = Util::guessMimeType($path, $body);
         }
 
