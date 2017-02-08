@@ -740,13 +740,8 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
             function ($entry) {
                 $type = $this->getTypeFromMetadata($entry);
 
-                if ($type === 'dir') {
-                    $handler = new Handler\Directory($this, $entry['path']);
-                } elseif ($type === 'image') {
-                    $handler = new Handler\Image($this, $entry['path']);
-                } else {
-                    $handler = new Handler\File($this, $entry['path']);
-                }
+                $handler = $this->getHandlerForType($entry['path'], $type);
+
                 $handler->setMountPoint($this->mountPoint);
 
                 return $handler;
