@@ -17,7 +17,7 @@ class Info implements JsonSerializable, Serializable
 {
     /** @var Dimensions */
     protected $dimensions;
-    /** @var Type */
+    /** @var TypeInterface */
     protected $type;
     /** @var int */
     protected $bits;
@@ -34,14 +34,14 @@ class Info implements JsonSerializable, Serializable
     /**
      * Constructor.
      *
-     * @param Dimensions $dimensions
-     * @param Type       $type
-     * @param int        $bits
-     * @param int        $channels
-     * @param string     $mime
-     * @param Exif       $exif
+     * @param Dimensions    $dimensions
+     * @param TypeInterface $type
+     * @param int           $bits
+     * @param int           $channels
+     * @param string        $mime
+     * @param Exif          $exif
      */
-    public function __construct(Dimensions $dimensions, Type $type, $bits, $channels, $mime, Exif $exif)
+    public function __construct(Dimensions $dimensions, TypeInterface $type, $bits, $channels, $mime, Exif $exif)
     {
         $this->dimensions = $dimensions;
         $this->type = $type;
@@ -257,7 +257,7 @@ class Info implements JsonSerializable, Serializable
     /**
      * Returns the image type.
      *
-     * @return Type
+     * @return TypeInterface
      */
     public function getType()
     {

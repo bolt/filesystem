@@ -39,7 +39,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $info = Image\Info::createFromFile($file);
 
         $this->assertInstanceOf(Image\Info::class, $info);
-        $this->assertInstanceOf(Image\Type::class, $info->getType());
+        $this->assertInstanceOf(Image\TypeInterface::class, $info->getType());
         $this->assertInstanceOf(Image\Exif::class, $info->getExif());
 
         $this->assertSame(400, $info->getWidth());
@@ -66,7 +66,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $info = Image\Info::createFromString($file);
 
         $this->assertInstanceOf(Image\Info::class, $info);
-        $this->assertInstanceOf(Image\Type::class, $info->getType());
+        $this->assertInstanceOf(Image\TypeInterface::class, $info->getType());
         $this->assertInstanceOf(Image\Exif::class, $info->getExif());
 
         $this->assertSame(400, $info->getWidth());

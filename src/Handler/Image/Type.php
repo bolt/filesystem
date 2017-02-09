@@ -5,19 +5,26 @@ namespace Bolt\Filesystem\Handler\Image;
 use Bolt\Filesystem\Exception\InvalidArgumentException;
 
 /**
- * An object representation of an image type.
+ * A singleton of image types.
  *
  * @author Carson Full <carsonfull@gmail.com>
  */
 final class Type
 {
-    /** @var int */
-    private $id;
-    /** @var string */
-    private $name;
+    /** @var TypeInterface[] */
+    private static $types = [];
+    /** @var bool */
+    private static $initialized = false;
 
-    /** @var Type[] */
-    private static $types;
+    /**
+     * Register an Image Type.
+     *
+     * @param TypeInterface $type
+     */
+    public static function register(TypeInterface $type)
+    {
+        static::$types[$type->getId()] = $type;
+    }
 
     /**
      * Returns a Type for the ID.
@@ -26,7 +33,7 @@ final class Type
      *
      * @throws InvalidArgumentException If the ID isn't a valid IMAGETYPE_* constant
      *
-     * @return Type
+     * @return TypeInterface
      */
     public static function getById($id)
     {
@@ -43,15 +50,11 @@ final class Type
     /**
      * Returns a list of all the image types.
      *
-     * @return Type[]
+     * @return TypeInterface[]
      */
     public static function getTypes()
     {
-        if (static::$types === null) {
-            foreach (static::getConstants() as $id => $name) {
-                static::$types[$id] = new static($id, $name);
-            }
-        }
+        static::initialize();
 
         return static::$types;
     }
@@ -64,7 +67,7 @@ final class Type
     public static function getMimeTypes()
     {
         return array_map(
-            function (Type $type) {
+            function (TypeInterface $type) {
                 return $type->getMimeType();
             },
             static::getTypes()
@@ -82,7 +85,7 @@ final class Type
     {
         $extensions = array_filter(
             array_map(
-                function (Type $type) use ($includeDot) {
+                function (TypeInterface $type) use ($includeDot) {
                     return $type->getExtension($includeDot);
                 },
                 static::getTypes()
@@ -96,7 +99,7 @@ final class Type
     /**
      * Shortcut for unknown image type.
      *
-     * @return Type
+     * @return TypeInterface
      */
     public static function unknown()
     {
@@ -104,100 +107,24 @@ final class Type
     }
 
     /**
-     * Returns the IMAGETYPE_* constant.
-     *
-     * @return int
+     * Register default types.
      */
-    public function getId()
+    private static function initialize()
     {
-        return $this->id;
-    }
+        if (static::$initialized) {
+            return;
+        }
+        static::$initialized = true;
 
-    /**
-     * Returns the MIME Type associated with this type.
-     *
-     * @return string
-     */
-    public function getMimeType()
-    {
-        return image_type_to_mime_type($this->id);
-    }
-
-    /**
-     * Returns the file extension for this type.
-     *
-     * @param bool $includeDot Whether to prepend a dot to the extension or not
-     *
-     * @return string
-     */
-    public function getExtension($includeDot = true)
-    {
-        return image_type_to_extension($this->id, $includeDot);
-    }
-
-    /**
-     * Returns the name of this type.
-     *
-     * @return string
-     */
-    public function toString()
-    {
-        return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString()
-    {
-        return $this->toString();
+        foreach (CoreType::getTypes() as $type) {
+            static::register($type);
+        }
     }
 
     /**
      * Constructor.
-     *
-     * @param int    $id   An IMAGETYPE_* constant
-     * @param string $name String representation based on constant
      */
-    private function __construct($id, $name)
+    private function __construct()
     {
-        $this->id = (int) $id;
-        $this->name = $name;
-    }
-
-    /**
-     * Returns a list of all the image type constants.
-     *
-     * @return array [int $id, string $name]
-     */
-    private static function getConstants()
-    {
-        // Get list of all standard constants
-        $constants = get_defined_constants(true);
-        if (defined('HHVM_VERSION')) {
-            $constants = $constants['Core'];
-        } else {
-            $constants = $constants['standard'];
-        }
-
-        // filter down to image type constants
-        $types = [];
-        foreach ($constants as $name => $value) {
-            if ($value !== IMAGETYPE_COUNT && strpos($name, 'IMAGETYPE_') === 0) {
-                $types[$name] = $value;
-            }
-        }
-
-        // flip these and map them to a humanized string
-        $types = array_map(
-            function ($type) {
-                return str_replace(['IMAGETYPE_', '_'], ['', ' '], $type);
-            },
-            array_flip($types)
-        );
-
-        ksort($types);
-
-        return $types;
     }
 }
