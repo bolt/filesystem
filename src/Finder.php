@@ -4,7 +4,7 @@ namespace Bolt\Filesystem;
 
 use Bolt\Filesystem\Exception\InvalidArgumentException;
 use Bolt\Filesystem\Exception\LogicException;
-use Bolt\Filesystem\Handler\HandlerInterface;
+use Bolt\Filesystem\Iterator\EnsureHandlerIterator;
 use Symfony\Component\Finder as Symfony;
 use Traversable;
 
@@ -518,7 +518,7 @@ class Finder implements \IteratorAggregate, \Countable
             throw new InvalidArgumentException('Finder::append() must be given an iterable object.');
         }
 
-        $this->iterators[] = $this->mapIterable($iterator);
+        $this->iterators[] = new EnsureHandlerIterator($this->filesystem, $iterator);
 
         return $this;
     }
@@ -585,26 +585,6 @@ class Finder implements \IteratorAggregate, \Countable
     public function count()
     {
         return iterator_count($this->getIterator());
-    }
-
-    /**
-     * Iterate through given list and ensure items are handler objects.
-     *
-     * @param array|Traversable $iterator
-     *
-     * @return \Generator
-     */
-    private function mapIterable($iterator)
-    {
-        foreach ($iterator as $handle) {
-            if ($handle instanceof HandlerInterface) {
-                yield $handle;
-            } elseif (is_string($handle)) {
-                yield $this->filesystem->get($handle);
-            } else {
-                throw new InvalidArgumentException(sprintf('Iterators or arrays given to Finder::append() must give path strings or %s objects.', HandlerInterface::class));
-            }
-        }
     }
 
     /**
