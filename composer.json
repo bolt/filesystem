@@ -23,12 +23,16 @@
         "symfony/finder": "^2.7|^3.0"
     },
     "require-dev": {
+        "contao/imagine-svg": "^0.1.2",
         "doctrine/cache": "^1.6",
         "league/flysystem-aws-s3-v3": "^1.0",
         "league/flysystem-cached-adapter": "^1.0",
         "league/flysystem-memory": "^1.0",
         "phpunit/phpunit": "^4.8",
         "symfony/filesystem": "^2.7|^3.0"
+    },
+    "suggest": {
+        "contao/imagine-svg": "To parse SVG image info"
     },
     "autoload": {
         "psr-4": {

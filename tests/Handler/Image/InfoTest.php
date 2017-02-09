@@ -125,4 +125,25 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected->getMime(), $actual->getMime());
         $this->assertEquals($expected->getExif()->getData(), $actual->getExif()->getData());
     }
+
+    public function testSvgFromString()
+    {
+        $file = $this->filesystem->getFile('fixtures/images/nut.svg')->read();
+        $info = Image\Info::createFromString($file);
+
+        $this->assertSame(1000, $info->getWidth());
+        $this->assertSame(1000, $info->getHeight());
+        $this->assertSame('image/svg+xml', $info->getMime());
+        $this->assertInstanceOf(Image\SvgType::class, $info->getType());
+    }
+
+    public function testSvgFromFile()
+    {
+        $info = Image\Info::createFromFile(__DIR__ . '/../../fixtures/images/nut.svg');
+
+        $this->assertSame(1000, $info->getWidth());
+        $this->assertSame(1000, $info->getHeight());
+        $this->assertSame('image/svg+xml', $info->getMime());
+        $this->assertInstanceOf(Image\SvgType::class, $info->getType());
+    }
 }

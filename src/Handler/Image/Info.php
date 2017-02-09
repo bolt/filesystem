@@ -3,7 +3,11 @@
 namespace Bolt\Filesystem\Handler\Image;
 
 use Bolt\Filesystem\Exception\IOException;
+use Bolt\Filesystem\Exception\LogicException;
+use Contao\ImagineSvg\Imagine as SvgImagine;
+use Imagine\Exception\RuntimeException;
 use JsonSerializable;
+use League\Flysystem;
 use PHPExif\Reader\Reader;
 use PHPExif\Reader\ReaderInterface;
 use Serializable;
@@ -72,7 +76,13 @@ class Info implements JsonSerializable, Serializable
     {
         $info = @getimagesize($file);
         if ($info === false) {
-            throw new IOException('Failed to get image data from file');
+            $data = @file_get_contents($file);
+            $type = Flysystem\Util::guessMimeType($file, $data);
+            if ($type !== SvgType::MIME) {
+                throw new IOException('Failed to get image data from file');
+            }
+
+            return static::createSvgFromString($data);
         }
 
         $exif = static::readExif($file);
@@ -83,12 +93,18 @@ class Info implements JsonSerializable, Serializable
     /**
      * Creates an Info from a string of image data.
      *
-     * @param string $data A string containing the image data
+     * @param string      $data     A string containing the image data
+     * @param string|null $filename The filename used for determining the MIME Type.
      *
      * @return Info
      */
-    public static function createFromString($data)
+    public static function createFromString($data, $filename = null)
     {
+        $type = Flysystem\Util::guessMimeType($filename, $data);
+        if ($type === SvgType::MIME) {
+            return static::createSvgFromString($data);
+        }
+
         $info = @getimagesizefromstring($data);
         if ($info === false) {
             throw new IOException('Failed to get image data from string');
@@ -144,6 +160,38 @@ class Info implements JsonSerializable, Serializable
             $info['channels'],
             $info['mime'],
             $exif
+        );
+    }
+
+    /**
+     * Creates an Info from a string of SVG image data.
+     *
+     * @param string $data
+     *
+     * @return Info
+     */
+    protected static function createSvgFromString($data)
+    {
+        if (!class_exists(SvgImagine::class)) {
+            throw new LogicException('Cannot parse SVG Image Info without "contao/imagine-svg" library.');
+        }
+
+        try {
+            $image = (new SvgImagine())->load($data);
+        } catch (RuntimeException $e) {
+            throw new IOException('Failed to parse image data from string', null, 0, $e);
+        }
+
+        $box = $image->getSize();
+        $dimensions = new Dimensions($box->getWidth(), $box->getHeight());
+
+        return new static(
+            $dimensions,
+            Type::getById(SvgType::ID),
+            0,
+            0,
+            SvgType::MIME,
+            new Exif([])
         );
     }
 

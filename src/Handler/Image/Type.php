@@ -119,6 +119,8 @@ final class Type
         foreach (CoreType::getTypes() as $type) {
             static::register($type);
         }
+
+        static::register(new SvgType());
     }
 
     /**

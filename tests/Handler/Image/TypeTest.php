@@ -3,6 +3,7 @@
 namespace Bolt\Filesystem\Tests\Handler\Image;
 
 use Bolt\Filesystem\Exception\InvalidArgumentException;
+use Bolt\Filesystem\Handler\Image\SvgType;
 use Bolt\Filesystem\Handler\Image\Type;
 use Bolt\Filesystem\Handler\Image\TypeInterface;
 
@@ -49,6 +50,17 @@ class TypeTest extends \PHPUnit_Framework_TestCase
         $type = Type::getById(IMAGETYPE_JPEG);
         $this->assertSame('JPEG', $type->toString());
         $this->assertSame('JPEG', (string) $type);
+    }
+
+    public function testSvg()
+    {
+        $type = Type::getById(SvgType::ID);
+        $this->assertEquals(101, $type->getId());
+        $this->assertEquals('image/svg+xml', $type->getMimeType());
+        $this->assertEquals('.svg', $type->getExtension());
+        $this->assertEquals('svg', $type->getExtension(false));
+        $this->assertEquals('SVG', $type->toString());
+        $this->assertEquals('SVG', (string) $type);
     }
 
     public function testGetTypes()
