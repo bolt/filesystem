@@ -60,6 +60,7 @@ class ExcludeDirectoryFilterIteratorTest extends IteratorTestCase
                     'fixtures/images/6-right-top.jpg',
                     'fixtures/images/7-right-bottom.jpg',
                     'fixtures/images/8-left-bottom.jpg',
+                    'fixtures/images/nut.svg',
                 ]
             ],
             'partial dir names do not count' => [
@@ -80,6 +81,7 @@ class ExcludeDirectoryFilterIteratorTest extends IteratorTestCase
                     'fixtures/images/6-right-top.jpg',
                     'fixtures/images/7-right-bottom.jpg',
                     'fixtures/images/8-left-bottom.jpg',
+                    'fixtures/images/nut.svg',
                     'fixtures/js',
                     'fixtures/js/script.js',
                 ]
@@ -100,6 +102,7 @@ class ExcludeDirectoryFilterIteratorTest extends IteratorTestCase
                     'fixtures/images/6-right-top.jpg',
                     'fixtures/images/7-right-bottom.jpg',
                     'fixtures/images/8-left-bottom.jpg',
+                    'fixtures/images/nut.svg',
                     'fixtures/js',
                     'fixtures/js/script.js',
                 ]
