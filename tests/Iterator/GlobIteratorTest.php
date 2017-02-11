@@ -189,6 +189,7 @@ class GlobIteratorTest extends IteratorTestCase
                 'images/6-right-top.jpg',
                 'images/7-right-bottom.jpg',
                 'images/8-left-bottom.jpg',
+                'images/nut.svg',
                 'js',
                 'js/script.js',
             ],

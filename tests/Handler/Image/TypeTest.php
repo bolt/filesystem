@@ -2,7 +2,10 @@
 
 namespace Bolt\Filesystem\Tests\Handler\Image;
 
+use Bolt\Filesystem\Exception\InvalidArgumentException;
+use Bolt\Filesystem\Handler\Image\SvgType;
 use Bolt\Filesystem\Handler\Image\Type;
+use Bolt\Filesystem\Handler\Image\TypeInterface;
 
 /**
  * Tests for Bolt\Filesystem\Image\Type
@@ -14,12 +17,12 @@ class TypeTest extends \PHPUnit_Framework_TestCase
     public function testGetById()
     {
         $type = Type::getById(IMAGETYPE_JPEG);
-        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Type', $type);
+        $this->assertInstanceOf(TypeInterface::class, $type);
 
         $type2 = Type::getById(IMAGETYPE_JPEG);
         $this->assertSame($type, $type2);
 
-        $this->setExpectedException('Bolt\Filesystem\Exception\InvalidArgumentException', 'Given type is not an IMAGETYPE_* constant');
+        $this->setExpectedException(InvalidArgumentException::class, 'Given type is not an IMAGETYPE_* constant');
         Type::getById(42);
     }
 
@@ -49,10 +52,21 @@ class TypeTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('JPEG', (string) $type);
     }
 
+    public function testSvg()
+    {
+        $type = Type::getById(SvgType::ID);
+        $this->assertEquals(101, $type->getId());
+        $this->assertEquals('image/svg+xml', $type->getMimeType());
+        $this->assertEquals('.svg', $type->getExtension());
+        $this->assertEquals('svg', $type->getExtension(false));
+        $this->assertEquals('SVG', $type->toString());
+        $this->assertEquals('SVG', (string) $type);
+    }
+
     public function testGetTypes()
     {
         $types = Type::getTypes();
-        $this->assertInstanceOf('Bolt\Filesystem\Handler\Image\Type', $types[0]);
+        $this->assertInstanceOf(TypeInterface::class, $types[0]);
     }
 
     public function testGetMimeTypes()

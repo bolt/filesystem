@@ -62,6 +62,7 @@ class DateRangeFilterIteratorTest extends IteratorTestCase
             'fixtures/images/6-right-top.jpg',
             'fixtures/images/7-right-bottom.jpg',
             'fixtures/images/8-left-bottom.jpg',
+            'fixtures/images/nut.svg',
             'fixtures/js',
             'fixtures/js/script.js',
         ];
@@ -80,6 +81,7 @@ class DateRangeFilterIteratorTest extends IteratorTestCase
             'fixtures/images/6-right-top.jpg',
             'fixtures/images/7-right-bottom.jpg',
             'fixtures/images/8-left-bottom.jpg',
+            'fixtures/images/nut.svg',
             'fixtures/js',
             'fixtures/js/script.js',
         ];

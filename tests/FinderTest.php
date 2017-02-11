@@ -70,6 +70,7 @@ class FinderTest extends IteratorTestCase
             'fixtures/images/6-right-top.jpg',
             'fixtures/images/7-right-bottom.jpg',
             'fixtures/images/8-left-bottom.jpg',
+            'fixtures/images/nut.svg',
             'fixtures/js/script.js',
         ];
         $finder = new Finder($this->filesystem);
@@ -112,6 +113,7 @@ class FinderTest extends IteratorTestCase
             'fixtures/images/6-right-top.jpg',
             'fixtures/images/7-right-bottom.jpg',
             'fixtures/images/8-left-bottom.jpg',
+            'fixtures/images/nut.svg',
             'fixtures/js/script.js',
         ];
         $finder = new Finder($this->filesystem);
@@ -194,6 +196,7 @@ class FinderTest extends IteratorTestCase
             'fixtures/images/6-right-top.jpg',
             'fixtures/images/7-right-bottom.jpg',
             'fixtures/images/8-left-bottom.jpg',
+            'fixtures/images/nut.svg',
             'fixtures/js',
             'fixtures/js/script.js',
         ];
@@ -205,6 +208,7 @@ class FinderTest extends IteratorTestCase
             'fixtures/css',
             'fixtures/css/old',
             'fixtures/images',
+            'fixtures/images/nut.svg',
             'fixtures/js',
             'fixtures/js/script.js',
         ];
@@ -398,6 +402,7 @@ class FinderTest extends IteratorTestCase
             'fixtures/images/6-right-top.jpg',
             'fixtures/images/7-right-bottom.jpg',
             'fixtures/images/8-left-bottom.jpg',
+            'fixtures/images/nut.svg',
             'fixtures/js',
             'fixtures/js/script.js',
         ];

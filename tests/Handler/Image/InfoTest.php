@@ -39,7 +39,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $info = Image\Info::createFromFile($file);
 
         $this->assertInstanceOf(Image\Info::class, $info);
-        $this->assertInstanceOf(Image\Type::class, $info->getType());
+        $this->assertInstanceOf(Image\TypeInterface::class, $info->getType());
         $this->assertInstanceOf(Image\Exif::class, $info->getExif());
 
         $this->assertSame(400, $info->getWidth());
@@ -66,7 +66,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $info = Image\Info::createFromString($file);
 
         $this->assertInstanceOf(Image\Info::class, $info);
-        $this->assertInstanceOf(Image\Type::class, $info->getType());
+        $this->assertInstanceOf(Image\TypeInterface::class, $info->getType());
         $this->assertInstanceOf(Image\Exif::class, $info->getExif());
 
         $this->assertSame(400, $info->getWidth());
@@ -124,5 +124,26 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected->getChannels(), $actual->getChannels());
         $this->assertSame($expected->getMime(), $actual->getMime());
         $this->assertEquals($expected->getExif()->getData(), $actual->getExif()->getData());
+    }
+
+    public function testSvgFromString()
+    {
+        $file = $this->filesystem->getFile('fixtures/images/nut.svg')->read();
+        $info = Image\Info::createFromString($file);
+
+        $this->assertSame(1000, $info->getWidth());
+        $this->assertSame(1000, $info->getHeight());
+        $this->assertSame('image/svg+xml', $info->getMime());
+        $this->assertInstanceOf(Image\SvgType::class, $info->getType());
+    }
+
+    public function testSvgFromFile()
+    {
+        $info = Image\Info::createFromFile(__DIR__ . '/../../fixtures/images/nut.svg');
+
+        $this->assertSame(1000, $info->getWidth());
+        $this->assertSame(1000, $info->getHeight());
+        $this->assertSame('image/svg+xml', $info->getMime());
+        $this->assertInstanceOf(Image\SvgType::class, $info->getType());
     }
 }
