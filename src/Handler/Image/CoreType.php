@@ -7,7 +7,7 @@ namespace Bolt\Filesystem\Handler\Image;
  *
  * @author Carson Full <carsonfull@gmail.com>
  */
-final class CoreType implements TypeInterface
+class CoreType extends Type implements TypeInterface
 {
     /** @var int */
     private $id;
@@ -15,7 +15,7 @@ final class CoreType implements TypeInterface
     private $name;
 
     /**
-     * Returns a list of all the image types.
+     * Returns a list of all the core image types.
      *
      * @return TypeInterface[]
      */
