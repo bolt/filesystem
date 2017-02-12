@@ -5,7 +5,7 @@ namespace Bolt\Filesystem\Handler\Image;
 /**
  * A SVG image type.
  */
-final class SvgType implements TypeInterface
+final class SvgType extends Type implements TypeInterface
 {
     const ID = 101;
     const MIME = 'image/svg+xml';

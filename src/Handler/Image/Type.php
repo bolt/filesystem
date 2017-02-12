@@ -7,9 +7,11 @@ use Bolt\Filesystem\Exception\InvalidArgumentException;
 /**
  * A singleton of image types.
  *
+ * @final
+ *
  * @author Carson Full <carsonfull@gmail.com>
  */
-final class Type
+class Type
 {
     /** @var TypeInterface[] */
     private static $types = [];
