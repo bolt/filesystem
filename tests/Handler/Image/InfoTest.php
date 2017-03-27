@@ -146,4 +146,17 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('image/svg+xml', $info->getMime());
         $this->assertInstanceOf(Image\SvgType::class, $info->getType());
     }
+
+    public function testSvgWithoutXmlDeclaration()
+    {
+        $file = $this->filesystem->getFile('fixtures/images/nut.svg');
+        $data = $file->read();
+        $data = substr($data, 39);
+        $info = Image\Info::createFromString($data);
+
+        $this->assertSame(1000, $info->getWidth());
+        $this->assertSame(1000, $info->getHeight());
+        $this->assertSame('image/svg+xml', $info->getMime());
+        $this->assertInstanceOf(Image\SvgType::class, $info->getType());
+    }
 }

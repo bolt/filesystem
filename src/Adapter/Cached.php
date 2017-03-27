@@ -108,7 +108,7 @@ class Cached extends CachedAdapter implements Capability\ImageInfo, Capability\I
             throw new IOException('Failed to read file', $path);
         }
 
-        return Image\Info::createFromString($result['contents']);
+        return Image\Info::createFromString($result['contents'], $path);
     }
 
     /**

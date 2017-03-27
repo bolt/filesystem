@@ -77,8 +77,7 @@ class Info implements JsonSerializable, Serializable
         $info = @getimagesize($file);
         if ($info === false) {
             $data = @file_get_contents($file);
-            $type = Flysystem\Util::guessMimeType($file, $data);
-            if ($type !== SvgType::MIME) {
+            if (!static::isSvg($data, $file)) {
                 throw new IOException('Failed to get image data from file');
             }
 
@@ -100,8 +99,7 @@ class Info implements JsonSerializable, Serializable
      */
     public static function createFromString($data, $filename = null)
     {
-        $type = Flysystem\Util::guessMimeType($filename, $data);
-        if ($type === SvgType::MIME) {
+        if (static::isSvg($data, $filename)) {
             return static::createSvgFromString($data);
         }
 
@@ -212,6 +210,31 @@ class Info implements JsonSerializable, Serializable
         } catch (\RuntimeException $e) {
             return new Exif();
         }
+    }
+
+    /**
+     * Determine data string is an SVG image.
+     *
+     * @param string $data
+     * @param string $filename
+     *
+     * @return bool
+     */
+    protected static function isSvg($data, $filename)
+    {
+        $type = Flysystem\Util::guessMimeType($filename, $data);
+
+        if ($type === SvgType::MIME) {
+            return true;
+        }
+
+        // Detect SVG files without the xml declaration (like from Adobe Illustrator)
+        if (strpos($data, '<svg') === 0) {
+            $data = '<?xml version="1.0" encoding="utf-8"?>' . $data;
+            $type = Flysystem\Util::guessMimeType($filename, $data);
+        }
+
+        return $type === SvgType::MIME;
     }
 
     /**

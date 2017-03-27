@@ -30,6 +30,16 @@ class Image extends File implements ImageInterface
     }
 
     /**
+     * @inheritdoc
+     *
+     * Use MIME Type from Info as it has handles SVG detection better.
+     */
+    public function getMimeType()
+    {
+        return $this->getInfo()->getMime();
+    }
+
+    /**
      * Pass-through to plugins, then Image\Info. This is for BC.
      *
      * @param string $method
