@@ -16,7 +16,11 @@ interface HandlerInterface extends MountPointAwareInterface
     /**
      * Set the Filesystem object.
      *
+     * WARNING: Do not call this unless you know what you are doing.
+     *
      * @param FilesystemInterface $filesystem
+     *
+     * @internal
      */
     public function setFilesystem(FilesystemInterface $filesystem);
 
@@ -30,7 +34,11 @@ interface HandlerInterface extends MountPointAwareInterface
     /**
      * Set the entree path.
      *
+     * WARNING: Do not call this unless you know what you are doing.
+     *
      * @param string $path
+     *
+     * @internal
      */
     public function setPath($path);
 

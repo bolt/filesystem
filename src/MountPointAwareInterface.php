@@ -18,6 +18,8 @@ interface MountPointAwareInterface
      * WARNING: Do not call this unless you know what you are doing.
      *
      * @param string $mountPoint
+     *
+     * @internal
      */
     public function setMountPoint($mountPoint);
 }
