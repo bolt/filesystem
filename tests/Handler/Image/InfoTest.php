@@ -54,6 +54,18 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($info->isSquare());
     }
 
+    public function testCreateFromFileEmpty()
+    {
+        $info = Image\Info::createFromFile(__DIR__ . '/../../fixtures2/empty.jpg');
+
+        $this->assertSame(0, $info->getWidth());
+        $this->assertSame(0, $info->getHeight());
+        $this->assertSame(0, $info->getBits());
+        $this->assertSame(0, $info->getChannels());
+        $this->assertSame(null, $info->getMime());
+        $this->assertSame(0.0, $info->getAspectRatio());
+    }
+
     public function testCreateFromFileFail()
     {
         $this->setExpectedException(IOException::class, 'Failed to get image data from file');
@@ -79,6 +91,20 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($info->isLandscape());
         $this->assertFalse($info->isPortrait());
         $this->assertFalse($info->isSquare());
+    }
+
+    public function testCreateFromStringEmpty()
+    {
+        $file = $this->filesystem->getFile('fixtures2/empty.jpg');
+
+        $info = Image\Info::createFromString($file->read(), $file->getPath());
+
+        $this->assertSame(0, $info->getWidth());
+        $this->assertSame(0, $info->getHeight());
+        $this->assertSame(0, $info->getBits());
+        $this->assertSame(0, $info->getChannels());
+        $this->assertSame(null, $info->getMime());
+        $this->assertSame(0.0, $info->getAspectRatio());
     }
 
     public function testCreateFromStringFail()
