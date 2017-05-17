@@ -77,11 +77,8 @@ class Info implements JsonSerializable, Serializable
         $info = @getimagesize($file);
         if ($info === false) {
             $data = @file_get_contents($file);
-            if ($data === '') {
+            if ($data === '' || !static::isSvg($data, $file)) {
                 return static::createEmpty();
-            }
-            if (!static::isSvg($data, $file)) {
-                throw new IOException('Failed to get image data from file');
             }
 
             return static::createSvgFromString($data);
@@ -112,7 +109,7 @@ class Info implements JsonSerializable, Serializable
 
         $info = @getimagesizefromstring($data);
         if ($info === false) {
-            throw new IOException('Failed to get image data from string');
+            return static::createEmpty();
         }
 
         $file = sprintf('data://%s;base64,%s', $info['mime'], base64_encode($data));
