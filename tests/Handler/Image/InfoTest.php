@@ -68,8 +68,8 @@ class InfoTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFromFileFail()
     {
-        $this->setExpectedException(IOException::class, 'Failed to get image data from file');
-        Image\Info::createFromFile('drop-bear.jpg');
+        $info = Image\Info::createFromFile('drop-bear.jpg');
+        $this->assertFalse($info->isValid());
     }
 
     public function testCreateFromString()
@@ -91,6 +91,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($info->isLandscape());
         $this->assertFalse($info->isPortrait());
         $this->assertFalse($info->isSquare());
+        $this->assertTrue($info->isValid());
     }
 
     public function testCreateFromStringEmpty()
@@ -105,12 +106,13 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0, $info->getChannels());
         $this->assertSame(null, $info->getMime());
         $this->assertSame(0.0, $info->getAspectRatio());
+        $this->assertTrue($info->isValid());
     }
 
     public function testCreateFromStringFail()
     {
-        $this->setExpectedException(IOException::class, 'Failed to get image data from string');
-        Image\Info::createFromString('drop-bear.jpg');
+        $info = Image\Info::createFromString('drop-bear.jpg');
+        $this->assertFalse($info->isValid());
     }
 
     public function testClone()

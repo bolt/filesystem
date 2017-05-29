@@ -31,6 +31,8 @@ class Info implements JsonSerializable, Serializable
     protected $mime;
     /** @var Exif */
     protected $exif;
+    /** @var boolean */
+    protected $isValid = true;
 
     /** @var ReaderInterface */
     protected static $exifReader;
@@ -78,7 +80,9 @@ class Info implements JsonSerializable, Serializable
         if ($info === false) {
             $data = @file_get_contents($file);
             if ($data === '' || !static::isSvg($data, $file)) {
-                return static::createEmpty();
+                $result = static::createEmpty();
+                $result->isValid = false;
+                return $result;
             }
 
             return static::createSvgFromString($data);
@@ -109,7 +113,9 @@ class Info implements JsonSerializable, Serializable
 
         $info = @getimagesizefromstring($data);
         if ($info === false) {
-            return static::createEmpty();
+            $result = static::createEmpty();
+            $result->isValid = false;
+            return $result;
         }
 
         $file = sprintf('data://%s;base64,%s', $info['mime'], base64_encode($data));
@@ -425,5 +431,13 @@ class Info implements JsonSerializable, Serializable
         $this->channels = $data['channels'];
         $this->mime = $data['mime'];
         $this->exif = new Exif($data['exif']);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isValid()
+    {
+        return $this->isValid;
     }
 }
