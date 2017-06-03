@@ -3,7 +3,6 @@
 namespace Bolt\Filesystem\Tests\Handler\Image;
 
 use Bolt\Filesystem\Adapter\Local;
-use Bolt\Filesystem\Exception\IOException;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\Handler\Image;
 
@@ -29,8 +28,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
     {
         $exif = new Image\Exif([]);
         $type = Image\Type::getById(IMAGETYPE_JPEG);
-        $info = new Image\Info(new Image\Dimensions(1024, 768), $type, 2, 7, 'Marcel Marceau', $exif);
-        $this->assertInstanceOf(Image\Info::class, $info);
+        new Image\Info(new Image\Dimensions(1024, 768), $type, 2, 7, 'Marcel Marceau', $exif);
     }
 
     public function testCreateFromFile()
@@ -52,6 +50,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($info->isLandscape());
         $this->assertFalse($info->isPortrait());
         $this->assertFalse($info->isSquare());
+        $this->assertTrue($info->isValid());
     }
 
     public function testCreateFromFileEmpty()
@@ -64,12 +63,14 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0, $info->getChannels());
         $this->assertSame(null, $info->getMime());
         $this->assertSame(0.0, $info->getAspectRatio());
+        $this->assertFalse($info->isValid());
     }
 
-    public function testCreateFromFileFail()
+    public function testCreateFromFileInvalid()
     {
-        $this->setExpectedException(IOException::class, 'Failed to get image data from file');
-        Image\Info::createFromFile('drop-bear.jpg');
+        $info = Image\Info::createFromFile('drop-bear.jpg');
+
+        $this->assertFalse($info->isValid());
     }
 
     public function testCreateFromString()
@@ -91,6 +92,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($info->isLandscape());
         $this->assertFalse($info->isPortrait());
         $this->assertFalse($info->isSquare());
+        $this->assertTrue($info->isValid());
     }
 
     public function testCreateFromStringEmpty()
@@ -105,12 +107,14 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0, $info->getChannels());
         $this->assertSame(null, $info->getMime());
         $this->assertSame(0.0, $info->getAspectRatio());
+        $this->assertFalse($info->isValid());
     }
 
-    public function testCreateFromStringFail()
+    public function testCreateFromStringInvalid()
     {
-        $this->setExpectedException(IOException::class, 'Failed to get image data from string');
-        Image\Info::createFromString('drop-bear.jpg');
+        $info = Image\Info::createFromString('drop-bear.jpg');
+
+        $this->assertFalse($info->isValid());
     }
 
     public function testClone()
@@ -136,6 +140,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected->getChannels(), $actual->getChannels());
         $this->assertSame($expected->getMime(), $actual->getMime());
         $this->assertEquals($expected->getExif()->getData(), $actual->getExif()->getData());
+        $this->assertSame($expected->isValid(), $actual->isValid());
     }
 
     public function testJsonSerialize()
@@ -150,6 +155,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected->getChannels(), $actual->getChannels());
         $this->assertSame($expected->getMime(), $actual->getMime());
         $this->assertEquals($expected->getExif()->getData(), $actual->getExif()->getData());
+        $this->assertSame($expected->isValid(), $actual->isValid());
     }
 
     public function testSvgFromString()
@@ -160,6 +166,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1000, $info->getWidth());
         $this->assertSame(1000, $info->getHeight());
         $this->assertSame('image/svg+xml', $info->getMime());
+        $this->assertTrue($info->isValid());
         $this->assertInstanceOf(Image\SvgType::class, $info->getType());
     }
 
@@ -170,6 +177,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1000, $info->getWidth());
         $this->assertSame(1000, $info->getHeight());
         $this->assertSame('image/svg+xml', $info->getMime());
+        $this->assertTrue($info->isValid());
         $this->assertInstanceOf(Image\SvgType::class, $info->getType());
     }
 
@@ -183,6 +191,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1000, $info->getWidth());
         $this->assertSame(1000, $info->getHeight());
         $this->assertSame('image/svg+xml', $info->getMime());
+        $this->assertTrue($info->isValid());
         $this->assertInstanceOf(Image\SvgType::class, $info->getType());
     }
 }
