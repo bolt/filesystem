@@ -31,6 +31,8 @@ class Info implements JsonSerializable, Serializable
     protected $mime;
     /** @var Exif */
     protected $exif;
+    /** @var bool */
+    protected $valid;
 
     /** @var ReaderInterface */
     protected static $exifReader;
@@ -53,16 +55,32 @@ class Info implements JsonSerializable, Serializable
         $this->channels = (int) $channels;
         $this->mime = $mime;
         $this->exif = $exif;
+        $this->valid = true;
     }
 
     /**
      * Creates an empty Info. Useful for when image does not exists to prevent null checks.
      *
      * @return Info
+     *
+     * @deprecated Use {@see createInvalid} instead.
      */
     public static function createEmpty()
     {
-        return new static(new Dimensions(0, 0), Type::unknown(), 0, 0, null, new Exif([]));
+        return static::createInvalid();
+    }
+
+    /**
+     * Creates an empty, invalid Info. Useful to prevent null checks for non-existent or invalid images.
+     *
+     * @return Info
+     */
+    public static function createInvalid()
+    {
+        $invalid = new static(new Dimensions(0, 0), Type::unknown(), 0, 0, null, new Exif([]));
+        $invalid->valid = false;
+
+        return $invalid;
     }
 
     /**
@@ -77,11 +95,8 @@ class Info implements JsonSerializable, Serializable
         $info = @getimagesize($file);
         if ($info === false) {
             $data = @file_get_contents($file);
-            if ($data === '') {
-                return static::createEmpty();
-            }
-            if (!static::isSvg($data, $file)) {
-                throw new IOException('Failed to get image data from file');
+            if ($data === '' || !static::isSvg($data, $file)) {
+                return static::createInvalid();
             }
 
             return static::createSvgFromString($data);
@@ -103,7 +118,7 @@ class Info implements JsonSerializable, Serializable
     public static function createFromString($data, $filename = null)
     {
         if ($data === '') {
-            return static::createEmpty();
+            return static::createInvalid();
         }
 
         if (static::isSvg($data, $filename)) {
@@ -112,7 +127,7 @@ class Info implements JsonSerializable, Serializable
 
         $info = @getimagesizefromstring($data);
         if ($info === false) {
-            throw new IOException('Failed to get image data from string');
+            return static::createInvalid();
         }
 
         $file = sprintf('data://%s;base64,%s', $info['mime'], base64_encode($data));
@@ -385,6 +400,16 @@ class Info implements JsonSerializable, Serializable
     }
 
     /**
+     * Whether this Info is valid or if there was an error.
+     *
+     * @return bool
+     */
+    public function isValid()
+    {
+        return $this->valid;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function __clone()
@@ -404,6 +429,7 @@ class Info implements JsonSerializable, Serializable
             'channels' => $this->channels,
             'mime'     => $this->mime,
             'exif'     => $this->exif->getData(),
+            'valid'    => $this->valid,
         ];
     }
 
@@ -428,5 +454,6 @@ class Info implements JsonSerializable, Serializable
         $this->channels = $data['channels'];
         $this->mime = $data['mime'];
         $this->exif = new Exif($data['exif']);
+        $this->valid = $data['valid'];
     }
 }
