@@ -336,9 +336,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
                 $origin = str_replace($targetDir, $originDir, $handler->getPath());
                 if (!$fsOrigin->has($origin)) {
                     if ($handler->isDir()) {
-                        $fsTarget->deleteDir($origin);
+                        $fsTarget->deleteDir($handler->getPath());
                     } else {
-                        $fsTarget->delete($origin);
+                        $fsTarget->delete($handler->getPath());
                     }
                 }
             }
