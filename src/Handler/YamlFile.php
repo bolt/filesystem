@@ -37,6 +37,7 @@ class YamlFile extends File implements ParsableInterface
         try {
             if (static::$useFlags) {
                 $flags = $this->optionsToFlags($options);
+
                 return Yaml::parse($contents, $flags);
             } else {
                 return Yaml::parse(

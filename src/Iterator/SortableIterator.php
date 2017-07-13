@@ -52,7 +52,7 @@ class SortableIterator implements \IteratorAggregate
             $this->sort = function ($a, $b) {
                 /** @var File|Directory $a */
                 /** @var File|Directory $b */
-                return ($a->getTimestamp() - $b->getTimestamp());
+                return $a->getTimestamp() - $b->getTimestamp();
             };
         } elseif (is_callable($sort)) {
             $this->sort = $sort;

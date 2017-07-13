@@ -53,11 +53,11 @@ trait PluggableTrait
     protected function findPlugin($method)
     {
         if (!isset($this->plugins[$method])) {
-            throw new PluginNotFoundException('Plugin not found for method: '.$method);
+            throw new PluginNotFoundException('Plugin not found for method: ' . $method);
         }
 
         if (!method_exists($this->plugins[$method], 'handle')) {
-            throw new LogicException(get_class($this->plugins[$method]).' does not have a handle method.');
+            throw new LogicException(get_class($this->plugins[$method]) . ' does not have a handle method.');
         }
 
         return $this->plugins[$method];
@@ -98,8 +98,8 @@ trait PluggableTrait
         } catch (PluginNotFoundException $e) {
             throw new BadMethodCallException(
                 'Call to undefined method '
-                .get_class($this)
-                .'::'.$method
+                . get_class($this)
+                . '::' . $method
             );
         }
     }

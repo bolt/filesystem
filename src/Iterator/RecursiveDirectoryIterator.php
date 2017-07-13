@@ -3,9 +3,9 @@
 namespace Bolt\Filesystem\Iterator;
 
 use Bolt\Filesystem\Exception\FileNotFoundException;
+use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\Handler\Directory;
 use Bolt\Filesystem\Handler\File;
-use Bolt\Filesystem\FilesystemInterface;
 use RecursiveIterator;
 use SeekableIterator;
 

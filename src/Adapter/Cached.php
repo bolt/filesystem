@@ -4,8 +4,8 @@ namespace Bolt\Filesystem\Adapter;
 
 use Bolt\Filesystem\Capability;
 use Bolt\Filesystem\Exception\IOException;
-use Bolt\Filesystem\Handler\Image;
 use Bolt\Filesystem\Exception\NotSupportedException;
+use Bolt\Filesystem\Handler\Image;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Cached\CachedAdapter;
 use League\Flysystem\Cached\CacheInterface;

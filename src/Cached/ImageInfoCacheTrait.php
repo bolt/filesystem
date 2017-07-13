@@ -43,7 +43,7 @@ trait ImageInfoCacheTrait
         return [
             'path', 'dirname', 'basename', 'extension', 'filename',
             'size', 'mimetype', 'visibility', 'timestamp', 'type',
-            'image_info'
+            'image_info',
         ];
     }
 }

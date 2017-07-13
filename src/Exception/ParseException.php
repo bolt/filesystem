@@ -17,10 +17,10 @@ class ParseException extends RuntimeException
     /**
      * Constructor.
      *
-     * @param string      $message The error message
+     * @param string      $message    The error message
      * @param int         $parsedLine The line where the error occurred
-     * @param null|string $snippet The snippet of code near the problem
-     * @param \Exception  $previous The previous exception
+     * @param null|string $snippet    The snippet of code near the problem
+     * @param \Exception  $previous   The previous exception
      */
     public function __construct($message, $parsedLine = -1, $snippet = null, \Exception $previous = null)
     {
@@ -43,6 +43,7 @@ class ParseException extends RuntimeException
     public static function castFromYaml(YamlParseException $exception)
     {
         $message = static::parseRawMessage($exception->getMessage());
+
         return new static($message, $exception->getParsedLine(), $exception->getSnippet(), $exception);
     }
 

@@ -43,7 +43,7 @@ class S3 extends AwsS3Adapter
                 'headObject',
                 [
                     'Bucket' => $this->bucket,
-                    'Key' => $location,
+                    'Key'    => $location,
                 ]
             );
         }
@@ -126,7 +126,7 @@ class S3 extends AwsS3Adapter
                 'getObjectAcl',
                 [
                     'Bucket' => $this->bucket,
-                    'Key' => $location,
+                    'Key'    => $location,
                 ]
             );
         }
@@ -209,11 +209,11 @@ class S3 extends AwsS3Adapter
         $options = $this->getOptionsFromConfig($config);
         $acl = isset($options['ACL']) ? $options['ACL'] : 'private';
 
-        if ( ! isset($options['ContentType'])) {
+        if (! isset($options['ContentType'])) {
             $options['ContentType'] = Util::guessMimeType($path, $body);
         }
 
-        if ( ! isset($options['ContentLength'])) {
+        if (! isset($options['ContentLength'])) {
             $options['ContentLength'] = is_string($body) ? Util::contentSize($body) : (is_resource($body) ? Util::getStreamSize($body) : null);
         }
 

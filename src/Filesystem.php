@@ -3,7 +3,6 @@
 namespace Bolt\Filesystem;
 
 use Bolt\Filesystem\Exception as Ex;
-use Bolt\Filesystem\Handler;
 use Bolt\Filesystem\Handler\FileInterface;
 use Bolt\Filesystem\Handler\HandlerInterface;
 use Carbon\Carbon;
@@ -56,6 +55,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
     public function has($path)
     {
         $path = $this->normalizePath($path);
+
         return $this->doHas($path);
     }
 
@@ -119,6 +119,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
 
         /** @var resource $resource */
         $resource = $object['stream'];
+
         return new Stream($resource);
     }
 
@@ -481,6 +482,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
     private function getIterator($path, $mode = null)
     {
         $it = new Iterator\RecursiveDirectoryIterator($this, $path);
+
         return new \RecursiveIteratorIterator($it, $mode);
     }
 
@@ -526,6 +528,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
 
             $handler = $this->getHandlerForType($path, $type);
         }
+
         return $this->get($path, $handler);
     }
 
