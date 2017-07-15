@@ -475,7 +475,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     protected function parsePath($path)
     {
         if (!is_string($path)) {
-            throw new InvalidArgumentException('First argument, $path, should be a string');
+            throw new InvalidArgumentException(sprintf('Path should be a string, %s provided.', is_object($path) ? get_class($path) : gettype($path)));
         }
 
         if (!preg_match('#^.+\:\/\/.*#', $path)) {
