@@ -48,25 +48,25 @@ class FileTest extends FilesystemTestCase
     public function testGetMimeType()
     {
         $file = new File($this->filesystem, 'fixtures/images/2-top-right.jpg');
-        $this->assertSame('image/jpeg', $file->getMimeType(false));
+        $this->assertSame('image/jpeg', $file->getMimeType());
     }
 
     public function testGetVisibility()
     {
         $file = new File($this->filesystem, 'fixtures/images/2-top-right.jpg');
-        $this->assertSame('public', $file->getVisibility(false));
+        $this->assertSame('public', $file->getVisibility());
     }
 
     public function testGetType()
     {
         $file = new File($this->filesystem, 'fixtures/images/2-top-right.jpg');
-        $this->assertSame('image', $file->getType(false));
+        $this->assertSame('image', $file->getType());
     }
 
     public function testGetSize()
     {
         $file = new File($this->filesystem, 'fixtures/images/2-top-right.jpg');
-        $this->assertSame(7023, $file->getSize(false));
+        $this->assertSame(7023, $file->getSize());
     }
 
     public function testGetSizeFormatted()

@@ -6,13 +6,14 @@ use Bolt\Filesystem\Exception\InvalidArgumentException;
 use Bolt\Filesystem\Handler\Image\SvgType;
 use Bolt\Filesystem\Handler\Image\Type;
 use Bolt\Filesystem\Handler\Image\TypeInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for Bolt\Filesystem\Image\Type
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class TypeTest extends \PHPUnit_Framework_TestCase
+class TypeTest extends TestCase
 {
     public function testGetById()
     {

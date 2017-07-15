@@ -4,8 +4,9 @@ namespace Bolt\Filesystem\Tests\Iterator;
 
 use ArrayIterator;
 use Bolt\Filesystem\Iterator\CallbackMapIterator;
+use PHPUnit\Framework\TestCase;
 
-class CallbackMapIteratorTest extends \PHPUnit_Framework_TestCase
+class CallbackMapIteratorTest extends TestCase
 {
     public function testArray()
     {

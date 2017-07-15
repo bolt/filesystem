@@ -3,7 +3,6 @@
 namespace Bolt\Filesystem\Tests;
 
 use Bolt\Filesystem\Adapter\Local;
-use Bolt\Filesystem\Exception\LogicException;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\Finder;
