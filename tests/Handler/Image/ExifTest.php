@@ -4,13 +4,14 @@ namespace Bolt\Filesystem\Tests\Handler\Image;
 
 use Bolt\Filesystem\Handler\Image\Exif;
 use PHPExif;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for Bolt\Filesystem\Image\Exif
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class ExifTest extends \PHPUnit_Framework_TestCase
+class ExifTest extends TestCase
 {
     public function testConstruct()
     {

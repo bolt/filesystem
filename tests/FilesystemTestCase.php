@@ -2,9 +2,10 @@
 
 namespace Bolt\Filesystem\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem as Symfony;
 
-abstract class FilesystemTestCase extends \PHPUnit_Framework_TestCase
+abstract class FilesystemTestCase extends TestCase
 {
     /** @var string project root */
     protected $rootDir;

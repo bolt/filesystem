@@ -4,10 +4,11 @@ namespace Bolt\Filesystem\Tests\Handler;
 
 use Bolt\Filesystem\Adapter\Local;
 use Bolt\Filesystem\Filesystem;
+use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\Handler\Directory;
-use Bolt\Filesystem\Tests\FilesystemTestCase;
+use Bolt\Filesystem\Handler\File;
 use Bolt\Filesystem\Handler\HandlerInterface;
-
+use Bolt\Filesystem\Tests\FilesystemTestCase;
 
 /**
  * Tests for Bolt\Filesystem\Directory
@@ -30,11 +31,11 @@ class DirectoryTest extends FilesystemTestCase
     public function testConstruct()
     {
         $dir = new Directory($this->filesystem);
-        $this->assertInstanceOf('Bolt\Filesystem\Handler\Directory', $dir);
+        $this->assertInstanceOf(Directory::class, $dir);
 
         $filesystem = new Filesystem(new Local(__DIR__));
         $dir = new Directory($filesystem);
-        $this->assertInstanceOf('Bolt\Filesystem\Handler\Directory', $dir);
+        $this->assertInstanceOf(Directory::class, $dir);
     }
 
     public function testSetFilesystem()
@@ -42,20 +43,20 @@ class DirectoryTest extends FilesystemTestCase
         $dir = new Directory($this->filesystem);
         $filesystem = new Filesystem(new Local(__DIR__));
         $dir->setFilesystem($filesystem);
-        $this->assertInstanceOf('Bolt\Filesystem\Filesystem', $dir->getFilesystem());
+        $this->assertInstanceOf(Filesystem::class, $dir->getFilesystem());
     }
 
     public function testGet()
     {
         $dir = new Directory($this->filesystem);
-        $this->assertInstanceOf('Bolt\Filesystem\Handler\File', $dir->get('fixtures/base.css'));
+        $this->assertInstanceOf(File::class, $dir->get('fixtures/base.css'));
     }
 
     public function testGetContents()
     {
         $dir = new Directory($this->filesystem);
         $content = $dir->getContents();
-        $this->assertInstanceOf('Bolt\Filesystem\Handler\HandlerInterface', $content[0]);
+        $this->assertInstanceOf(HandlerInterface::class, $content[0]);
     }
 
     public function testExists()

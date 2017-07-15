@@ -7,7 +7,6 @@ use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\Iterator\GlobIterator;
 use Symfony\Component\Filesystem as Symfony;
-use Webmozart\Glob\Glob;
 
 class GlobIteratorTest extends IteratorTestCase
 {
