@@ -13,6 +13,7 @@
         }
     ],
     "require": {
+        "bolt/common": "^1.0",
         "ext-json": "*",
         "guzzlehttp/psr7": "^1.2",
         "league/flysystem": "^1.0",
