@@ -2,13 +2,14 @@
 
 namespace Bolt\Filesystem;
 
+use Bolt\Common\Deprecated;
 use Bolt\Filesystem\Exception\DumpException;
 use Bolt\Filesystem\Exception\ParseException;
-use Seld\JsonLint\JsonParser;
-use Seld\JsonLint\ParsingException;
 
 /**
  * Json offers methods to parse and dump JSON with error handling.
+ *
+ * @deprecated since 2.4 and will be removed in 3.0. Use {@see \Bolt\Common\Json} instead.
  */
 final class Json
 {
@@ -22,19 +23,18 @@ final class Json
      * @throws ParseException If the JSON is not valid
      *
      * @return array
+     *
+     * @deprecated since 2.4 and will be removed in 3.0. Use {@see \Bolt\Common\Json::parse} instead.
      */
     public static function parse($json, $depth = 512, $options = 0)
     {
-        if ($json === null) {
-            return null;
-        }
+        Deprecated::method(2.4, \Bolt\Common\Json::class . '::parse');
 
-        $data = json_decode($json, true, $depth, $options);
-        if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
-            self::validateSyntax($json);
+        try {
+            return \Bolt\Common\Json::parse($json, $options, $depth);
+        } catch (\Bolt\Common\Exception\DumpException $e) {
+            throw new DumpException($e->getMessage(), $e->getCode(), $e);
         }
-
-        return $data;
     }
 
     /**
@@ -47,67 +47,17 @@ final class Json
      * @throws DumpException If dumping fails
      *
      * @return string
+     *
+     * @deprecated since 2.4 and will be removed in 3.0. Use {@see \Bolt\Common\Json::dump} instead.
      */
     public static function dump($data, $options = 448)
     {
-        $json = json_encode($data, $options);
-        if ($json === false) {
-            throw new DumpException('JSON dumping failed: ' . static::errorToString(json_last_error()));
-        }
+        Deprecated::method(2.4, \Bolt\Common\Json::class . '::dump');
 
-        // compact brackets to follow recent php versions
-        if (PHP_VERSION_ID < 50428 ||
-            (
-                PHP_VERSION_ID >= 50500 &&
-                PHP_VERSION_ID < 50512
-            ) ||
-            (
-                defined('JSON_C_VERSION') &&
-                version_compare(phpversion('json'), '1.3.6', '<')
-            )
-        ) {
-            $json = preg_replace('/\[\s+\]/', '[]', $json);
-            $json = preg_replace('/\{\s+\}/', '{}', $json);
-        }
-
-        return $json;
-    }
-
-    /**
-     * Validates the syntax of a JSON string.
-     *
-     * @param string $json
-     *
-     * @throws ParseException
-     */
-    private static function validateSyntax($json)
-    {
-        $parser = new JsonParser();
         try {
-            $parser->parse($json);
-        } catch (ParsingException $e) {
-            throw ParseException::castFromJson($e);
-        }
-        if (json_last_error() === JSON_ERROR_UTF8) {
-            throw new ParseException('JSON parsing failed: ' . static::errorToString(JSON_ERROR_UTF8));
-        }
-    }
-
-    /**
-     * Converts the error code to a readable message.
-     *
-     * @param int $code return code of json_last_error function
-     *
-     * @return string
-     */
-    private static function errorToString($code)
-    {
-        switch ($code) {
-            case JSON_ERROR_DEPTH:          return 'Maximum stack depth exceeded';
-            case JSON_ERROR_STATE_MISMATCH: return 'Underflow or the modes mismatch';
-            case JSON_ERROR_CTRL_CHAR:      return 'Unexpected control character found';
-            case JSON_ERROR_UTF8:           return 'Malformed UTF-8 characters, possibly incorrectly encoded';
-            default:                        return 'Unknown error';
+            return \Bolt\Common\Json::dump($data, $options);
+        } catch (\Bolt\Common\Exception\ParseException $e) {
+            throw new ParseException($e->getRawMessage(), $e->getParsedLine(), $e->getSnippet(), $e);
         }
     }
 }
