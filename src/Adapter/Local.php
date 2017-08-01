@@ -27,17 +27,11 @@ class Local extends LocalBase implements Capability\ImageInfo, Capability\Includ
      */
     protected function ensureDirectory($root)
     {
-        if (!is_dir($root)) {
-            $umask = umask(0);
-            $result = @mkdir($root, $this->permissionMap['dir']['public'], true);
-            umask($umask);
-
-            if (!$result) {
-                throw new DirectoryCreationException($root);
-            }
+        try {
+            parent::ensureDirectory($root);
+        } catch (\Exception $e) {
+            throw new DirectoryCreationException($root);
         }
-
-        return realpath($root);
     }
 
     /**
@@ -56,7 +50,9 @@ class Local extends LocalBase implements Capability\ImageInfo, Capability\Includ
             return false;
         }
 
-        return compact('path', 'size', 'contents', 'mimetype');
+        $type = 'file';
+
+        return compact('type', 'path', 'size', 'contents', 'mimetype');
     }
 
     /**
