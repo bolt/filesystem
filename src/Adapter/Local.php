@@ -2,6 +2,7 @@
 
 namespace Bolt\Filesystem\Adapter;
 
+use Bolt\Common\Thrower;
 use Bolt\Filesystem\Capability;
 use Bolt\Filesystem\Exception\DirectoryCreationException;
 use Bolt\Filesystem\Exception\IncludeFileException;
@@ -119,21 +120,11 @@ class Local extends LocalBase implements Capability\ImageInfo, Capability\Includ
     {
         $location = $this->applyPathPrefix($path);
 
-        set_error_handler(
-            function ($num, $message) use ($path) {
-                throw new IncludeFileException($message, $path);
-            }
-        );
-
-        if ($once) {
-            $result = includeFileOnce($location);
-        } else {
-            $result = includeFile($location);
+        try {
+            return Thrower::call(__NAMESPACE__ . '\includeFile' . ($once ? 'Once' : ''), $location);
+        } catch (\Exception $e) {
+            throw new IncludeFileException($e->getMessage(), $path, 0, $e);
         }
-
-        restore_error_handler();
-
-        return $result;
     }
 }
 
