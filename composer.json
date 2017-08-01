@@ -21,7 +21,6 @@
         "nesbot/carbon": "^1.20",
         "php": "^5.5.9 || ^7.0",
         "webmozart/glob": "^4.0",
-        "seld/jsonlint": "^1.4",
         "symfony/finder": "^2.7|^3.0",
         "symfony/yaml": "^2.7|^3.0"
     },

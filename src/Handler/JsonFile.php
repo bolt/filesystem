@@ -2,7 +2,9 @@
 
 namespace Bolt\Filesystem\Handler;
 
-use Bolt\Filesystem\Json;
+use Bolt\Common\Json;
+use Bolt\Filesystem\Exception\DumpException;
+use Bolt\Filesystem\Exception\ParseException;
 
 /**
  * File handling for JSON files.
@@ -24,7 +26,11 @@ class JsonFile extends File implements ParsableInterface
 
         $contents = $this->read();
 
-        return Json::parse($contents, $options['depth'], $options['flags']);
+        try {
+            return Json::parse($contents, $options['flags'], $options['depth']);
+        } catch (\Bolt\Common\Exception\ParseException $e) {
+            throw new ParseException($e->getRawMessage(), $e->getParsedLine(), $e->getSnippet(), $e);
+        }
     }
 
     /**
@@ -36,7 +42,12 @@ class JsonFile extends File implements ParsableInterface
             'flags' => 448,
         ];
 
-        $content = Json::dump($contents, $options['flags']);
+        try {
+            $content = Json::dump($contents, $options['flags']);
+        } catch (\Bolt\Common\Exception\DumpException $e) {
+            throw new DumpException($e->getMessage(), $e->getCode(), $e);
+        }
+
         $this->put($content);
     }
 }

@@ -2,6 +2,6 @@
 
 namespace Bolt\Filesystem\Exception;
 
-class DumpException extends RuntimeException
+class DumpException extends \Bolt\Common\Exception\DumpException implements ExceptionInterface
 {
 }
