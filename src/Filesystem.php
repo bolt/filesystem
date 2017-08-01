@@ -570,6 +570,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         if ($metadata === false || !isset($metadata['type'])) {
             throw new Ex\IOException("Failed to get file's type", $path);
         }
+        $metadata += ['path' => $path];
 
         return $this->getTypeFromMetadata($metadata);
     }
