@@ -2,7 +2,9 @@
 
 namespace Bolt\Filesystem\Adapter;
 
+use Bolt\Common\Thrower;
 use Bolt\Filesystem\Capability;
+use Bolt\Filesystem\Exception\IncludeFileException;
 use League\Flysystem\Memory\MemoryAdapter;
 
 /**
@@ -24,7 +26,11 @@ class Memory extends MemoryAdapter implements Capability\IncludeFile
         }
 
         $contents = $this->read($path)['contents'];
-        $contents = evalContents($contents);
+        try {
+            $contents = Thrower::call(__NAMESPACE__ . '\evalContents', $contents);
+        } catch (\Exception $e) {
+            throw new IncludeFileException($e->getMessage(), $path, 0, $e);
+        }
 
         $this->includedFiles[$path] = true;
 
