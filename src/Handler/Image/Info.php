@@ -225,13 +225,13 @@ class Info implements JsonSerializable, Serializable
         if (static::$exifReader === null) {
             static::$exifReader = Reader::factory(Reader::TYPE_NATIVE);
         }
-        try {
-            $exif = static::$exifReader->read($file);
 
+        $exif = static::$exifReader->read($file);
+        if ($exif instanceof \PHPExif\Exif) {
             return Exif::cast($exif);
-        } catch (\RuntimeException $e) {
-            return new Exif();
         }
+
+        return new Exif();
     }
 
     /**
