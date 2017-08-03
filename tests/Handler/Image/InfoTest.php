@@ -195,4 +195,15 @@ class InfoTest extends TestCase
         $this->assertTrue($info->isValid());
         $this->assertInstanceOf(Image\SvgType::class, $info->getType());
     }
+
+    public function testReadExif()
+    {
+        $info = Image\Info::createFromFile(__DIR__ . '/../../fixtures2/empty.jpg');
+
+        $m = new \ReflectionMethod(Image\Info::class,'readExif');
+        $m->setAccessible(true);
+
+        $exif = $m->invoke($info, __DIR__ . '/../../fixtures2/empty.jpg');
+        $this->assertInstanceOf(Image\Exif::class, $exif);
+    }
 }
