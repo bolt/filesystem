@@ -21,8 +21,8 @@
         "nesbot/carbon": "^1.20",
         "php": "^5.5.9 || ^7.0",
         "webmozart/glob": "^4.0",
-        "symfony/finder": "^2.7|^3.0",
-        "symfony/yaml": "^2.7|^3.0"
+        "symfony/finder": "^2.7 || ^3.0 || ^4.0",
+        "symfony/yaml": "^2.7 || ^3.0 || ^4.0"
     },
     "require-dev": {
         "contao/imagine-svg": "^0.1.2",
@@ -33,7 +33,7 @@
         "league/flysystem-sftp": "^1.0",
         "phpunit/phpunit": "^4.8",
         "psr/simple-cache": "^1.0",
-        "symfony/filesystem": "^2.7|^3.0"
+        "symfony/filesystem": "^2.7 || ^3.0 || ^4.0"
     },
     "suggest": {
         "contao/imagine-svg": "To parse SVG image info"
