@@ -22,7 +22,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
 {
     use MountPointAwareTrait;
     use Plugin\PluggableTrait;
-    use Flysystem\ConfigAwareTrait;
+    use ConfigAwareTrait;
 
     /** @var Flysystem\AdapterInterface */
     protected $adapter;
