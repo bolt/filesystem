@@ -456,9 +456,11 @@ class FinderTest extends IteratorTestCase
         $this->assertIterator($expected, $iterator);
     }
 
+    /**
+     * @expectedException \Bolt\Filesystem\Exception\FileNotFoundException
+     */
     public function testInWithNonExistentDirectory()
     {
-        $this->setExpectedException('Bolt\Filesystem\Exception\FileNotFoundException');
         $finder = new Finder($this->filesystem);
         $finder->in('foobar');
     }
@@ -471,9 +473,11 @@ class FinderTest extends IteratorTestCase
         $this->assertIterator(['fixtures/css/old/old_style.css', 'fixtures/js/script.js'], $finder);
     }
 
+    /**
+     * @expectedException \Bolt\Filesystem\Exception\InvalidArgumentException
+     */
     public function testInWithNonDirectoryGlob()
     {
-        $this->setExpectedException('Bolt\Filesystem\Exception\InvalidArgumentException');
         $finder = new Finder($this->filesystem);
         $finder->in('/fixtures/js/a*');
     }

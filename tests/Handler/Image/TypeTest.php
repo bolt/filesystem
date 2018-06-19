@@ -2,7 +2,6 @@
 
 namespace Bolt\Filesystem\Tests\Handler\Image;
 
-use Bolt\Filesystem\Exception\InvalidArgumentException;
 use Bolt\Filesystem\Handler\Image\SvgType;
 use Bolt\Filesystem\Handler\Image\Type;
 use Bolt\Filesystem\Handler\Image\TypeInterface;
@@ -15,6 +14,10 @@ use PHPUnit\Framework\TestCase;
  */
 class TypeTest extends TestCase
 {
+    /**
+     * @expectedException \Bolt\Filesystem\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Given type is not an IMAGETYPE_* constant
+     */
     public function testGetById()
     {
         $type = Type::getById(IMAGETYPE_JPEG);
@@ -23,7 +26,6 @@ class TypeTest extends TestCase
         $type2 = Type::getById(IMAGETYPE_JPEG);
         $this->assertSame($type, $type2);
 
-        $this->setExpectedException(InvalidArgumentException::class, 'Given type is not an IMAGETYPE_* constant');
         Type::getById(42);
     }
 

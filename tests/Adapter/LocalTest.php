@@ -3,7 +3,6 @@
 namespace Bolt\Filesystem\Tests\Adapter;
 
 use Bolt\Filesystem\Adapter\Local;
-use Bolt\Filesystem\Exception\DirectoryCreationException;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\Tests\FilesystemTestCase;
@@ -28,6 +27,10 @@ class LocalTest extends FilesystemTestCase
         $this->filesystem = new Filesystem(new Local($this->rootDir . '/tests'));
     }
 
+    /**
+     * @expectedException \Bolt\Filesystem\Exception\DirectoryCreationException
+     * @expectedExceptionMessage Failed to create directory
+     */
     public function testConstruct()
     {
         if (posix_getuid() === 0) {
@@ -37,7 +40,6 @@ class LocalTest extends FilesystemTestCase
         $local = new Local($this->tempDir);
         $this->assertInstanceOf(Local::class, $local);
 
-        $this->setExpectedException(DirectoryCreationException::class, 'Failed to create directory');
         new Local('/bad');
     }
 

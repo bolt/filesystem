@@ -86,6 +86,10 @@ class FileTest extends FilesystemTestCase
         $this->assertRegExp('/width: 100%/', (string) $stream);
     }
 
+    /**
+     * @expectedException \Bolt\Filesystem\Exception\FileExistsException
+     * @expectedExceptionMessage File already exists at path: temp/dropbear.log
+     */
     public function testWrite()
     {
         $text = 'Attack of the drop bear';
@@ -95,10 +99,13 @@ class FileTest extends FilesystemTestCase
         $newFile = new File($this->filesystem, 'temp/dropbear.log');
         $this->assertSame('Attack of the drop bear', $newFile->read());
 
-        $this->setExpectedException('Bolt\Filesystem\Exception\FileExistsException', 'File already exists at path: temp/dropbear.log');
         $newFile->write('anything');
     }
 
+    /**
+     * @expectedException \Bolt\Filesystem\Exception\FileExistsException
+     * @expectedExceptionMessage File already exists at path: temp/base.css
+     */
     public function testWriteStream()
     {
         $file = new File($this->filesystem, 'fixtures/base.css');
@@ -109,7 +116,6 @@ class FileTest extends FilesystemTestCase
 
         $this->assertSame($file->read(), $newFile->read());
 
-        $this->setExpectedException('Bolt\Filesystem\Exception\FileExistsException', 'File already exists at path: temp/base.css');
         $newFile->writeStream($stream);
     }
 
