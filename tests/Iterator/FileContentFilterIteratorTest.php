@@ -42,7 +42,11 @@ class FileContentFilterIteratorTest extends IteratorTestCase
     public function testUnreadableFile()
     {
         $inner = new \ArrayIterator();
-        $mock = $this->getMock('Bolt\Filesystem\Handler\File', ['read'], [$this->filesystem, 'fixtures/base.css']);
+        $mock = $this->getMockBuilder(File::class)
+            ->setConstructorArgs([$this->filesystem, 'fixtures/base.css'])
+            ->setMethods(['read'])
+            ->getMock()
+        ;
         $mock->expects($this->atLeastOnce())
             ->method('read')
             ->will($this->throwException(new IOException('Fake it, until you make it!')))

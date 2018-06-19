@@ -42,7 +42,11 @@ class SortableIteratorTest extends IteratorTestCase
      */
     public function testAccept($mode, array $expected)
     {
-        $filesystem = $this->getMock(Filesystem::class, ['getTimestamp'], [$this->filesystem->getAdapter()]);
+        $filesystem = $this->getMockBuilder(Filesystem::class)
+            ->setConstructorArgs([$this->filesystem->getAdapter()])
+            ->setMethods(['getTimestamp'])
+            ->getMock()
+        ;
         $filesystem->method('getTimestamp')
             ->willReturnMap([
                 ['fixtures/js/script.js',           1],
