@@ -136,6 +136,22 @@ class Local extends LocalBase implements Capability\ImageInfo, Capability\Includ
             throw new IncludeFileException($e->getMessage(), $path, 0, $e);
         }
     }
+    
+    /**
+     * @inheritdoc
+     */
+    public function getMetadata($path)
+    {
+        $location = $this->applyPathPrefix($path);
+
+        if (!file_exists($location)) {
+            throw new FileNotFoundException($location);
+        }
+
+        $info = new SplFileInfo($location);
+
+        return $this->normalizeFileInfo($info);
+    }
 }
 
 /**
