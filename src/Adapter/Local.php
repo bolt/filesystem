@@ -66,7 +66,7 @@ class Local extends LocalBase implements Capability\ImageInfo, Capability\Includ
         $location = $this->applyPathPrefix($path);
 
         if (!file_exists($location)) {
-            throw new FileNotFoundException($location);
+            throw new FileNotFoundException($path);
         }
 
         if (!is_writable($location)) {
@@ -76,7 +76,11 @@ class Local extends LocalBase implements Capability\ImageInfo, Capability\Includ
         try {
             return Thrower::call('unlink', $location);
         } catch (\ErrorException $ex) {
-            throw new FileNotFoundException($location, $ex);
+            if (strpos($ex->getMessage(), "No such file or directory") !== false) {
+                throw new FileNotFoundException($path, $ex);
+            } else {
+                throw new IOException('Could not remove file', $path);
+            }
         }
     }
 
@@ -145,7 +149,7 @@ class Local extends LocalBase implements Capability\ImageInfo, Capability\Includ
         $location = $this->applyPathPrefix($path);
 
         if (!file_exists($location)) {
-            throw new FileNotFoundException($location);
+            throw new FileNotFoundException($path);
         }
 
         $info = new SplFileInfo($location);
