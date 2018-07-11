@@ -152,7 +152,7 @@ class Local extends LocalBase implements Capability\ImageInfo, Capability\Includ
             throw new FileNotFoundException($path);
         }
 
-        $info = new SplFileInfo($location);
+        $info = new \SplFileInfo($location);
 
         return $this->normalizeFileInfo($info);
     }
