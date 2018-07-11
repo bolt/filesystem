@@ -3,6 +3,7 @@
 namespace Bolt\Filesystem\Tests\Adapter;
 
 use Bolt\Filesystem\Adapter\Local;
+use Bolt\Filesystem\Exception\FileNotFoundException;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\Tests\FilesystemTestCase;
@@ -58,6 +59,9 @@ class LocalTest extends FilesystemTestCase
         $this->assertFalse($update);
     }
 
+    /**
+     * @expectedException \Bolt\Filesystem\Exception\FileNotFoundException
+     */
     public function testDelete()
     {
         $this->filesystem->get('fixtures/base.css')->copy('temp/koala.css');
@@ -65,8 +69,7 @@ class LocalTest extends FilesystemTestCase
         $delete = $local->delete('koala.css');
         $this->assertTrue($delete);
 
-        $delete = $local->delete('koala.css.typo');
-        $this->assertFalse($delete);
+        $local->delete('koala.css.typo');
     }
 
     public function testCreateDir()

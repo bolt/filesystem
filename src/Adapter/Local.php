@@ -5,7 +5,9 @@ namespace Bolt\Filesystem\Adapter;
 use Bolt\Common\Thrower;
 use Bolt\Filesystem\Capability;
 use Bolt\Filesystem\Exception\DirectoryCreationException;
+use Bolt\Filesystem\Exception\FileNotFoundException;
 use Bolt\Filesystem\Exception\IncludeFileException;
+use Bolt\Filesystem\Exception\IOException;
 use Bolt\Filesystem\Handler\Image;
 use League\Flysystem\Adapter\Local as LocalBase;
 use League\Flysystem\Config;
@@ -63,11 +65,23 @@ class Local extends LocalBase implements Capability\ImageInfo, Capability\Includ
     {
         $location = $this->applyPathPrefix($path);
 
-        if (!is_writable($location)) {
-            return false;
+        if (!file_exists($location)) {
+            throw new FileNotFoundException($path);
         }
 
-        return unlink($location);
+        if (!is_writable($location)) {
+            throw new IOException('File is not writable', $location);
+        }
+
+        try {
+            return Thrower::call('unlink', $location);
+        } catch (\ErrorException $ex) {
+            if (strpos($ex->getMessage(), "No such file or directory") !== false) {
+                throw new FileNotFoundException($path, $ex);
+            } else {
+                throw new IOException('Could not remove file', $path);
+            }
+        }
     }
 
     /**
@@ -122,9 +136,25 @@ class Local extends LocalBase implements Capability\ImageInfo, Capability\Includ
 
         try {
             return Thrower::call(__NAMESPACE__ . '\includeFile' . ($once ? 'Once' : ''), $location);
-        } catch (\Exception $e) {
+        } catch (\ErrorException $e) {
             throw new IncludeFileException($e->getMessage(), $path, 0, $e);
         }
+    }
+    
+    /**
+     * @inheritdoc
+     */
+    public function getMetadata($path)
+    {
+        $location = $this->applyPathPrefix($path);
+
+        if (!file_exists($location)) {
+            throw new FileNotFoundException($path);
+        }
+
+        $info = new \SplFileInfo($location);
+
+        return $this->normalizeFileInfo($info);
     }
 }
 
