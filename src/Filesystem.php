@@ -853,7 +853,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
      *
      * @return HandlerInterface
      */
-    private function getHandlerForType($path, $type)
+    protected function getHandlerForType($path, $type)
     {
         switch ($type) {
             case 'dir':
@@ -869,7 +869,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         }
     }
 
-    private function getTypeFromMetadata($metadata)
+    protected function getTypeFromMetadata($metadata)
     {
         switch ($metadata['type']) {
             case 'dir':
@@ -884,7 +884,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         }
     }
 
-    private function getTypeFromPath($path)
+    protected function getTypeFromPath($path)
     {
         $ext = pathinfo($path, PATHINFO_EXTENSION);
         if (in_array($ext, Handler\Image\Type::getExtensions())) {
@@ -900,7 +900,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         return null;
     }
 
-    private function getDocumentExtensions()
+    protected function getDocumentExtensions()
     {
         return $this->getConfig()->get(
             'doc_extensions',
