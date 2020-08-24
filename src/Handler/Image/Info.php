@@ -121,7 +121,7 @@ class Info implements JsonSerializable, Serializable
             return static::createInvalid();
         }
 
-        if (static::isSvg($data, $filename)) {
+        if (static::isSvg($data, (string) $filename)) {
             return static::createSvgFromString($data);
         }
 
